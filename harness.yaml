@@ -1,0 +1,84 @@
+version: 0.2
+project_name: harness
+project_type: protocol-tooling
+languages:
+  - markdown
+  - yaml
+
+default_mode: delivery
+
+allowed_paths:
+  - harness/**
+  - AGENTS.md
+  - harness.yaml
+
+protected_paths:
+  - .idea/**
+
+default_commands:
+  delivery:
+    - "rg -n '^## ' harness/2026-03-31-project-harness-design-v0.1.md harness/tasks/*.md"
+    - "ruby -e 'require \"yaml\"; YAML.load_file(\"harness.yaml\"); puts \"harness.yaml ok\"'"
+  explore:
+    - "rg -n '^#|^##|^###' harness/2026-03-31-project-harness-design-v0.1.md harness/tasks/*.md"
+  poc:
+    - "ruby -e 'require \"yaml\"; YAML.load_file(\"harness.yaml\"); puts \"harness.yaml ok\"'"
+
+risk_rules:
+  high:
+    path_matches:
+      - AGENTS.md
+      - harness.yaml
+    requires_confirmation: true
+    minimum_evidence:
+      - diff_summary
+      - manual_confirmation
+  medium:
+    path_matches:
+      - harness/tasks/**
+      - harness/*.md
+    requires_confirmation: false
+    minimum_evidence:
+      - diff_summary
+  low:
+    path_matches:
+      - docs/**
+    requires_confirmation: false
+    minimum_evidence:
+      - diff_summary
+
+task_templates:
+  bug: harness/tasks/bug.md
+  feature: harness/tasks/feature.md
+  explore: harness/tasks/explore.md
+
+skill_policy:
+  bug:
+    clarify:
+      prefer:
+        - systematic-debugging
+    execute:
+      prefer:
+        - safe-editing
+    verify:
+      prefer:
+        - validation-required
+  feature:
+    execute:
+      prefer:
+        - safe-editing
+    verify:
+      prefer:
+        - validation-required
+  explore:
+    clarify:
+      prefer:
+        - brainstorming
+
+output_policy:
+  required_sections:
+    - task_conclusion
+    - actual_scope
+    - verification_evidence
+    - remaining_risks
+    - next_steps

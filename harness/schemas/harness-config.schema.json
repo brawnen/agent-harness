@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness.local/schemas/harness-config.schema.json",
+  "title": "Harness Project Config",
+  "description": "项目级 harness.yaml 的结构定义。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_type",
+    "default_mode",
+    "allowed_paths",
+    "protected_paths",
+    "default_commands",
+    "risk_rules"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "project_type": {
+      "type": "string",
+      "enum": [
+        "frontend",
+        "backend",
+        "fullstack",
+        "library",
+        "infra",
+        "monorepo",
+        "other"
+      ]
+    },
+    "default_mode": {
+      "type": "string",
+      "enum": [
+        "delivery",
+        "explore",
+        "poc"
+      ]
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "protected_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "default_commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type_check": {
+          "type": "string"
+        },
+        "lint": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string"
+        },
+        "build": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pattern",
+          "level"
+        ],
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "minLength": 1
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "task_templates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "description": "模板文件所在目录，默认 harness/tasks/"
+        },
+        "inject_phase": {
+          "type": "string",
+          "enum": [
+            "intake",
+            "contract_closure"
+          ],
+          "description": "模板注入时机：intake 阶段作为推断辅助，或 contract_closure 阶段作为字段默认值"
+        }
+      }
+    },
+    "skill_policy": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "skill_name",
+          "action"
+        ],
+        "properties": {
+          "skill_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "force",
+              "prefer",
+              "deny"
+            ]
+          }
+        }
+      }
+    },
+    "output_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "report_format": {
+          "type": "string",
+          "enum": [
+            "json",
+            "yaml",
+            "markdown"
+          ]
+        },
+        "report_directory": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

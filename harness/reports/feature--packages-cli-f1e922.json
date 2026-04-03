@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.2",
+  "task_id": "feature--packages-cli-f1e922",
+  "intent": "feature",
+  "conclusion": "已在 packages/cli 实现 state MVP，并抽出共享 state store，支持 init/get/update/active。",
+  "actual_scope": [
+    "packages/cli",
+    "init/get/update/active",
+    "report/gate/audit"
+  ],
+  "scope_deviation": null,
+  "evidence_summary": [
+    {
+      "type": "command_result",
+      "result": "node /Users/lijianfeng/code/pp/agent-harness/packages/cli/bin/agent-harness.js state init --draft-file task-draft.json --task-id state-mvp-demo"
+    }
+  ],
+  "remaining_risks": [
+    "Node CLI 仍未迁移 report/gate/audit",
+    "当前 state MVP 只支持本地 JSON 状态存储"
+  ],
+  "overrides_used": [
+
+  ],
+  "next_steps": [
+    "实现 packages/cli 的 report MVP",
+    "让后续 gate/report 复用共享 state store"
+  ],
+  "completed_at": "2026-04-03T11:09:21+08:00"
+}

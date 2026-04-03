@@ -1,0 +1,13 @@
+{
+  "name": "@agent-harness/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Protocol assets for agent-harness: rules, schemas, templates, and adapter examples.",
+  "files": [
+    "rules",
+    "schemas",
+    "templates",
+    "adapters",
+    "README.md"
+  ]
+}

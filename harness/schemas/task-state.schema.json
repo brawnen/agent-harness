@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness.local/schemas/task-state.schema.json",
+  "title": "Harness Task State",
+  "description": "持久化到 harness/state/tasks/<task_id>.json 的任务状态对象。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "current_phase",
+    "current_state",
+    "task_draft",
+    "evidence",
+    "open_questions",
+    "override_history",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9\\-]+$",
+      "minLength": 1
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": [
+        "intake",
+        "clarify",
+        "plan",
+        "execute",
+        "verify",
+        "report",
+        "close"
+      ]
+    },
+    "current_state": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "needs_clarification",
+        "planned",
+        "in_progress",
+        "blocked",
+        "verifying",
+        "done",
+        "failed",
+        "suspended"
+      ]
+    },
+    "task_draft": {
+      "$ref": "./task-draft.schema.json"
+    },
+    "confirmed_contract": {
+      "description": "当合同闭合后填入，未闭合时为 null。",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "intent",
+            "goal",
+            "scope",
+            "acceptance"
+          ],
+          "properties": {
+            "intent": {
+              "type": "string"
+            },
+            "goal": {
+              "type": "string"
+            },
+            "scope": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "acceptance": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "title": {
+              "type": "string"
+            },
+            "constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "verification": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "context_refs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "string"
+            },
+            "mode": {
+              "type": "string"
+            },
+            "risk_level": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ]
+            },
+            "evidence_required": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "content",
+          "timestamp"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "command_result",
+              "test_result",
+              "diff_summary",
+              "artifact",
+              "reasoning_note",
+              "manual_confirmation",
+              "audit_log"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "exit_code": {
+            "type": "integer",
+            "description": "仅 command_result / test_result 时使用"
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "仅 test_result 时使用"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "override_history": {
+      "type": "array",
+      "items": {
+        "$ref": "./audit-log.schema.json#/$defs/audit_entry"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$comment": "Claude Code hooks template for the future Node.js CLI. This file is an adapter example, not a final contract.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|Bash|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent-harness gate before-tool --tool \"$TOOL_NAME\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent-harness state update --tool \"$TOOL_NAME\" --exit-code \"$EXIT_CODE\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness.local/schemas/state-index.schema.json",
+  "title": "Harness State Index",
+  "description": "harness/state/index.json 的结构定义，记录当前活跃和挂起的任务索引。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "active_task_id",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "active_task_id": {
+      "type": ["string", "null"],
+      "description": "当前活跃任务 ID，无活跃任务时为 null"
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "intent",
+          "goal_summary",
+          "current_state",
+          "updated_at"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "goal_summary": {
+            "type": "string",
+            "description": "任务目标的简短摘要，用于快速识别"
+          },
+          "current_state": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "needs_clarification",
+              "planned",
+              "in_progress",
+              "blocked",
+              "verifying",
+              "done",
+              "failed",
+              "suspended"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

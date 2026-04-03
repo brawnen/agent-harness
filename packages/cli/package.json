@@ -1,0 +1,16 @@
+{
+  "name": "@agent-harness/cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node.js CLI skeleton for agent-harness.",
+  "bin": {
+    "agent-harness": "./bin/agent-harness.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node ./bin/agent-harness.js --help"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

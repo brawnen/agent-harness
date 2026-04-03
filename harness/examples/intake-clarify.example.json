@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.1",
+  "command": "intake",
+  "status": "needs_clarification",
+  "task_draft": {
+    "schema_version": "0.1",
+    "source_input": "修下登录页提交后卡死的问题，先别动后端接口。",
+    "intent": "bug",
+    "goal": "修复登录页提交后卡死的问题",
+    "scope": [
+      "src/web/login/*"
+    ],
+    "acceptance": [
+      "登录提交后不再卡死"
+    ],
+    "constraints": [
+      "不改后端接口"
+    ],
+    "mode": "delivery",
+    "assumptions": [
+      "问题范围先限定在前端登录页"
+    ],
+    "open_questions": [
+      "完成标准是否要求必须成功跳转，还是错误提示正确也可接受"
+    ],
+    "risk_signals": [
+      "验收标准可能影响修复路径"
+    ],
+    "context_refs": [],
+    "next_action": "clarify",
+    "derived": {
+      "risk_level": "medium",
+      "state": "needs_clarification"
+    }
+  },
+  "interaction": {
+    "summary": "这是一个前端登录页 bug 修复任务，目标是解决提交后卡死，当前边界先限定在登录页前端，不改后端接口。",
+    "assumptions": [
+      "可以先在前端范围内定位问题"
+    ],
+    "blocking_gap": "完成标准还不够明确",
+    "question": "完成标准是必须跳转成功，还是错误提示正确也可接受？",
+    "next_action": "clarify"
+  },
+  "metadata": {
+    "project": "harness",
+    "config_path": "harness.yaml",
+    "generated_at": "2026-04-01T00:00:00+08:00"
+  }
+}

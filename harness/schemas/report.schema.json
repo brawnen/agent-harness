@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harness.local/schemas/report.schema.json",
+  "title": "Harness Task Report",
+  "description": "任务完成后的结构化报告对象。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "intent",
+    "conclusion",
+    "actual_scope",
+    "evidence_summary",
+    "remaining_risks",
+    "next_steps",
+    "completed_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.2"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "string"
+    },
+    "conclusion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "任务结论：根因判断（bug）、交付内容（feature）、调研结论（explore）"
+    },
+    "actual_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "实际改动或分析范围，与合同 scope 对比"
+    },
+    "scope_deviation": {
+      "type": ["string", "null"],
+      "description": "与原始 scope 的偏差说明，无偏差时为 null"
+    },
+    "evidence_summary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "result"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "command_result",
+              "test_result",
+              "diff_summary",
+              "artifact",
+              "reasoning_note",
+              "manual_confirmation"
+            ]
+          },
+          "result": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "remaining_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "剩余风险，无则为空数组"
+    },
+    "overrides_used": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "本次任务中使用的 force_override 摘要"
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "下一步建议"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

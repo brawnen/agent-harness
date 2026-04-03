@@ -1,0 +1,16 @@
+{
+  "name": "agent-harness",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Monorepo for the agent-harness protocol and CLI.",
+  "workspaces": [
+    "packages/protocol",
+    "packages/cli"
+  ],
+  "scripts": {
+    "cli:help": "node packages/cli/bin/agent-harness.js --help"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

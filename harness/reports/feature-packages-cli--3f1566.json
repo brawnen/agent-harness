@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.2",
+  "task_id": "feature-packages-cli--3f1566",
+  "intent": "feature",
+  "conclusion": "已在 packages/cli 实现 audit MVP，并让 gate/report 复用本地审计日志链路。",
+  "actual_scope": [
+    "packages/cli",
+    "gate/report"
+  ],
+  "scope_deviation": null,
+  "evidence_summary": [
+    {
+      "type": "command_result",
+      "result": "node /Users/lijianfeng/code/pp/agent-harness/packages/cli/bin/agent-harness.js audit read --task-id audit-mvp-task"
+    }
+  ],
+  "remaining_risks": [
+    "Node CLI 仍未实现更深的宿主级自动注入",
+    "audit 当前只覆盖本地 JSONL，不含远端或聚合查询能力"
+  ],
+  "overrides_used": [
+
+  ],
+  "next_steps": [
+    "清理 README/文档中的 MVP 状态描述并准备下一阶段",
+    "评估是否还需要单独实现 update 或先收敛发布面"
+  ],
+  "completed_at": "2026-04-03T11:31:40+08:00"
+}

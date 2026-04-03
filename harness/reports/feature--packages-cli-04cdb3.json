@@ -1,0 +1,32 @@
+{
+  "schema_version": "0.2",
+  "task_id": "feature--packages-cli-04cdb3",
+  "intent": "feature",
+  "conclusion": "已在 packages/cli 实现 gate MVP，可在 before-tool 阶段基于任务状态、protected_paths、scope 和高风险确认做确定性门禁判断。",
+  "actual_scope": [
+    "packages/cli"
+  ],
+  "scope_deviation": null,
+  "evidence_summary": [
+    {
+      "type": "command_result",
+      "result": "node /Users/lijianfeng/code/pp/agent-harness/packages/cli/bin/agent-harness.js gate before-tool --tool Write --task-id protected-task --file-path .idea/workspace.xml"
+    },
+    {
+      "type": "command_result",
+      "result": "node packages/cli/bin/agent-harness.js gate before-tool --tool Write --file-path packages/cli/src/index.js"
+    }
+  ],
+  "remaining_risks": [
+    "Node CLI 仍未迁移 audit 层",
+    "gate 当前不写 overrides_used/audit 事件，只返回结构化结果"
+  ],
+  "overrides_used": [
+
+  ],
+  "next_steps": [
+    "实现 packages/cli 的 audit MVP",
+    "让 gate/report 通过 Node audit 层串起来"
+  ],
+  "completed_at": "2026-04-03T11:26:57+08:00"
+}
