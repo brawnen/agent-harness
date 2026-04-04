@@ -46,8 +46,8 @@
           "description": "触发此事件的控制信号名，例如 block_plan、block_execution"
         },
         "description": {
-          "type": "string",
-          "description": "事件描述：被跳过的门禁、违规内容、补救措施"
+          "description": "事件描述：被跳过的门禁、违规内容、补救措施",
+          "type": "string"
         },
         "user_input": {
           "type": ["string", "null"],
@@ -78,7 +78,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.2"
+      "const": "0.3"
     },
     "entries": {
       "type": "array",

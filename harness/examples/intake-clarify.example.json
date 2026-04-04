@@ -1,9 +1,9 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.3",
   "command": "intake",
   "status": "needs_clarification",
   "task_draft": {
-    "schema_version": "0.1",
+    "schema_version": "0.3",
     "source_input": "修下登录页提交后卡死的问题，先别动后端接口。",
     "intent": "bug",
     "goal": "修复登录页提交后卡死的问题",

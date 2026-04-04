@@ -50,7 +50,7 @@
 - 说明被阻断的原因
 - 给出需要用户确认或补充的内容
 
-> **注意**：当前宿主无原生 hook 机制，执行门禁完全依赖本规则（L2）。请严格遵守，不要在规则未满足时执行写入操作。
+> **注意**：当前项目已为 Codex 接入 repo-local hooks（`.codex/hooks.json`），可自动执行最小 intake 与 active task 恢复；Claude Code / Gemini CLI 仍主要依赖本规则（L2）。即便在 Codex 下，执行门禁也不能只依赖 hook，规则未满足时仍不得写入。
 
 ## Harness 完成门禁（L2）
 
@@ -111,13 +111,39 @@ Override 不能跳过：
 - 无法确定时，主动询问用户："你说的是刚才 XXX 的任务，还是一个新问题？"
 - 切换任务前必须先保存当前任务状态
 
-## Harness State 持久化（手动模式）
+## Harness State 持久化
 
-本项目配有 harness CLI（`ruby bin/harness`），但当前宿主无自动 hook，需在关键节点手动调用：
+本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`）。
 
-- 任务开始时：`ruby bin/harness task intake --persist "任务描述"`
-- 任务完成前：`ruby bin/harness task verify`
-- 任务完成后：`ruby bin/harness task report --conclusion "结论"`
+### Codex 自动模式
+
+当前仓库已提供 repo-local `.codex/hooks.json`，并通过项目级 `.codex/config.toml` 默认开启 `codex_hooks`。在 trusted project 场景下：
+
+- `SessionStart` 会尝试恢复 active task 摘要
+- `UserPromptSubmit` 会自动判断是续写当前任务、创建新任务，还是要求先澄清
+- 明显新任务会自动挂起旧任务
+
+建议在当前仓库中使用：
+
+- `codex`
+- `codex exec ...`
+
+若项目未被 Codex 视为 trusted project，仍可显式使用：
+
+- `codex --enable codex_hooks`
+- `codex exec --enable codex_hooks ...`
+
+### 手动 fallback
+
+当 hook 未启用、自动 intake 失败，或需要人工修正任务归属时，手动调用现有命令：
+
+- 直接从自然语言创建任务：`node packages/cli/bin/agent-harness.js task intake "任务描述"`
+- 挂起当前 active task：`node packages/cli/bin/agent-harness.js task suspend-active --reason "原因"`
+- 任务初始化：准备 task draft JSON 后执行 `node packages/cli/bin/agent-harness.js state init --draft-file <path>`
+- 查看当前活跃任务：`node packages/cli/bin/agent-harness.js state active`
+- 查看指定任务状态：`node packages/cli/bin/agent-harness.js state get --task-id <id>`
+- 任务完成前：`node packages/cli/bin/agent-harness.js verify --task-id <id>`
+- 任务完成后：`node packages/cli/bin/agent-harness.js report --task-id <id> --conclusion "结论"`
 
 状态文件位置：
 - 任务状态：`harness/state/tasks/<task_id>.json`

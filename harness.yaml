@@ -1,4 +1,4 @@
-version: 0.2
+version: "0.3"
 project_name: harness
 project_type: protocol-tooling
 languages:
@@ -75,10 +75,48 @@ skill_policy:
       prefer:
         - brainstorming
 
+delivery_policy:
+  commit:
+    mode: explicit_only
+    via: skill
+    require:
+      - verify_passed
+      - report_generated
+  push:
+    mode: explicit_only
+    via: manual
+    require:
+      - commit_exists
+
 output_policy:
-  required_sections:
-    - task_conclusion
-    - actual_scope
-    - verification_evidence
-    - remaining_risks
-    - next_steps
+  report:
+    required: true
+    format: json
+    directory: harness/reports
+    required_sections:
+      - task_conclusion
+      - actual_scope
+      - verification_evidence
+      - remaining_risks
+      - next_steps
+  changelog:
+    mode: conditional
+    file: CHANGELOG.md
+    required_for:
+      - bug
+      - feature
+      - refactor
+  design_note:
+    mode: conditional
+    directory: docs/
+    required_if:
+      - cross_module_change
+      - public_contract_changed
+      - risk_level: high
+  adr:
+    mode: conditional
+    directory: docs/
+    required_if:
+      - architectural_decision
+      - policy_change
+      - protocol_change

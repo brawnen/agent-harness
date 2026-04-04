@@ -1,5 +1,12 @@
 # Harness 设计说明书 v0.2
 
+> Status: Historical / Superseded
+>
+> 这份文档代表 `agent-harness` 向 `agent-native` 方向收敛的第二轮设计。
+> 其中大量原则仍然有效，但实现状态与对象边界已被后续 Node CLI、Codex hooks 和开源分层方案修正。
+> 当前主设计基线已切换到：
+> [Agent Harness 设计文档 v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
+
 ## 1. 设计结论
 
 Harness 不是一个给用户单独操作的外部工具，而是一个面向 agent 的任务收敛内核。

@@ -19,7 +19,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.2"
+      "const": "0.3"
     },
     "task_id": {
       "type": "string"
@@ -87,6 +87,39 @@
       },
       "description": "本次任务中使用的 force_override 摘要"
     },
+    "output_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "changelog": {
+          "$ref": "#/$defs/output_artifact"
+        },
+        "design_note": {
+          "$ref": "#/$defs/output_artifact"
+        },
+        "adr": {
+          "$ref": "#/$defs/output_artifact"
+        }
+      }
+    },
+    "delivery_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "signals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/delivery_signal"
+          }
+        },
+        "commit": {
+          "$ref": "#/$defs/delivery_readiness"
+        },
+        "push": {
+          "$ref": "#/$defs/delivery_readiness"
+        }
+      }
+    },
     "next_steps": {
       "type": "array",
       "items": {
@@ -97,6 +130,116 @@
     "completed_at": {
       "type": "string",
       "format": "date-time"
+    }
+  },
+  "$defs": {
+    "output_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "required",
+        "satisfied",
+        "reason"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "satisfied": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "delivery_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configured",
+        "mode",
+        "via",
+        "ready",
+        "required_signals",
+        "satisfied_signals",
+        "missing_signals",
+        "reason"
+      ],
+      "properties": {
+        "configured": {
+          "type": "boolean"
+        },
+        "mode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "via": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ready": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "required_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "satisfied_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "delivery_signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "satisfied",
+        "reason"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "satisfied": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
     }
   }
 }

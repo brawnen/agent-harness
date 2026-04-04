@@ -15,7 +15,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.2"
+      "const": "0.3"
     },
     "command": {
       "type": "string",

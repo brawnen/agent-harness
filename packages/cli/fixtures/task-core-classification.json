@@ -1,0 +1,150 @@
+{
+  "schema_version": "0.3",
+  "cases": [
+    {
+      "name": "continue-keyword",
+      "active_task": {
+        "input": "继续完善 packages/cli 的 intake 判定",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "输出结构化 decision"
+        ]
+      },
+      "prompt": "继续把 packages/cli 这块做完",
+      "expected": {
+        "action": "continue",
+        "decision_type": "continue",
+        "reason_code": "matched_continue_keyword",
+        "block": false
+      }
+    },
+    {
+      "name": "new-task-keyword",
+      "active_task": {
+        "input": "继续完善 packages/cli 的 intake 判定",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "输出结构化 decision"
+        ]
+      },
+      "prompt": "另外一个问题：分析 report MVP",
+      "expected": {
+        "action": "created",
+        "decision_type": "new",
+        "reason_code": "matched_new_task_keyword",
+        "block": false
+      }
+    },
+    {
+      "name": "active-goal-fragment",
+      "active_task": {
+        "input": "验证当前仓库里的 Codex hooks 接入是否生效",
+        "scope": [
+          ".codex/"
+        ],
+        "acceptance": [
+          "给出结论"
+        ]
+      },
+      "prompt": "我想验证当前仓库里的 Codex hooks",
+      "expected": {
+        "action": "continue",
+        "decision_type": "continue",
+        "reason_code": "matched_active_goal_fragment",
+        "block": false
+      }
+    },
+    {
+      "name": "active-scope-match",
+      "active_task": {
+        "input": "补强 Codex hooks 文档",
+        "scope": [
+          ".codex/",
+          "README.md"
+        ],
+        "acceptance": [
+          "文档补齐"
+        ]
+      },
+      "prompt": "把 README.md 里的 Codex hooks 接入说明整理一下",
+      "expected": {
+        "action": "continue",
+        "decision_type": "continue",
+        "reason_code": "matched_active_scope",
+        "block": false
+      }
+    },
+    {
+      "name": "ambiguous-high-risk",
+      "active_task": {
+        "input": "继续完善 packages/cli 的 intake 判定",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "输出结构化 decision"
+        ]
+      },
+      "prompt": "删除一下",
+      "expected": {
+        "action": "clarify",
+        "decision_type": "clarify",
+        "reason_code": "ambiguous_high_risk_prompt",
+        "block": true
+      }
+    },
+    {
+      "name": "fallback-new-task",
+      "active_task": {
+        "input": "继续完善 packages/cli 的 intake 判定",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "输出结构化 decision"
+        ]
+      },
+      "prompt": "请评估 report MVP 的发布边界",
+      "expected": {
+        "action": "created",
+        "decision_type": "new",
+        "reason_code": "fallback_new_task",
+        "block": false
+      }
+    },
+    {
+      "name": "inactive-active-task-state",
+      "active_task": {
+        "input": "继续完善 packages/cli 的 intake 判定",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "输出结构化 decision"
+        ],
+        "state": "suspended"
+      },
+      "prompt": "继续做 packages/cli 这块",
+      "expected": {
+        "action": "created",
+        "decision_type": "new",
+        "reason_code": "inactive_active_task_state",
+        "block": false
+      }
+    },
+    {
+      "name": "no-active-task",
+      "prompt": "实现 task intake 的自动创建行为",
+      "expected": {
+        "action": "created",
+        "decision_type": "new",
+        "reason_code": "no_active_task",
+        "block": false
+      }
+    }
+  ]
+}

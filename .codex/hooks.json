@@ -1,0 +1,40 @@
+{
+  "$comment": "Repo-local Codex hooks for minimal automatic intake and session restore.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/user_prompt_submit_intake.js\"",
+            "statusMessage": "Running agent-harness automatic intake"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_restore.js\"",
+            "statusMessage": "Restoring agent-harness active task"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_record_evidence.js\"",
+            "statusMessage": "Recording agent-harness evidence"
+          }
+        ]
+      }
+    ]
+  }
+}

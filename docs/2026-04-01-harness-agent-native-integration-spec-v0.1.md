@@ -443,11 +443,11 @@ Host Adapter 很重要，但它不是主架构。
 
 这份文档是现有设计的上位集成规范：
 
-- [主设计稿](/Users/lijianfeng/code/pp/harness/harness/2026-03-31-project-harness-design-v0.1.md)
+- [主设计稿](./2026-03-31-project-harness-design-v0.1.md)
   定义对象、状态和项目配置
-- [intake / interaction 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-intake-interaction-spec-v0.1.md)
+- [intake / interaction 规范](./2026-04-01-harness-intake-interaction-spec-v0.1.md)
   定义自然语言如何收敛成 task draft
-- [intake CLI 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-intake-cli-spec-v0.1.md)
+- [intake CLI 规范](./2026-04-01-harness-intake-cli-spec-v0.1.md)
   只是 reference adapter 规范，不是主架构
 
 换句话说：

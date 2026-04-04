@@ -15,6 +15,6 @@
 
 当前状态：
 
-- `schemas/` 与 `templates/` 先从历史 `harness/` 目录复制
+- `schemas/` 与 `templates/` 已进入 `packages/protocol`
 - `rules/` 已拆出 `base.md` 与 `full.md`
 - `adapters/` 先提供宿主接入说明和示例配置

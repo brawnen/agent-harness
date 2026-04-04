@@ -413,27 +413,64 @@ function queueWriteAction({ actions, content, force, pathName }) {
 
 function renderHarnessConfig(project, mode) {
   const config = {
-    schema_version: "0.2",
+    version: "0.3",
+    project_name: path.basename(process.cwd()),
     project_type: project.projectType,
     default_mode: mode,
     allowed_paths: ["**"],
     protected_paths: [".git/**", ".idea/**"],
     default_commands: project.defaultCommands,
-    risk_rules: [
-      { pattern: "harness.yaml", level: "high", reason: "项目协议配置" },
-      { pattern: "CLAUDE.md", level: "medium", reason: "Claude Code 宿主规则" },
-      { pattern: "AGENTS.md", level: "medium", reason: "Codex 宿主规则" },
-      { pattern: "GEMINI.md", level: "medium", reason: "Gemini CLI 宿主规则" },
-      { pattern: "harness/**", level: "medium", reason: "agent-harness 运行与模板目录" }
-    ],
+    risk_rules: {
+      high: {
+        path_matches: ["harness.yaml"],
+        requires_confirmation: true,
+        minimum_evidence: ["diff_summary", "manual_confirmation"],
+        reason: "项目协议配置"
+      },
+      medium: {
+        path_matches: ["CLAUDE.md", "AGENTS.md", "GEMINI.md", "harness/**"],
+        requires_confirmation: false,
+        minimum_evidence: ["diff_summary"],
+        reason: "宿主规则与 agent-harness 运行目录"
+      },
+      low: {
+        path_matches: ["docs/**"],
+        requires_confirmation: false,
+        minimum_evidence: ["diff_summary"],
+        reason: "普通文档修改"
+      }
+    },
     languages: project.languages,
     task_templates: {
-      directory: "harness/tasks",
-      inject_phase: "intake"
+      bug: "harness/tasks/bug.md",
+      feature: "harness/tasks/feature.md",
+      explore: "harness/tasks/explore.md"
+    },
+    delivery_policy: {
+      commit: {
+        mode: "explicit_only",
+        via: "skill",
+        require: ["verify_passed", "report_generated"]
+      },
+      push: {
+        mode: "explicit_only",
+        via: "manual",
+        require: ["commit_exists"]
+      }
     },
     output_policy: {
-      report_format: "markdown",
-      report_directory: "harness/reports"
+      report: {
+        required: true,
+        format: "json",
+        directory: "harness/reports",
+        required_sections: [
+          "task_conclusion",
+          "actual_scope",
+          "verification_evidence",
+          "remaining_risks",
+          "next_steps"
+        ]
+      }
     }
   };
 

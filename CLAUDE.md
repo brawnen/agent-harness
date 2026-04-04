@@ -113,15 +113,13 @@ Override 不能跳过：
 
 ## Harness State 持久化（CLI 集成）
 
-本项目已配置 harness CLI（`ruby bin/harness`），支持自动状态管理：
+本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`），宿主仍无自动 hook；需要持久化时手动调用现有命令：
 
-- intake 完成后使用 `--persist` 自动初始化 state
-- PostToolUse hook 自动调用 `harness state update` 记录工具执行
-- 手动操作：
-  - `ruby bin/harness state get --task-id <id>` 查看状态
-  - `ruby bin/harness state restore --task-id <id>` 恢复挂起任务
-  - `ruby bin/harness task verify` 检查完成条件
-  - `ruby bin/harness task report --conclusion "..."` 生成报告
+- 任务初始化：准备 task draft JSON 后执行 `node packages/cli/bin/agent-harness.js state init --draft-file <path>`
+- 查看当前活跃任务：`node packages/cli/bin/agent-harness.js state active`
+- 查看指定任务状态：`node packages/cli/bin/agent-harness.js state get --task-id <id>`
+- 任务完成前：`node packages/cli/bin/agent-harness.js verify --task-id <id>`
+- 任务完成后：`node packages/cli/bin/agent-harness.js report --task-id <id> --conclusion "结论"`
 
 状态文件位置：
 - 任务状态：`harness/state/tasks/<task_id>.json`

@@ -14,10 +14,10 @@
 
 本文基于以下文档进行可行性分析：
 
-- [agent-native integration 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-agent-native-integration-spec-v0.1.md)
-- [主设计稿](/Users/lijianfeng/code/pp/harness/harness/2026-03-31-project-harness-design-v0.1.md)
-- [intake / interaction 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-intake-interaction-spec-v0.1.md)
-- [intake CLI 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-intake-cli-spec-v0.1.md)
+- [agent-native integration 规范](./2026-04-01-harness-agent-native-integration-spec-v0.1.md)
+- [主设计稿](./2026-03-31-project-harness-design-v0.1.md)
+- [intake / interaction 规范](./2026-04-01-harness-intake-interaction-spec-v0.1.md)
+- [intake CLI 规范](./2026-04-01-harness-intake-cli-spec-v0.1.md)
 - [task-draft.schema.json](/Users/lijianfeng/code/pp/harness/harness/schemas/task-draft.schema.json)
 - [intake-result.schema.json](/Users/lijianfeng/code/pp/harness/harness/schemas/intake-result.schema.json)
 
@@ -368,7 +368,7 @@ harness 作为独立进程，负责 state 管理和确定性信号。
 
 这份分析是对 agent-native integration 规范的补充评估：
 
-- [主设计稿](/Users/lijianfeng/code/pp/harness/harness/2026-03-31-project-harness-design-v0.1.md) 回答"harness 有哪些对象"
-- [intake 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-intake-interaction-spec-v0.1.md) 回答"harness 如何收敛任务"
-- [agent-native 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-agent-native-integration-spec-v0.1.md) 回答"harness 如何原生内置到 agent"
+- [主设计稿](./2026-03-31-project-harness-design-v0.1.md) 回答"harness 有哪些对象"
+- [intake 规范](./2026-04-01-harness-intake-interaction-spec-v0.1.md) 回答"harness 如何收敛任务"
+- [agent-native 规范](./2026-04-01-harness-agent-native-integration-spec-v0.1.md) 回答"harness 如何原生内置到 agent"
 - 本文回答"agent-native 规范能不能落地，差什么"

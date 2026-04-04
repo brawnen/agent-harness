@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { loadProjectConfig } from "../lib/project-config.js";
 import { resolveTaskId, requireTaskState } from "../lib/state-store.js";
 
 const VERIFICATION_MATRIX = {
@@ -39,19 +40,23 @@ export function runVerify(argv) {
   }
 
   let taskState;
+  const cwd = process.cwd();
   try {
     const taskId = parsed.options.taskFile
       ? null
-      : resolveTaskId(process.cwd(), parsed.options.taskId);
+      : resolveTaskId(cwd, parsed.options.taskId);
     taskState = parsed.options.taskFile
-      ? readTaskFile(process.cwd(), parsed.options.taskFile)
-      : requireTaskState(process.cwd(), taskId);
+      ? readTaskFile(cwd, parsed.options.taskFile)
+      : requireTaskState(cwd, taskId);
   } catch (error) {
     console.error(error.message);
     return 1;
   }
 
-  const result = verifyTaskState(taskState);
+  const projectConfig = loadProjectConfig(cwd);
+  const result = verifyTaskState(taskState, {
+    reportPolicy: normalizeReportPolicy(projectConfig?.output_policy?.report)
+  });
   console.log(`${JSON.stringify(result, null, 2)}\n`);
   return result.allowed ? 0 : 1;
 }
@@ -95,12 +100,13 @@ function parseVerifyArgs(argv) {
   return { ok: true, options };
 }
 
-export function verifyTaskState(taskState) {
+export function verifyTaskState(taskState, options = {}) {
   const intent = taskState?.confirmed_contract?.intent ?? taskState?.task_draft?.intent ?? "unknown";
   const acceptance = taskState?.confirmed_contract?.acceptance ?? taskState?.task_draft?.acceptance ?? [];
   const evidence = Array.isArray(taskState?.evidence) ? taskState.evidence : [];
   const openQuestions = Array.isArray(taskState?.open_questions) ? taskState.open_questions : [];
   const missingEvidence = [];
+  const reportPolicy = normalizeReportPolicy(options.reportPolicy);
 
   if (openQuestions.length > 0) {
     missingEvidence.push(`存在未关闭的阻断问题: ${openQuestions[0]}`);
@@ -135,6 +141,7 @@ export function verifyTaskState(taskState) {
     allowed: missingEvidence.length === 0,
     intent,
     missing_evidence: missingEvidence,
+    report_policy: reportPolicy,
     signal: missingEvidence.length === 0 ? "allow_completion" : "block_completion",
     task_id: taskState.task_id ?? null
   };
@@ -151,4 +158,16 @@ function readTaskFile(cwd, taskFile) {
   } catch {
     throw new Error(`JSON 解析失败: ${filePath}`);
   }
+}
+
+function normalizeReportPolicy(value) {
+  const policy = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return {
+    required: policy.required !== false,
+    format: typeof policy.format === "string" ? policy.format : "json",
+    directory: typeof policy.directory === "string" ? policy.directory : "harness/reports",
+    required_sections: Array.isArray(policy.required_sections)
+      ? policy.required_sections.map((item) => String(item))
+      : []
+  };
 }

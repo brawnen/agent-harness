@@ -148,8 +148,8 @@ CLI 标准输出必须符合：
 
 这份 CLI 规范依赖：
 
-- [主设计稿](/Users/lijianfeng/code/pp/harness/harness/2026-03-31-project-harness-design-v0.1.md)
-- [intake / interaction 规范](/Users/lijianfeng/code/pp/harness/harness/2026-04-01-harness-intake-interaction-spec-v0.1.md)
+- [主设计稿](./2026-03-31-project-harness-design-v0.1.md)
+- [intake / interaction 规范](./2026-04-01-harness-intake-interaction-spec-v0.1.md)
 
 关系分工：
 

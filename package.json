@@ -8,7 +8,10 @@
     "packages/cli"
   ],
   "scripts": {
-    "cli:help": "node packages/cli/bin/agent-harness.js --help"
+    "cli:help": "node packages/cli/bin/agent-harness.js --help",
+    "codex:hooks:check": "node --check .codex/hooks/user_prompt_submit_intake.js && node --check .codex/hooks/session_start_restore.js && node --check .codex/hooks/post_tool_use_record_evidence.js",
+    "codex:hooks:status": "node packages/cli/bin/agent-harness.js status",
+    "codex:e2e": "node packages/cli/scripts/verify-codex-e2e.js"
   },
   "engines": {
     "node": ">=18"

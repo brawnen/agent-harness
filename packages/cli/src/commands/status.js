@@ -1,6 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { evaluateTaskDeliveryReadiness, summarizeDeliveryReadiness } from "../lib/delivery-policy.js";
+import { inspectOutputPolicyWorkspace, normalizeOutputPolicy } from "../lib/output-policy.js";
+import { loadProjectConfig } from "../lib/project-config.js";
+import { getActiveTask } from "../lib/state-store.js";
+
 const REQUIRED_TEMPLATE_FILES = [
   "harness/tasks/bug.md",
   "harness/tasks/explore.md",
@@ -24,6 +29,14 @@ export function runStatus(argv) {
   pushCheck(checks, harnessConfig);
   exitCode = maxExitCode(exitCode, harnessConfig.severity);
 
+  const deliveryPolicyCheck = inspectDeliveryPolicy(cwd);
+  pushCheck(checks, deliveryPolicyCheck);
+  exitCode = maxExitCode(exitCode, deliveryPolicyCheck.severity);
+
+  const outputPolicyCheck = inspectOutputPolicy(cwd);
+  pushCheck(checks, outputPolicyCheck);
+  exitCode = maxExitCode(exitCode, outputPolicyCheck.severity);
+
   const hosts = detectedHosts.length > 0 ? detectedHosts : ["claude-code", "codex", "gemini-cli"];
   for (const host of hosts) {
     const hostCheck = inspectHostRules(cwd, host, detectedHosts.length === 0);
@@ -36,6 +49,10 @@ export function runStatus(argv) {
   exitCode = maxExitCode(exitCode, templatesCheck.severity);
 
   const runtimeMode = detectRuntimeMode(cwd);
+  const codexHooksCheck = inspectCodexHooks(cwd, hosts.includes("codex"));
+  pushCheck(checks, codexHooksCheck);
+  exitCode = maxExitCode(exitCode, codexHooksCheck.severity);
+
   const claudeHooksCheck = inspectClaudeHooks(cwd, runtimeMode, hosts.includes("claude-code"));
   pushCheck(checks, claudeHooksCheck);
   exitCode = maxExitCode(exitCode, claudeHooksCheck.severity);
@@ -61,16 +78,73 @@ export function runStatus(argv) {
 }
 
 function inspectHarnessConfig(cwd) {
-  const configPath = path.join(cwd, "harness.yaml");
-  if (!fs.existsSync(configPath)) {
+  const config = loadProjectConfig(cwd);
+  if (!config) {
     return fail("harness.yaml", "缺失，项目尚未初始化");
   }
 
-  const content = fs.readFileSync(configPath, "utf8");
-  const schemaVersion = content.match(/^schema_version:\s+"?([^"\n]+)"?/m)?.[1] ?? "unknown";
-  const mode = content.match(/^default_mode:\s+"?([^"\n]+)"?/m)?.[1] ?? "unknown";
+  const schemaVersion = config.version ?? "unknown";
+  const mode = config.default_mode ?? "unknown";
 
-  return ok("harness.yaml", `schema_version=${schemaVersion}, default_mode=${mode}`);
+  return ok("harness.yaml", `version=${schemaVersion}, default_mode=${mode}`);
+}
+
+function inspectDeliveryPolicy(cwd) {
+  const config = loadProjectConfig(cwd);
+  if (!config) {
+    return skip("delivery_policy", "harness.yaml 缺失，无法检查");
+  }
+
+  const deliveryPolicy = config.delivery_policy ?? {};
+  const commit = deliveryPolicy.commit ?? null;
+  const push = deliveryPolicy.push ?? null;
+
+  if (!commit && !push) {
+    return warn("delivery_policy", "未配置 commit/push 策略");
+  }
+
+  const activeTask = getActiveTask(cwd);
+  if (!activeTask) {
+    const summary = [];
+    if (commit) {
+      summary.push(`commit=${commit.mode ?? "unknown"} via=${commit.via ?? "unknown"}`);
+    }
+    if (push) {
+      summary.push(`push=${push.mode ?? "unknown"} via=${push.via ?? "unknown"}`);
+    }
+
+    return ok("delivery_policy", `${summary.join(", ")}；当前无 active task，暂不计算 readiness`);
+  }
+
+  const outputPolicy = normalizeOutputPolicy(config.output_policy ?? {});
+  const readiness = evaluateTaskDeliveryReadiness(cwd, activeTask, {
+    deliveryPolicy,
+    reportPolicy: outputPolicy.report
+  });
+
+  return ok("delivery_policy", `active_task=${activeTask.task_id}；${summarizeDeliveryReadiness(readiness)}`);
+}
+
+function inspectOutputPolicy(cwd) {
+  const config = loadProjectConfig(cwd);
+  if (!config) {
+    return skip("output_policy", "harness.yaml 缺失，无法检查");
+  }
+
+  const outputPolicy = config.output_policy ?? {};
+  const normalizedPolicy = normalizeOutputPolicy(outputPolicy);
+  const report = normalizedPolicy.report ?? null;
+
+  if (!report) {
+    return warn("output_policy", "未配置 output_policy.report");
+  }
+
+  const inspection = inspectOutputPolicyWorkspace(cwd, normalizedPolicy);
+  if (inspection.warnings.length > 0) {
+    return warn("output_policy", `${inspection.summary}；${inspection.warnings.join("；")}`);
+  }
+
+  return ok("output_policy", inspection.summary);
 }
 
 function inspectHostRules(cwd, host, fallback) {
@@ -121,6 +195,52 @@ function detectRuntimeMode(cwd) {
   return runtimeMarkers.some((file) => fs.existsSync(path.join(cwd, file))) ? "full" : "protocol-only";
 }
 
+function inspectCodexHooks(cwd, hasCodexHost) {
+  if (!hasCodexHost) {
+    return skip(".codex/hooks", "当前项目未检测到 Codex 宿主");
+  }
+
+  const configPath = path.join(cwd, ".codex", "config.toml");
+  const hooksPath = path.join(cwd, ".codex", "hooks.json");
+
+  if (!fs.existsSync(configPath) && !fs.existsSync(hooksPath)) {
+    return warn(".codex/hooks", "未发现 .codex/config.toml 和 hooks.json");
+  }
+
+  if (!fs.existsSync(configPath)) {
+    return warn(".codex/hooks", "缺少 .codex/config.toml，trusted project 下不会默认启用 codex_hooks");
+  }
+
+  if (!fs.existsSync(hooksPath)) {
+    return warn(".codex/hooks", "缺少 .codex/hooks.json");
+  }
+
+  const configContent = fs.readFileSync(configPath, "utf8");
+  const hooksEnabled = /\bcodex_hooks\s*=\s*true\b/.test(configContent);
+  if (!hooksEnabled) {
+    return warn(".codex/hooks", ".codex/config.toml 存在，但未开启 features.codex_hooks = true");
+  }
+
+  let parsedHooks;
+  try {
+    parsedHooks = JSON.parse(fs.readFileSync(hooksPath, "utf8"));
+  } catch {
+    return warn(".codex/hooks", "hooks.json 存在，但 JSON 解析失败");
+  }
+
+  const checks = [
+    hasCodexHookCommand(parsedHooks, "UserPromptSubmit", "user_prompt_submit_intake.js"),
+    hasCodexHookCommand(parsedHooks, "SessionStart", "session_start_restore.js"),
+    hasCodexHookCommand(parsedHooks, "PostToolUse", "post_tool_use_record_evidence.js")
+  ];
+
+  if (checks.some((item) => item === false)) {
+    return warn(".codex/hooks", "hooks.json 存在，但 agent-harness Codex hooks 不完整");
+  }
+
+  return ok(".codex/hooks", "Codex hooks 已配置；trusted project 默认启用，untrusted 请显式使用 codex --enable codex_hooks");
+}
+
 function inspectClaudeHooks(cwd, runtimeMode, hasClaudeHost) {
   const settingsPath = path.join(cwd, ".claude", "settings.json");
 
@@ -157,6 +277,17 @@ function inspectClaudeHooks(cwd, runtimeMode, hasClaudeHost) {
   }
 
   return warn(".claude/settings.json", "hooks 存在，但 agent-harness 命令不完整");
+}
+
+function hasCodexHookCommand(parsedHooks, eventName, commandFragment) {
+  const eventEntries = parsedHooks?.hooks?.[eventName];
+  if (!Array.isArray(eventEntries)) {
+    return false;
+  }
+
+  return eventEntries
+    .flatMap((entry) => entry?.hooks ?? [])
+    .some((hook) => typeof hook?.command === "string" && hook.command.includes(commandFragment));
 }
 
 function inspectRuntimeDirectories(cwd, runtimeMode) {

@@ -8,7 +8,9 @@
   },
   "type": "module",
   "scripts": {
-    "start": "node ./bin/agent-harness.js --help"
+    "start": "node ./bin/agent-harness.js --help",
+    "verify:task-core": "node ./scripts/verify-task-core-classification.js",
+    "verify:codex-e2e": "node ./scripts/verify-codex-e2e.js"
   },
   "engines": {
     "node": ">=18"

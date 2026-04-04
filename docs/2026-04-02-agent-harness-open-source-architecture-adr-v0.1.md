@@ -150,14 +150,10 @@ repo/
 │   ├── adr/
 │   ├── architecture/
 │   └── migration/
-├── legacy/
-│   └── ruby-cli/
 ├── README.md
 ├── LICENSE
 └── CONTRIBUTING.md
 ```
-
-迁移期允许保留 Ruby 版本作为参考实现，但它应放入 `legacy/`，不再占据主线入口。
 
 ## 6. 包职责
 
@@ -200,7 +196,7 @@ repo/
 
 本节记录的是第一阶段迁移时的 `init` MVP 约束；当前对外发布范围以第 11 节“v0.1 范围冻结”为准。
 
-第一阶段只交付 Node 版 `init`，不要求完整迁移现有 Ruby CLI。
+第一阶段只交付 Node 版 `init`，不要求一次性补齐全部长期能力。
 
 ### 7.1 必做能力
 
@@ -218,7 +214,7 @@ repo/
 2. 不迁移完整 `gate` 逻辑
 3. 不迁移完整 `audit / report` 能力
 4. 不实现复杂的跨宿主智能合并
-5. 不承诺与当前 Ruby CLI 的状态文件完全兼容
+5. 不承诺第一阶段就提供复杂升级兼容
 
 ## 8. init 命令契约
 
@@ -327,9 +323,9 @@ npx @<scope>/cli init --dry-run
 
 ### 12.2 当前约束
 
-- 现有 Ruby CLI 仍然是参考实现
-- 当前文档和状态文件仍位于历史 `harness/` 目录下
-- 迁移期间允许新旧结构并存，但必须以 Node + npm 路径为主叙事
+- 当前文档和状态文件仍位于 `harness/` 目录下
+- `harness.yaml` 仍是过渡配置名
+- 宿主 hooks 自动集成仍未完全收口
 
 ## 13. 直接后果
 
@@ -343,7 +339,6 @@ npx @<scope>/cli init --dry-run
 代价：
 
 - 需要承担 Node 重写成本
-- Ruby 与 Node 会短期并存
 - 需要明确一份迁移文档管理过渡期差异
 
 ## 14. 本文用途
@@ -354,4 +349,4 @@ npx @<scope>/cli init --dry-run
 - `packages/protocol` 抽取
 - `packages/cli` 初始化
 - README 开源叙事重写
-- Ruby CLI 迁移计划
+- 发布边界与后续宿主接入收口

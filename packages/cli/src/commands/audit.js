@@ -42,7 +42,7 @@ function runAuditRead(argv) {
   try {
     const entries = readAuditEntries(process.cwd(), parsed.options.taskId);
     printJson({
-      schema_version: "0.2",
+      schema_version: "0.3",
       entries
     });
     return 0;

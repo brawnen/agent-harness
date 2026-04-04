@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://harness.local/schemas/harness-config.schema.json",
   "title": "Harness Project Config",
-  "description": "项目级 harness.yaml 的结构定义。",
+  "description": "项目级 harness.yaml 的结构定义。当前 schema 以 v0.3 为唯一支持版本。",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version",
+    "version",
     "project_type",
     "default_mode",
     "allowed_paths",
@@ -14,10 +14,370 @@
     "default_commands",
     "risk_rules"
   ],
-  "properties": {
-    "schema_version": {
+  "$defs": {
+    "string_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "mode": {
       "type": "string",
-      "const": "0.2"
+      "enum": [
+        "delivery",
+        "explore",
+        "poc"
+      ]
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "bug",
+        "feature",
+        "explore",
+        "refactor",
+        "prototype"
+      ]
+    },
+    "default_commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "delivery": {
+          "$ref": "#/$defs/string_list"
+        },
+        "explore": {
+          "$ref": "#/$defs/string_list"
+        },
+        "poc": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "risk_rule_level": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path_matches": {
+          "$ref": "#/$defs/string_list"
+        },
+        "requires_confirmation": {
+          "type": "boolean"
+        },
+        "minimum_evidence": {
+          "$ref": "#/$defs/string_list"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "high": {
+          "$ref": "#/$defs/risk_rule_level"
+        },
+        "medium": {
+          "$ref": "#/$defs/risk_rule_level"
+        },
+        "low": {
+          "$ref": "#/$defs/risk_rule_level"
+        }
+      }
+    },
+    "task_templates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explore": {
+          "type": "string",
+          "minLength": 1
+        },
+        "refactor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prototype": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "skill_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prefer": {
+          "$ref": "#/$defs/string_list"
+        },
+        "force": {
+          "$ref": "#/$defs/string_list"
+        },
+        "deny": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "skill_policy_phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "clarify": {
+          "$ref": "#/$defs/skill_selection"
+        },
+        "plan": {
+          "$ref": "#/$defs/skill_selection"
+        },
+        "execute": {
+          "$ref": "#/$defs/skill_selection"
+        },
+        "verify": {
+          "$ref": "#/$defs/skill_selection"
+        },
+        "report": {
+          "$ref": "#/$defs/skill_selection"
+        }
+      }
+    },
+    "skill_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bug": {
+          "$ref": "#/$defs/skill_policy_phase"
+        },
+        "feature": {
+          "$ref": "#/$defs/skill_policy_phase"
+        },
+        "explore": {
+          "$ref": "#/$defs/skill_policy_phase"
+        },
+        "refactor": {
+          "$ref": "#/$defs/skill_policy_phase"
+        },
+        "prototype": {
+          "$ref": "#/$defs/skill_policy_phase"
+        }
+      }
+    },
+    "report_output_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "json",
+            "yaml",
+            "markdown"
+          ]
+        },
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_sections": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "changelog_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "disabled",
+            "optional",
+            "required",
+            "conditional"
+          ]
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_for": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/intent"
+          }
+        },
+        "skip_if": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "artifact_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "disabled",
+            "optional",
+            "required",
+            "conditional"
+          ]
+        },
+        "directory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_if": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "output_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "report": {
+          "$ref": "#/$defs/report_output_policy"
+        },
+        "changelog": {
+          "$ref": "#/$defs/changelog_policy"
+        },
+        "design_note": {
+          "$ref": "#/$defs/artifact_policy"
+        },
+        "adr": {
+          "$ref": "#/$defs/artifact_policy"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "report"
+          ]
+        }
+      ]
+    },
+    "commit_message_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "skill",
+            "manual",
+            "cli"
+          ]
+        },
+        "convention": {
+          "type": "string",
+          "enum": [
+            "optional",
+            "conventional_commits",
+            "project_defined"
+          ]
+        }
+      }
+    },
+    "commit_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "disabled",
+            "explicit_only",
+            "allow_if_ready"
+          ]
+        },
+        "via": {
+          "type": "string",
+          "enum": [
+            "skill",
+            "manual",
+            "cli"
+          ]
+        },
+        "require": {
+          "$ref": "#/$defs/string_list"
+        },
+        "message": {
+          "$ref": "#/$defs/commit_message_policy"
+        }
+      }
+    },
+    "push_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "disabled",
+            "explicit_only"
+          ]
+        },
+        "via": {
+          "type": "string",
+          "enum": [
+            "skill",
+            "manual"
+          ]
+        },
+        "require": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "delivery_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commit": {
+          "$ref": "#/$defs/commit_policy"
+        },
+        "push": {
+          "$ref": "#/$defs/push_policy"
+        }
+      }
+    }
+  },
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "0.3"
+    },
+    "project_name": {
+      "type": "string",
+      "minLength": 1
     },
     "project_type": {
       "type": "string",
@@ -28,144 +388,40 @@
         "library",
         "infra",
         "monorepo",
+        "protocol-tooling",
         "other"
       ]
     },
+    "languages": {
+      "$ref": "#/$defs/string_list"
+    },
     "default_mode": {
-      "type": "string",
-      "enum": [
-        "delivery",
-        "explore",
-        "poc"
-      ]
+      "$ref": "#/$defs/mode"
     },
     "allowed_paths": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
+      "$ref": "#/$defs/string_list",
       "minItems": 1
     },
     "protected_paths": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "$ref": "#/$defs/string_list"
     },
     "default_commands": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "type_check": {
-          "type": "string"
-        },
-        "lint": {
-          "type": "string"
-        },
-        "test": {
-          "type": "string"
-        },
-        "build": {
-          "type": "string"
-        }
-      }
+      "$ref": "#/$defs/default_commands"
     },
     "risk_rules": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "pattern",
-          "level"
-        ],
-        "properties": {
-          "pattern": {
-            "type": "string",
-            "minLength": 1
-          },
-          "level": {
-            "type": "string",
-            "enum": [
-              "low",
-              "medium",
-              "high"
-            ]
-          },
-          "reason": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "languages": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "$ref": "#/$defs/risk_rules"
     },
     "task_templates": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "directory": {
-          "type": "string",
-          "description": "模板文件所在目录，默认 harness/tasks/"
-        },
-        "inject_phase": {
-          "type": "string",
-          "enum": [
-            "intake",
-            "contract_closure"
-          ],
-          "description": "模板注入时机：intake 阶段作为推断辅助，或 contract_closure 阶段作为字段默认值"
-        }
-      }
+      "$ref": "#/$defs/task_templates"
     },
     "skill_policy": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "skill_name",
-          "action"
-        ],
-        "properties": {
-          "skill_name": {
-            "type": "string",
-            "minLength": 1
-          },
-          "action": {
-            "type": "string",
-            "enum": [
-              "force",
-              "prefer",
-              "deny"
-            ]
-          }
-        }
-      }
+      "$ref": "#/$defs/skill_policy"
+    },
+    "delivery_policy": {
+      "$ref": "#/$defs/delivery_policy"
     },
     "output_policy": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "report_format": {
-          "type": "string",
-          "enum": [
-            "json",
-            "yaml",
-            "markdown"
-          ]
-        },
-        "report_directory": {
-          "type": "string"
-        }
-      }
+      "$ref": "#/$defs/output_policy"
     }
   }
 }

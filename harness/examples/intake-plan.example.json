@@ -1,9 +1,9 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.3",
   "command": "intake",
   "status": "planned",
   "task_draft": {
-    "schema_version": "0.1",
+    "schema_version": "0.3",
     "source_input": "帮我看看这个仓库现在的发布链路是不是太耦合了，先别改代码。",
     "intent": "explore",
     "goal": "评估当前发布链路的耦合程度",
