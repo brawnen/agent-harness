@@ -35,7 +35,11 @@ export function validateTaskOutputArtifacts(cwd, taskState, outputPolicy, artifa
     .map(([, artifact]) => artifact.name);
 
   if (missingRequired.length > 0) {
-    throw new Error(`缺少必需输出工件: ${missingRequired.join(", ")}`);
+    const error = new Error(`缺少必需输出工件: ${missingRequired.join(", ")}`);
+    error.code = "MISSING_OUTPUT_ARTIFACTS";
+    error.missing_required = missingRequired;
+    error.artifacts = artifacts;
+    throw error;
   }
 
   return artifacts;

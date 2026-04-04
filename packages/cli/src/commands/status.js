@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { evaluateTaskDeliveryReadiness, summarizeDeliveryReadiness } from "../lib/delivery-policy.js";
-import { inspectOutputPolicyWorkspace, normalizeOutputPolicy } from "../lib/output-policy.js";
+import { evaluateTaskArtifactPolicy, inspectOutputPolicyWorkspace, normalizeOutputPolicy } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
 import { getActiveTask } from "../lib/state-store.js";
 
@@ -36,6 +36,10 @@ export function runStatus(argv) {
   const outputPolicyCheck = inspectOutputPolicy(cwd);
   pushCheck(checks, outputPolicyCheck);
   exitCode = maxExitCode(exitCode, outputPolicyCheck.severity);
+
+  const artifactHintsCheck = inspectActiveTaskArtifactHints(cwd);
+  pushCheck(checks, artifactHintsCheck);
+  exitCode = maxExitCode(exitCode, artifactHintsCheck.severity);
 
   const hosts = detectedHosts.length > 0 ? detectedHosts : ["claude-code", "codex", "gemini-cli"];
   for (const host of hosts) {
@@ -145,6 +149,42 @@ function inspectOutputPolicy(cwd) {
   }
 
   return ok("output_policy", inspection.summary);
+}
+
+function inspectActiveTaskArtifactHints(cwd) {
+  const config = loadProjectConfig(cwd);
+  if (!config) {
+    return skip("artifact_hints", "harness.yaml 缺失，无法检查");
+  }
+
+  const activeTask = getActiveTask(cwd);
+  if (!activeTask) {
+    return skip("artifact_hints", "当前无 active task");
+  }
+
+  const outputPolicy = normalizeOutputPolicy(config.output_policy ?? {});
+  const requirements = evaluateTaskArtifactPolicy(activeTask, outputPolicy);
+  const requiredArtifacts = Object.values(requirements).filter((artifact) => artifact.required);
+
+  if (requiredArtifacts.length === 0) {
+    return ok("artifact_hints", `active_task=${activeTask.task_id}；当前无需额外输出工件`);
+  }
+
+  const names = requiredArtifacts.map((artifact) => artifact.name);
+  const hints = [];
+  if (names.includes("changelog")) {
+    hints.push(`更新 ${outputPolicy.changelog.file}`);
+  }
+  if (names.includes("design_note")) {
+    const suggestedPath = path.posix.join(outputPolicy.design_note.directory, `${activeTask.task_id}-design-note.md`);
+    hints.push(`docs scaffold --type design-note --task-id ${activeTask.task_id} --path ${suggestedPath}`);
+  }
+  if (names.includes("adr")) {
+    const suggestedPath = path.posix.join(outputPolicy.adr.directory, `${activeTask.task_id}-adr.md`);
+    hints.push(`docs scaffold --type adr --task-id ${activeTask.task_id} --path ${suggestedPath}`);
+  }
+
+  return warn("artifact_hints", `active_task=${activeTask.task_id}；建议补齐 ${names.join(", ")}；${hints.join("；")}`);
 }
 
 function inspectHostRules(cwd, host, fallback) {

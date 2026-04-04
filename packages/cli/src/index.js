@@ -1,5 +1,6 @@
 import { runAudit } from "./commands/audit.js";
 import { runDelivery } from "./commands/delivery.js";
+import { runDocs } from "./commands/docs.js";
 import { runGate } from "./commands/gate.js";
 import { runInit } from "./commands/init.js";
 import { runReport } from "./commands/report.js";
@@ -17,7 +18,8 @@ Usage:
   agent-harness init --dry-run
   agent-harness init --protocol-only
   agent-harness audit <append|read>
-  agent-harness delivery <ready|request>
+  agent-harness delivery <ready|request|commit>
+  agent-harness docs scaffold --type <design-note|adr>
   agent-harness gate before-tool --tool <tool>
   agent-harness status
   agent-harness task intake "<任务描述>"
@@ -37,7 +39,7 @@ Options:
   --force
 
 Status:
-  task/init/status/state/verify/report/gate/audit/delivery MVP are implemented.
+  task/init/status/state/verify/report/gate/audit/delivery/docs MVP are implemented.
 `;
 
 export function run(argv) {
@@ -63,6 +65,10 @@ export function run(argv) {
 
   if (command === "delivery") {
     return runDelivery(argv.slice(1));
+  }
+
+  if (command === "docs") {
+    return runDocs(argv.slice(1));
   }
 
   if (command === "gate") {

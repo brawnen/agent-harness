@@ -13,6 +13,7 @@
 - `report` MVP
 - `gate` MVP
 - `audit` MVP
+- `docs` MVP
 - `--dry-run`
 - `--protocol-only`
 - 宿主规则注入
@@ -128,11 +129,41 @@ npm --prefix packages/cli run verify:task-core
 
 - 在 `status` 中展示 active task 的 `commit-ready / push-ready`
 - 在 `report` 中输出 `delivery_readiness`
-- 提供 `delivery ready` 和 `delivery request --action commit|push` 入口
+- 提供 `delivery ready`、`delivery request --action commit|push` 和 `delivery commit` 入口
 - `commit` 保留为 skill 化的显式动作
 - `push` 保留为人工动作，不作为 skill 默认能力
 - 当前只做 readiness 计算，不会自动执行 `git commit` 或 `git push`
 - `commit_exists` 目前仍是保守信号，默认不会自动判定为 true
+
+`delivery commit` 当前行为：
+
+- 先复用 `delivery request --action commit`
+- 读取任务报告中的 `actual_scope` 和 `output_artifacts`
+- 目录型 scope 只会展开为当前有变更的文件
+- 支持 `--dry-run` 先预览提交计划
+- 对明显过宽的目录 scope 默认阻断，需显式使用 `--force-wide-scope`
+- 自动执行本地 `git add` / `git commit`
+- 永远不会执行 `git push`
+
+`docs scaffold` 当前行为：
+
+- 提供 `docs scaffold --type design-note|adr`
+- 默认读取 active task，也支持 `--task-id`
+- 根据任务上下文生成最小 Markdown 骨架
+- 默认写入 `output_policy.design_note.directory` 或 `output_policy.adr.directory`
+- 支持 `--path` 自定义目标路径
+- 已存在文件默认阻止覆盖，需显式使用 `--force`
+
+当 `report` 因缺少 `design_note` 或 `adr` 被阻断时：
+
+- 会直接输出对应的 `docs scaffold` 建议命令
+- 并给出重新执行 `report` 时应补的 `--design-note` / `--adr` 参数
+
+`status` 当前也会对 active task 主动给出 output artifact 提示：
+
+- 若当前任务要求 `changelog / design_note / adr`
+- 会直接提示建议补齐的工件
+- 对 `design_note / adr` 会给出可直接执行的 `docs scaffold` 命令
 
 Codex 自动 evidence：
 

@@ -9,3 +9,5 @@ All notable changes to `agent-harness` will be documented in this file.
 - Established the `v0.3` design and config baseline for the Node.js CLI, Codex hooks, and output policy.
 - Added Codex hook workflow stabilization and a minimal Codex E2E regression script.
 - Enabled repository-level `output_policy` requirements for `report`, `changelog`, `design_note`, and `adr`.
+- Added `docs scaffold` for `design-note` and `adr`, and surfaced active-task artifact hints in `status`.
+- Tightened `delivery commit` with wide-scope blocking, `--dry-run`, and explicit `--force-wide-scope`.

@@ -31,11 +31,20 @@ export function runReport(argv) {
       return 1;
     }
 
-    const outputArtifacts = validateTaskOutputArtifacts(cwd, taskState, outputPolicy, {
-      adr: parsed.options.adr,
-      changelog: parsed.options.changelogFile,
-      design_note: parsed.options.designNote
-    });
+    let outputArtifacts;
+    try {
+      outputArtifacts = validateTaskOutputArtifacts(cwd, taskState, outputPolicy, {
+        adr: parsed.options.adr,
+        changelog: parsed.options.changelogFile,
+        design_note: parsed.options.designNote
+      });
+    } catch (error) {
+      if (error?.code === "MISSING_OUTPUT_ARTIFACTS") {
+        console.error(buildMissingArtifactsMessage(taskId, error, outputPolicy));
+        return 1;
+      }
+      throw error;
+    }
     const deliveryReadiness = evaluateTaskDeliveryReadiness(cwd, taskState, {
       deliveryPolicy: normalizeDeliveryPolicy(projectConfig?.delivery_policy),
       reportPolicy,
@@ -216,4 +225,33 @@ function writeReport(cwd, report, reportPolicy) {
   fs.mkdirSync(reportsDir, { recursive: true });
   const reportPath = path.join(reportsDir, `${report.task_id}.json`);
   fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+}
+
+function buildMissingArtifactsMessage(taskId, error, outputPolicy) {
+  const missing = Array.isArray(error?.missing_required) ? error.missing_required : [];
+  const lines = [
+    `缺少必需输出工件: ${missing.join(", ")}`
+  ];
+
+  for (const artifact of missing) {
+    if (artifact === "changelog") {
+      lines.push(`- changelog: 请更新 ${outputPolicy.changelog.file}，然后重新执行 report`);
+      continue;
+    }
+
+    if (artifact === "design_note") {
+      const suggestedPath = path.posix.join(outputPolicy.design_note.directory, `${taskId}-design-note.md`);
+      lines.push(`- design_note: 可先执行 \`node packages/cli/bin/agent-harness.js docs scaffold --type design-note --task-id ${taskId} --path ${suggestedPath}\``);
+      lines.push(`  然后在 report 中补上 \`--design-note ${suggestedPath}\``);
+      continue;
+    }
+
+    if (artifact === "adr") {
+      const suggestedPath = path.posix.join(outputPolicy.adr.directory, `${taskId}-adr.md`);
+      lines.push(`- adr: 可先执行 \`node packages/cli/bin/agent-harness.js docs scaffold --type adr --task-id ${taskId} --path ${suggestedPath}\``);
+      lines.push(`  然后在 report 中补上 \`--adr ${suggestedPath}\``);
+    }
+  }
+
+  return `${lines.join("\n")}\n`;
 }
