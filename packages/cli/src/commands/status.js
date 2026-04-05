@@ -4,12 +4,18 @@ import path from "node:path";
 import { evaluateTaskDeliveryReadiness, summarizeDeliveryReadiness } from "../lib/delivery-policy.js";
 import { evaluateTaskArtifactPolicy, inspectOutputPolicyWorkspace, normalizeOutputPolicy } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
+import {
+  hasRuntimeSetup,
+  resolveRuntimeDirName,
+  runtimeRelativeCandidates,
+  runtimeRelativePathForCwd
+} from "../lib/runtime-paths.js";
 import { getActiveTask } from "../lib/state-store.js";
 
 const REQUIRED_TEMPLATE_FILES = [
-  "harness/tasks/bug.md",
-  "harness/tasks/explore.md",
-  "harness/tasks/feature.md"
+  "bug.md",
+  "explore.md",
+  "feature.md"
 ];
 
 export function runStatus(argv) {
@@ -215,24 +221,22 @@ function inspectHostRules(cwd, host, fallback) {
 }
 
 function inspectTemplates(cwd) {
-  const missing = REQUIRED_TEMPLATE_FILES.filter((file) => !fs.existsSync(path.join(cwd, file)));
+  const missing = REQUIRED_TEMPLATE_FILES.filter((file) => {
+    return !runtimeRelativeCandidates("tasks", file)
+      .some((candidate) => fs.existsSync(path.join(cwd, candidate)));
+  });
   if (missing.length > 0) {
-    return warn("harness/tasks", `缺少模板: ${missing.map((file) => path.basename(file)).join(", ")}`);
+    return warn("runtime/tasks", `缺少模板: ${missing.join(", ")}`);
   }
 
-  return ok("harness/tasks", "bug / feature / explore 模板已就绪");
+  return ok("runtime/tasks", "bug / feature / explore 模板已就绪");
 }
 
 function detectRuntimeMode(cwd) {
-  const runtimeMarkers = [
-    "harness/README.md",
-    "harness/state",
-    "harness/audit",
-    "harness/reports",
-    ".claude/settings.json"
-  ];
-
-  return runtimeMarkers.some((file) => fs.existsSync(path.join(cwd, file))) ? "full" : "protocol-only";
+  if (hasRuntimeSetup(cwd) || fs.existsSync(path.join(cwd, ".claude", "settings.json"))) {
+    return "full";
+  }
+  return "protocol-only";
 }
 
 function inspectCodexHooks(cwd, hasCodexHost) {
@@ -332,22 +336,23 @@ function hasCodexHookCommand(parsedHooks, eventName, commandFragment) {
 
 function inspectRuntimeDirectories(cwd, runtimeMode) {
   if (runtimeMode === "protocol-only") {
-    return skip("harness/runtime", "protocol-only 模式，无需运行时目录");
+    return skip("runtime", "protocol-only 模式，无需运行时目录");
   }
 
+  const runtimeDir = resolveRuntimeDirName(cwd);
   const required = [
-    "harness/README.md",
-    "harness/state/tasks",
-    "harness/audit",
-    "harness/reports"
+    path.posix.join(runtimeDir, "README.md"),
+    path.posix.join(runtimeDir, "state", "tasks"),
+    path.posix.join(runtimeDir, "audit"),
+    path.posix.join(runtimeDir, "reports")
   ];
   const missing = required.filter((file) => !fs.existsSync(path.join(cwd, file)));
 
   if (missing.length > 0) {
-    return warn("harness/runtime", `缺少: ${missing.join(", ")}`);
+    return warn("runtime", `缺少: ${missing.join(", ")}`);
   }
 
-  return ok("harness/runtime", "运行时目录已就绪");
+  return ok("runtime", `运行时目录已就绪（${runtimeDir}/）`);
 }
 
 function inspectGitignore(cwd, runtimeMode) {
@@ -361,7 +366,10 @@ function inspectGitignore(cwd, runtimeMode) {
   }
 
   const content = fs.readFileSync(targetPath, "utf8");
-  const required = ["harness/state/", "harness/audit/"];
+  const required = [
+    `${runtimeRelativePathForCwd(cwd, "state")}/`,
+    `${runtimeRelativePathForCwd(cwd, "audit")}/`
+  ];
   const missing = required.filter((entry) => !content.includes(entry));
 
   if (missing.length > 0) {

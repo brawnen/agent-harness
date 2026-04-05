@@ -5,6 +5,7 @@ import path from "node:path";
 import { evaluateTaskDeliveryReadiness, normalizeDeliveryPolicy } from "../lib/delivery-policy.js";
 import { normalizeOutputPolicy } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
+import { runtimeRelativeCandidates } from "../lib/runtime-paths.js";
 import { requireTaskState, resolveTaskId } from "../lib/state-store.js";
 
 const VALID_ACTIONS = new Set(["commit", "push"]);
@@ -361,17 +362,17 @@ function resolveCommitPrefix(intent) {
 }
 
 function stageCommitPaths(cwd, paths) {
-  runGit(cwd, ["add", "--", ...paths]);
-  runGit(cwd, ["add", "-u", "--", ...paths]);
+  runGit(cwd, ["add", "-A", "--", ...paths]);
 }
 
 function resolveCommitPaths(cwd, candidates) {
   const changedFiles = listChangedFiles(cwd);
   const changedSet = new Set(changedFiles);
   const resolved = new Set();
+  const excludedPrefixes = runtimeRelativeCandidates("reports");
 
   for (const candidate of candidates) {
-    if (!candidate || candidate.startsWith("harness/reports/")) {
+    if (!candidate || excludedPrefixes.some((prefix) => candidate.startsWith(`${prefix}/`) || candidate === prefix)) {
       continue;
     }
 
@@ -401,9 +402,10 @@ function resolveCommitPaths(cwd, candidates) {
 
 function detectWideScope(cwd, candidates) {
   const wide = [];
+  const excludedPrefixes = runtimeRelativeCandidates("reports");
 
   for (const candidate of candidates) {
-    if (!candidate || candidate.startsWith("harness/reports/")) {
+    if (!candidate || excludedPrefixes.some((prefix) => candidate.startsWith(`${prefix}/`) || candidate === prefix)) {
       continue;
     }
 

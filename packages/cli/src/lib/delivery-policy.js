@@ -70,7 +70,7 @@ function buildSignalStatus(cwd, taskState, reportPolicy, verification, options) 
       satisfied: reportGenerated,
       reason: reportGenerated
         ? (options.reportWillBeGenerated ? "本次 report 执行将生成报告" : "已检测到报告文件")
-        : `未检测到报告文件: ${path.relative(cwd, reportPath ?? "harness/reports/<task_id>.json")}`
+        : `未检测到报告文件: ${path.relative(cwd, reportPath ?? ".harness/reports/<task_id>.json")}`
     },
     commit_exists: {
       name: "commit_exists",

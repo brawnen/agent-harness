@@ -29,7 +29,7 @@
 - 检测项目类型
 - 检测宿主类型
 - 生成 `harness.yaml`
-- 复制协议任务模板到 `harness/tasks/`
+- 复制协议任务模板到 `.harness/tasks/`
 - 注入 `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` 规则块
 - 在非 `--protocol-only` 模式下生成运行时目录和 Claude Code hooks
 
@@ -77,8 +77,8 @@ npm --prefix packages/cli run verify:task-core
 
 `verify` MVP 当前负责：
 
-- 读取 `harness/state/index.json` 中的 active task，或显式 `--task-id`
-- 读取 `harness/state/tasks/<task_id>.json`
+- 读取 `.harness/state/index.json` 中的 active task，或显式 `--task-id`
+- 读取 `.harness/state/tasks/<task_id>.json`
 - 按最小验证矩阵检查 `intent / evidence / open_questions / acceptance`
 - 输出结构化 JSON 结果
 - 用退出码区分允许完成和阻止完成
@@ -89,15 +89,15 @@ npm --prefix packages/cli run verify:task-core
 - `state get`
 - `state update`
 - `state active`
-- 维护 `harness/state/index.json`
-- 维护 `harness/state/tasks/<task_id>.json`
+- 维护 `.harness/state/index.json`
+- 维护 `.harness/state/tasks/<task_id>.json`
 - 复用最小合法状态迁移表
 
 `report` MVP 当前负责：
 
 - 读取 active task 或显式 `--task-id`
 - 在生成报告前复用 `verify` 规则做完成门禁检查
-- 写入 `harness/reports/<task_id>.json`
+- 写入 `.harness/reports/<task_id>.json`
 - 将任务状态推进到 `close / done`
 - 根据 `output_policy` 校验 `CHANGELOG.md`、`design note`、`ADR` 等交付工件
 - 根据 `delivery_policy` 计算 `commit-ready / push-ready`，并把 `delivery_readiness` 写进报告
@@ -121,7 +121,7 @@ npm --prefix packages/cli run verify:task-core
 
 - `audit append`
 - `audit read`
-- 写入 `harness/audit/<task_id>.jsonl`
+- 写入 `.harness/audit/<task_id>.jsonl`
 - 让 `gate` 记录最小 `gate_violation`
 - 让 `report` 读取 `force_override/manual_confirmation` 作为 `overrides_used`
 

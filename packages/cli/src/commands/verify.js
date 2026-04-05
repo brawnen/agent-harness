@@ -165,7 +165,7 @@ function normalizeReportPolicy(value) {
   return {
     required: policy.required !== false,
     format: typeof policy.format === "string" ? policy.format : "json",
-    directory: typeof policy.directory === "string" ? policy.directory : "harness/reports",
+    directory: typeof policy.directory === "string" ? policy.directory : ".harness/reports",
     required_sections: Array.isArray(policy.required_sections)
       ? policy.required_sections.map((item) => String(item))
       : []

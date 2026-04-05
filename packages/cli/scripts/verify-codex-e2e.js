@@ -3,6 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
+import { runtimePath } from "../src/lib/runtime-paths.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "../../..");
@@ -41,7 +43,7 @@ function main() {
 }
 
 function createExecutionContext(repoDir) {
-  const indexPath = path.join(repoDir, "harness/state/index.json");
+  const indexPath = runtimePath(repoDir, "state", "index.json");
   const originalIndexContent = fs.existsSync(indexPath) ? fs.readFileSync(indexPath, "utf8") : null;
   const originalActiveTaskId = originalIndexContent ? readJson(indexPath).active_task_id ?? null : null;
 
@@ -59,7 +61,7 @@ function createExecutionContext(repoDir) {
 function runNewTaskAutoIntakeScenario(context) {
   const beforeTaskIds = listTaskIds(context.repoDir);
   runCodex(context.repoDir, "只做分析，不修改文件：解释一下当前仓库的任务管理链路。");
-  const index = readJson(path.join(context.repoDir, "harness/state/index.json"));
+  const index = readJson(runtimePath(context.repoDir, "state", "index.json"));
   if (!index.active_task_id) {
     throw new Error("新任务自动 intake 失败：未生成 active_task_id");
   }
@@ -73,9 +75,9 @@ function runNewTaskAutoIntakeScenario(context) {
 }
 
 function runFollowUpPromptScenario(context) {
-  const before = readJson(path.join(context.repoDir, "harness/state/index.json")).active_task_id;
+  const before = readJson(runtimePath(context.repoDir, "state", "index.json")).active_task_id;
   runUserPromptHook(context.repoDir, "继续推进刚才的任务，只做分析，不修改文件。");
-  const after = readJson(path.join(context.repoDir, "harness/state/index.json")).active_task_id;
+  const after = readJson(runtimePath(context.repoDir, "state", "index.json")).active_task_id;
   if (!before || before !== after) {
     throw new Error(`follow-up prompt 误切任务：before=${before}, after=${after}`);
   }
@@ -209,12 +211,12 @@ function runShell(command, cwd) {
 
 function cleanupCreatedArtifacts(context) {
   for (const taskId of context.createdTaskIds) {
-    safeRemove(path.join(context.repoDir, "harness/state/tasks", `${taskId}.json`));
-    safeRemove(path.join(context.repoDir, "harness/audit", `${taskId}.jsonl`));
-    safeRemove(path.join(context.repoDir, "harness/reports", `${taskId}.json`));
+    safeRemove(runtimePath(context.repoDir, "state", "tasks", `${taskId}.json`));
+    safeRemove(runtimePath(context.repoDir, "audit", `${taskId}.jsonl`));
+    safeRemove(runtimePath(context.repoDir, "reports", `${taskId}.json`));
   }
 
-  const indexPath = path.join(context.repoDir, "harness/state/index.json");
+  const indexPath = runtimePath(context.repoDir, "state", "index.json");
   if (context.originalIndexContent == null) {
     safeRemove(indexPath);
     return;
@@ -224,7 +226,7 @@ function cleanupCreatedArtifacts(context) {
 }
 
 function listTaskIds(repoDir) {
-  const tasksDir = path.join(repoDir, "harness/state/tasks");
+  const tasksDir = runtimePath(repoDir, "state", "tasks");
   if (!fs.existsSync(tasksDir)) {
     return new Set();
   }
@@ -237,7 +239,7 @@ function listTaskIds(repoDir) {
 }
 
 function readTaskState(repoDir, taskId) {
-  return readJson(path.join(repoDir, "harness/state/tasks", `${taskId}.json`));
+  return readJson(runtimePath(repoDir, "state", "tasks", `${taskId}.json`));
 }
 
 function readJson(filePath) {

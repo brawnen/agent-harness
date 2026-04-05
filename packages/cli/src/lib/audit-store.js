@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const AUDIT_DIR = path.join("harness", "audit");
+import { runtimePath } from "./runtime-paths.js";
+
 const VALID_EVENT_TYPES = [
   "force_override",
   "gate_violation",
@@ -26,7 +27,7 @@ export function appendAuditEntry(cwd, entry) {
     timestamp: entry.timestamp ?? new Date().toISOString()
   };
 
-  const auditDir = path.join(cwd, AUDIT_DIR);
+  const auditDir = auditDirPath(cwd);
   fs.mkdirSync(auditDir, { recursive: true });
   const filePath = path.join(auditDir, `${entry.task_id}.jsonl`);
   fs.appendFileSync(filePath, `${JSON.stringify(nextEntry)}\n`, "utf8");
@@ -34,7 +35,7 @@ export function appendAuditEntry(cwd, entry) {
 }
 
 export function readAuditEntries(cwd, taskId) {
-  const filePath = path.join(cwd, AUDIT_DIR, `${taskId}.jsonl`);
+  const filePath = path.join(auditDirPath(cwd), `${taskId}.jsonl`);
   if (!fs.existsSync(filePath)) {
     return [];
   }
@@ -45,6 +46,10 @@ export function readAuditEntries(cwd, taskId) {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => JSON.parse(line));
+}
+
+function auditDirPath(cwd) {
+  return runtimePath(cwd, "audit");
 }
 
 function validateEntry(entry) {

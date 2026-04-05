@@ -6,6 +6,7 @@ All notable changes to `agent-harness` will be documented in this file.
 
 ### 2026-04-05
 
+- Migrated the default runtime directory from `harness/` to `.harness/`, kept legacy read compatibility in the CLI, and switched the repository itself to `.harness/`.
 - Removed the old root-level doc paths after moving early drafts and specs into `docs/archive/`, so the archive migration no longer leaves duplicate file history in the top-level `docs/` directory.
 - Cleaned `harness/` by removing unused `examples`, `templates`, and duplicated `schemas` assets, and updated `harness.yaml` to stop referencing removed Ruby-based commands and stale design paths.
 - Archived early design and integration drafts under `docs/archive/` and kept only the current documentation baseline in `docs/`.

@@ -8,7 +8,7 @@ languages:
 default_mode: delivery
 
 allowed_paths:
-  - harness/**
+  - .harness/**
   - AGENTS.md
   - harness.yaml
 
@@ -17,10 +17,10 @@ protected_paths:
 
 default_commands:
   delivery:
-    - "rg -n '^## ' docs/2026-04-03-agent-harness-design-v0.3.md harness/tasks/*.md"
+    - "rg -n '^## ' docs/2026-04-03-agent-harness-design-v0.3.md .harness/tasks/*.md"
     - "node -e \"require('fs').accessSync('harness.yaml'); console.log('harness.yaml ok')\""
   explore:
-    - "rg -n '^#|^##|^###' docs/2026-04-03-agent-harness-design-v0.3.md harness/tasks/*.md"
+    - "rg -n '^#|^##|^###' docs/2026-04-03-agent-harness-design-v0.3.md .harness/tasks/*.md"
   poc:
     - "node -e \"require('fs').accessSync('harness.yaml'); console.log('harness.yaml ok')\""
 
@@ -35,7 +35,7 @@ risk_rules:
       - manual_confirmation
   medium:
     path_matches:
-      - harness/tasks/**
+      - .harness/tasks/**
     requires_confirmation: false
     minimum_evidence:
       - diff_summary
@@ -47,9 +47,9 @@ risk_rules:
       - diff_summary
 
 task_templates:
-  bug: harness/tasks/bug.md
-  feature: harness/tasks/feature.md
-  explore: harness/tasks/explore.md
+  bug: .harness/tasks/bug.md
+  feature: .harness/tasks/feature.md
+  explore: .harness/tasks/explore.md
 
 skill_policy:
   bug:
@@ -91,7 +91,7 @@ output_policy:
   report:
     required: true
     format: json
-    directory: harness/reports
+    directory: .harness/reports
     required_sections:
       - task_conclusion
       - actual_scope

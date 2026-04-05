@@ -146,14 +146,14 @@ Override 不能跳过：
 - 任务完成后：`node packages/cli/bin/agent-harness.js report --task-id <id> --conclusion "结论"`
 
 状态文件位置：
-- 任务状态：`harness/state/tasks/<task_id>.json`
-- 任务索引：`harness/state/index.json`
-- 审计日志：`harness/audit/<task_id>.jsonl`
-- 完成报告：`harness/reports/<task_id>.json`
+- 任务状态：`.harness/state/tasks/<task_id>.json`
+- 任务索引：`.harness/state/index.json`
+- 审计日志：`.harness/audit/<task_id>.jsonl`
+- 完成报告：`.harness/reports/<task_id>.json`
 
 ## 项目配置
 
 - 配置文件：`harness.yaml`
 - protected_paths：`.idea/**`
-- 任务模板：`harness/tasks/` 下 bug.md / feature.md / explore.md
+- 任务模板：`.harness/tasks/` 下 bug.md / feature.md / explore.md
 - 风险规则见 harness.yaml 中 risk_rules 部分

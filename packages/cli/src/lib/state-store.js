@@ -2,10 +2,9 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
+import { runtimePath } from "./runtime-paths.js";
+
 const SCHEMA_VERSION = "0.3";
-const STATE_DIR = path.join("harness", "state");
-const TASKS_DIR = path.join(STATE_DIR, "tasks");
-const STATE_LOCK_DIR = path.join(STATE_DIR, ".write-lock");
 const LOCK_WAIT_MS = 25;
 const LOCK_TIMEOUT_MS = 5000;
 const LOCK_STALE_MS = 30000;
@@ -213,7 +212,7 @@ export function setActiveTaskId(cwd, taskId) {
 }
 
 function persistTaskState(cwd, taskId, state) {
-  ensureDirectory(path.join(cwd, TASKS_DIR));
+  ensureDirectory(tasksDirPath(cwd));
   atomicWriteFile(taskFilePath(cwd, taskId), `${JSON.stringify(state, null, 2)}\n`);
 }
 
@@ -242,7 +241,7 @@ function updateIndex(cwd, taskId, state, { setActive = false } = {}) {
 }
 
 function saveStateIndex(cwd, index) {
-  ensureDirectory(path.join(cwd, STATE_DIR));
+  ensureDirectory(stateDirPath(cwd));
   const nextIndex = {
     schema_version: SCHEMA_VERSION,
     active_task_id: index.active_task_id ?? null,
@@ -253,11 +252,11 @@ function saveStateIndex(cwd, index) {
 }
 
 function taskFilePath(cwd, taskId) {
-  return path.join(cwd, TASKS_DIR, `${taskId}.json`);
+  return path.join(tasksDirPath(cwd), `${taskId}.json`);
 }
 
 function stateIndexPath(cwd) {
-  return path.join(cwd, STATE_DIR, "index.json");
+  return path.join(stateDirPath(cwd), "index.json");
 }
 
 function defaultIndex() {
@@ -373,7 +372,7 @@ function atomicWriteFile(filePath, content) {
 }
 
 function withStateWriteLock(cwd, callback) {
-  const lockPath = path.join(cwd, STATE_LOCK_DIR);
+  const lockPath = stateLockDirPath(cwd);
   const release = acquireStateWriteLock(lockPath);
   try {
     return callback();
@@ -495,4 +494,16 @@ function compactObject(value) {
   return Object.fromEntries(
     Object.entries(value).filter(([, item]) => item !== undefined && item !== null)
   );
+}
+
+function stateDirPath(cwd) {
+  return runtimePath(cwd, "state");
+}
+
+function tasksDirPath(cwd) {
+  return runtimePath(cwd, "state", "tasks");
+}
+
+function stateLockDirPath(cwd) {
+  return runtimePath(cwd, "state", ".write-lock");
 }

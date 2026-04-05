@@ -85,6 +85,29 @@ npx @agent-harness/cli init --protocol-only
 - README 中出现的 `npx @agent-harness/cli ...` 是目标分发形态，不是已发布事实
 - 本地运行要求 `Node.js >= 18`
 
+## Use Agent Harness In This Repository
+
+当前仓库已经把 `agent-harness` 用在自己身上。
+
+你现在就可以直接在本仓库里这样使用：
+
+```bash
+codex
+node packages/cli/bin/agent-harness.js status
+node packages/cli/bin/agent-harness.js delivery ready
+```
+
+当前仓库的自举形态包括：
+
+- `harness.yaml` 作为项目策略入口
+- `.harness/state`、`.harness/audit`、`.harness/reports` 作为运行时目录
+- `.codex/config.toml` 与 `.codex/hooks.json` 作为 Codex 宿主接入层
+- `delivery commit` 作为本地提交标准入口
+
+如果你想看更完整的自举与跨项目接入方式，见：
+
+- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+
 ## Quick Start
 
 ### Protocol only
@@ -101,6 +124,10 @@ npx @agent-harness/cli init --protocol-only
 node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js init --host codex
 node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 ```
+
+更完整的跨项目接入说明见：
+
+- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
 
 ### Codex
 
@@ -160,10 +187,10 @@ codex exec "继续推进当前任务"
 ```text
 .
 ├── docs/           # 设计文档、ADR、roadmap、策略说明
+├── .harness/       # 运行时 state / audit / reports / tasks
 ├── packages/
 │   ├── protocol/   # rules / schemas / templates / adapters
 │   └── cli/        # Node.js CLI
-├── harness/        # 运行时 state / audit / reports / schemas / tasks
 └── package.json    # workspace 根配置
 ```
 
@@ -211,6 +238,7 @@ codex exec "继续推进当前任务"
 - [Codex v0.3 Roadmap](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-codex-v0.3-roadmap.md)
 - [CHANGELOG Maintenance Policy](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
 - [Task Core Misclassification Fixture Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
+- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
 - [CLI README](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
 - [Protocol README](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
 

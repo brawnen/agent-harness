@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { DEFAULT_RUNTIME_DIR, defaultRuntimeRelativePath } from "../lib/runtime-paths.js";
+
 const CLI_VERSION = "0.1.0";
 const RULE_MODES = new Set(["base", "full"]);
 const HOSTS = new Set(["auto", "claude-code", "codex", "gemini-cli"]);
@@ -287,7 +289,7 @@ function queueInitActions(context) {
 
 function queueProtocolTemplates(actions, cwd, force) {
   const templateDir = path.join(PROTOCOL_ROOT, "templates");
-  const targetDir = path.join(cwd, "harness", "tasks");
+  const targetDir = path.join(cwd, DEFAULT_RUNTIME_DIR, "tasks");
   const templateFiles = fs.readdirSync(templateDir).filter((file) => file.endsWith(".md"));
 
   for (const file of templateFiles) {
@@ -349,7 +351,7 @@ function queueClaudeSettingsMerge(actions, cwd) {
 }
 
 function queueRuntimeFiles(actions, cwd) {
-  const runtimeReadme = path.join(cwd, "harness", "README.md");
+  const runtimeReadme = path.join(cwd, DEFAULT_RUNTIME_DIR, "README.md");
   queueWriteAction({
     actions,
     content: buildRuntimeReadme(),
@@ -357,7 +359,11 @@ function queueRuntimeFiles(actions, cwd) {
     pathName: runtimeReadme
   });
 
-  for (const file of ["harness/state/tasks/.gitkeep", "harness/audit/.gitkeep", "harness/reports/.gitkeep"]) {
+  for (const file of [
+    defaultRuntimeRelativePath("state", "tasks", ".gitkeep"),
+    defaultRuntimeRelativePath("audit", ".gitkeep"),
+    defaultRuntimeRelativePath("reports", ".gitkeep")
+  ]) {
     const targetPath = path.join(cwd, file);
     actions.push({
       description: "创建运行时目录占位",
@@ -379,9 +385,9 @@ function queueGitignoreUpdate(actions, cwd) {
   const targetPath = path.join(cwd, ".gitignore");
   const entries = [
     "# agent-harness runtime",
-    "harness/state/",
-    "harness/audit/",
-    "harness/reports/"
+    defaultRuntimeRelativePath("state") + "/",
+    defaultRuntimeRelativePath("audit") + "/",
+    defaultRuntimeRelativePath("reports") + "/"
   ];
   const existing = fs.existsSync(targetPath) ? readText(targetPath) : "";
   const nextContent = mergeGitignore(existing, entries);
@@ -428,7 +434,7 @@ function renderHarnessConfig(project, mode) {
         reason: "项目协议配置"
       },
       medium: {
-        path_matches: ["CLAUDE.md", "AGENTS.md", "GEMINI.md", "harness/**"],
+        path_matches: ["CLAUDE.md", "AGENTS.md", "GEMINI.md", ".harness/**"],
         requires_confirmation: false,
         minimum_evidence: ["diff_summary"],
         reason: "宿主规则与 agent-harness 运行目录"
@@ -442,9 +448,9 @@ function renderHarnessConfig(project, mode) {
     },
     languages: project.languages,
     task_templates: {
-      bug: "harness/tasks/bug.md",
-      feature: "harness/tasks/feature.md",
-      explore: "harness/tasks/explore.md"
+      bug: ".harness/tasks/bug.md",
+      feature: ".harness/tasks/feature.md",
+      explore: ".harness/tasks/explore.md"
     },
     delivery_policy: {
       commit: {
@@ -462,7 +468,7 @@ function renderHarnessConfig(project, mode) {
       report: {
         required: true,
         format: "json",
-        directory: "harness/reports",
+        directory: ".harness/reports",
         required_sections: [
           "task_conclusion",
           "actual_scope",

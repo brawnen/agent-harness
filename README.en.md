@@ -86,6 +86,29 @@ Notes:
 - any `npx @agent-harness/cli ...` command in this README describes the target distribution shape, not a currently available package
 - local usage requires `Node.js >= 18`
 
+## Use Agent Harness In This Repository
+
+This repository already uses `agent-harness` on itself.
+
+You can use it in this repo right now with:
+
+```bash
+codex
+node packages/cli/bin/agent-harness.js status
+node packages/cli/bin/agent-harness.js delivery ready
+```
+
+The current self-hosting setup includes:
+
+- `harness.yaml` as the project policy entrypoint
+- `.harness/state`, `.harness/audit`, and `.harness/reports` as runtime directories
+- `.codex/config.toml` and `.codex/hooks.json` as the Codex host integration layer
+- `delivery commit` as the standard local commit entrypoint
+
+For the full self-hosting and cross-repo usage guide, see:
+
+- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
+
 ## Quick Start
 
 ### Protocol only
@@ -102,6 +125,10 @@ If you want to try the current CLI in another repo before npm publishing, use th
 node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js init --host codex
 node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 ```
+
+For the full cross-repo setup guide, see:
+
+- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
 
 ### Codex
 
@@ -161,10 +188,10 @@ Current boundaries:
 ```text
 .
 ├── docs/           # design docs, ADRs, roadmap, policy docs
+├── .harness/       # runtime state / audit / reports / tasks
 ├── packages/
 │   ├── protocol/   # rules / schemas / templates / adapters
 │   └── cli/        # Node.js CLI
-├── harness/        # runtime state / audit / reports / schemas / tasks
 └── package.json    # workspace root config
 ```
 
@@ -212,6 +239,7 @@ Main remaining work:
 - [Codex v0.3 Roadmap](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-codex-v0.3-roadmap.md)
 - [CHANGELOG Maintenance Policy](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
 - [Task Core Misclassification Fixture Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
+- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
 - [CLI README](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
 - [Protocol README](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
 
