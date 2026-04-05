@@ -1,6 +1,6 @@
 # Agent Harness Self-Hosting And Cross-Repo Usage Guide v0.1
 
-[中文](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+[中文](docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
 
 This document answers two questions:
 
@@ -13,13 +13,13 @@ This repository is already self-hosting `agent-harness`.
 
 The current setup includes:
 
-- [harness.yaml](/Users/lijianfeng/code/pp/agent-harness/harness.yaml): project policy entrypoint
-- [.harness/tasks](/Users/lijianfeng/code/pp/agent-harness/.harness/tasks): task templates
-- [.harness/state](/Users/lijianfeng/code/pp/agent-harness/.harness/state): task state
-- [.harness/audit](/Users/lijianfeng/code/pp/agent-harness/.harness/audit): audit logs
-- [.harness/reports](/Users/lijianfeng/code/pp/agent-harness/.harness/reports): completion reports
-- [.codex/config.toml](/Users/lijianfeng/code/pp/agent-harness/.codex/config.toml): Codex feature flag
-- [.codex/hooks.json](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks.json): Codex hook integration
+- [harness.yaml](harness.yaml): project policy entrypoint
+- [.harness/tasks](.harness/tasks): task templates
+- [.harness/state](.harness/state): task state
+- [.harness/audit](.harness/audit): audit logs
+- [.harness/reports](.harness/reports): completion reports
+- [.codex/config.toml](.codex/config.toml): Codex feature flag
+- [.codex/hooks.json](.codex/hooks.json): Codex hook integration
 
 The minimum path in this repository is:
 
@@ -39,6 +39,16 @@ node packages/cli/bin/agent-harness.js report --conclusion "summary"
 node packages/cli/bin/agent-harness.js delivery commit
 ```
 
+### 1.1 Interaction Rhythm
+
+For day-to-day team usage, keep the interaction rhythm consistent:
+
+- before confirmation: propose the plan and wait
+- after confirmation: execute directly, without repeating the previous full plan
+- final close-out: provide the result once, without repeating interim summaries verbatim
+
+This rule is worth keeping in host rule files and project conventions so the agent does not drift into repetitive responses during longer tasks.
+
 ## 2. How To Use It In Other Projects
 
 Today there are two realistic adoption modes.
@@ -53,11 +63,11 @@ Use this if you:
 
 How:
 
-1. Copy [packages/protocol/rules/base.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/base.md) or [packages/protocol/rules/full.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/full.md) into the target repo’s `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`
+1. Copy [packages/protocol/rules/base.md](packages/protocol/rules/base.md) or [packages/protocol/rules/full.md](packages/protocol/rules/full.md) into the target repo’s `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`
 2. Reuse:
-   - [packages/protocol/templates](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/templates)
-   - [packages/protocol/schemas](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas)
-   - [packages/protocol/adapters](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/adapters)
+   - [packages/protocol/templates](packages/protocol/templates)
+   - [packages/protocol/schemas](packages/protocol/schemas)
+   - [packages/protocol/adapters](packages/protocol/adapters)
 
 ### 2.2 Reuse The Current Local CLI Directly
 

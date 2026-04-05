@@ -59,7 +59,7 @@
 
 把样本补到：
 
-- [task-core-classification.json](/Users/lijianfeng/code/pp/agent-harness/packages/cli/fixtures/task-core-classification.json)
+- [task-core-classification.json](packages/cli/fixtures/task-core-classification.json)
 
 写法要求：
 
@@ -87,7 +87,7 @@ npm --prefix packages/cli run verify:task-core
 
 只有在 fixture 已经明确失败后，才允许改：
 
-- [task-core.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/src/lib/task-core.js)
+- [task-core.js](packages/cli/src/lib/task-core.js)
 
 修改目标是：
 
@@ -135,6 +135,6 @@ npm --prefix packages/cli run verify:task-core
 ## 当前样本入口
 
 - 样本集：
-  [task-core-classification.json](/Users/lijianfeng/code/pp/agent-harness/packages/cli/fixtures/task-core-classification.json)
+  [task-core-classification.json](packages/cli/fixtures/task-core-classification.json)
 - 回归脚本：
-  [verify-task-core-classification.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/scripts/verify-task-core-classification.js)
+  [verify-task-core-classification.js](packages/cli/scripts/verify-task-core-classification.js)

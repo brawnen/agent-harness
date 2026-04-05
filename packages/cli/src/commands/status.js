@@ -11,7 +11,7 @@ import {
   runtimeRelativePathForCwd
 } from "../lib/runtime-paths.js";
 import { getActiveTask } from "../lib/state-store.js";
-import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
+import { buildWorkflowWarning, evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 
 const REQUIRED_TEMPLATE_FILES = [
   "bug.md",
@@ -218,11 +218,14 @@ function inspectWorkflowMode(cwd) {
     ? decision.reasons.join(", ")
     : "none";
   const upgraded = decision.upgraded_from ? `；upgraded_from=${decision.upgraded_from}` : "";
+  const warningMessage = buildWorkflowWarning(decision);
+  const summary = `active_task=${activeTask.task_id}；recommended=${decision.recommended_mode}；effective=${decision.effective_mode}${upgraded}；reasons=${reasons}`;
 
-  return ok(
-    "workflow_mode",
-    `active_task=${activeTask.task_id}；recommended=${decision.recommended_mode}；effective=${decision.effective_mode}${upgraded}；reasons=${reasons}`
-  );
+  if (warningMessage) {
+    return warn("workflow_mode", `${summary}；warning=${warningMessage}`);
+  }
+
+  return ok("workflow_mode", summary);
 }
 
 function inspectHostRules(cwd, host, fallback) {

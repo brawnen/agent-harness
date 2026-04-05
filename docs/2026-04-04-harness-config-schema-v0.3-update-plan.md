@@ -15,18 +15,18 @@
 本方案综合以下 4 个来源：
 
 1. 当前 schema：
-   - [harness-config.schema.json](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas/harness-config.schema.json)
+   - [harness-config.schema.json](packages/protocol/schemas/harness-config.schema.json)
 
 2. 当前真实配置：
-   - [harness.yaml](/Users/lijianfeng/code/pp/agent-harness/harness.yaml)
+   - [harness.yaml](harness.yaml)
 
 3. 当前实现：
-   - [init.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/src/commands/init.js)
-   - [project-config.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/src/lib/project-config.js)
+   - [init.js](packages/cli/src/commands/init.js)
+   - [project-config.js](packages/cli/src/lib/project-config.js)
 
 4. 最新设计结论：
-   - [Agent Harness 设计文档 v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
-   - [Harness Config Policy Extension Draft v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-harness-config-policy-extension-draft-v0.1.md)
+   - [Agent Harness 设计文档 v0.3](docs/2026-04-03-agent-harness-design-v0.3.md)
+   - [Harness Config Policy Extension Draft v0.1](docs/2026-04-03-harness-config-policy-extension-draft-v0.1.md)
 
 ## 3. 当前 v0.2 schema 的主要问题
 
@@ -41,7 +41,7 @@
 - `skill_policy` 是数组
 - `output_policy` 只支持 `report_format` / `report_directory`
 
-但当前真实 [harness.yaml](/Users/lijianfeng/code/pp/agent-harness/harness.yaml) 中：
+但当前真实 [harness.yaml](harness.yaml) 中：
 
 - 顶层字段叫 `version`，不是 `schema_version`
 - `risk_rules` 是按 `high / medium / low` 分组对象

@@ -18,8 +18,8 @@
 - [主设计稿](./2026-03-31-project-harness-design-v0.1.md)
 - [intake / interaction 规范](./2026-04-01-harness-intake-interaction-spec-v0.1.md)
 - [intake CLI 规范](./2026-04-01-harness-intake-cli-spec-v0.1.md)
-- [task-draft.schema.json](/Users/lijianfeng/code/pp/harness/harness/schemas/task-draft.schema.json)
-- [intake-result.schema.json](/Users/lijianfeng/code/pp/harness/harness/schemas/intake-result.schema.json)
+- [task-draft.schema.json](harness/schemas/task-draft.schema.json)
+- [intake-result.schema.json](harness/schemas/intake-result.schema.json)
 
 ## 3. 能实现的部分
 

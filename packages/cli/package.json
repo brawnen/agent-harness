@@ -1,16 +1,44 @@
 {
   "name": "@agent-harness/cli",
   "version": "0.1.0",
-  "private": true,
-  "description": "Node.js CLI skeleton for agent-harness.",
+  "description": "CLI for task convergence, verification, reporting, and delivery in agent-harness projects.",
+  "license": "MIT",
   "bin": {
     "agent-harness": "./bin/agent-harness.js"
   },
   "type": "module",
+  "files": [
+    "bin",
+    "src",
+    "LICENSE",
+    "README.md",
+    "README.zh-CN.md"
+  ],
+  "keywords": [
+    "agent",
+    "ai",
+    "workflow",
+    "task",
+    "codex",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brawnen/agent-harness.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/brawnen/agent-harness/issues"
+  },
+  "homepage": "https://github.com/brawnen/agent-harness/tree/main/packages/cli",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@agent-harness/protocol": "^0.1.0"
+  },
   "scripts": {
-    "start": "node ./bin/agent-harness.js --help",
-    "verify:task-core": "node ./scripts/verify-task-core-classification.js",
-    "verify:codex-e2e": "node ./scripts/verify-codex-e2e.js"
+    "start": "node ./bin/agent-harness.js --help"
   },
   "engines": {
     "node": ">=18"

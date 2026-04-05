@@ -6,7 +6,7 @@ import { evaluateTaskDeliveryReadiness, normalizeDeliveryPolicy } from "../lib/d
 import { normalizeOutputPolicy, validateTaskOutputArtifacts } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
 import { requireTaskState, resolveTaskId, updateTaskState } from "../lib/state-store.js";
-import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
+import { buildWorkflowWarning, evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 import { verifyTaskState } from "./verify.js";
 
 const SCHEMA_VERSION = "0.3";
@@ -58,7 +58,8 @@ export function runReport(argv) {
       outputArtifacts,
       previousDecision: taskState.workflow_decision
     });
-    const report = buildReport(cwd, taskState, parsed.options, outputArtifacts, deliveryReadiness, workflowDecision);
+    const workflowWarning = buildWorkflowWarning(workflowDecision);
+    const report = buildReport(cwd, taskState, parsed.options, outputArtifacts, deliveryReadiness, workflowDecision, workflowWarning);
     validateReportAgainstPolicy(report, reportPolicy);
     writeReport(cwd, report, reportPolicy);
 
@@ -68,6 +69,9 @@ export function runReport(argv) {
       workflow_decision: workflowDecision
     });
 
+    if (workflowWarning) {
+      console.error(`workflow warning: ${workflowWarning}`);
+    }
     console.log(`${JSON.stringify(report, null, 2)}\n`);
     return 0;
   } catch (error) {
@@ -156,7 +160,7 @@ function parseReportArgs(argv) {
   return { ok: true, options };
 }
 
-function buildReport(cwd, taskState, options, outputArtifacts, deliveryReadiness, workflowDecision) {
+function buildReport(cwd, taskState, options, outputArtifacts, deliveryReadiness, workflowDecision, workflowWarning) {
   const contract = taskState.confirmed_contract ?? {};
   const draft = taskState.task_draft ?? {};
   const evidence = Array.isArray(taskState.evidence) ? taskState.evidence : [];
@@ -188,6 +192,7 @@ function buildReport(cwd, taskState, options, outputArtifacts, deliveryReadiness
     output_artifacts: outputArtifacts,
     delivery_readiness: deliveryReadiness,
     workflow_decision: workflowDecision,
+    workflow_warning: workflowWarning,
     next_steps: options.nextSteps,
     completed_at: new Date().toISOString()
   };

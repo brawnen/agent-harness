@@ -79,7 +79,7 @@ Current Baseline
 
 位置：
 
-- [packages/protocol](/Users/lijianfeng/code/pp/agent-harness/packages/protocol)
+- [packages/protocol](packages/protocol)
 
 职责：
 
@@ -101,7 +101,7 @@ Current Baseline
 
 位置：
 
-- [packages/cli](/Users/lijianfeng/code/pp/agent-harness/packages/cli)
+- [packages/cli](packages/cli)
 
 职责：
 
@@ -120,9 +120,9 @@ CLI 是工具层，不是协议层前置条件。
 
 位置：
 
-- [harness/state](/Users/lijianfeng/code/pp/agent-harness/harness/state)
-- [harness/audit](/Users/lijianfeng/code/pp/agent-harness/harness/audit)
-- [harness/reports](/Users/lijianfeng/code/pp/agent-harness/harness/reports)
+- [harness/state](harness/state)
+- [harness/audit](harness/audit)
+- [harness/reports](harness/reports)
 
 职责：
 
@@ -200,6 +200,18 @@ CLI 是工具层，不是协议层前置条件。
 - `report`
 - `close`
 
+### 6.3.1 Interaction Rhythm
+
+`agent-harness` 不只约束任务状态，也约束交互节奏。
+
+当前主线规则是：
+
+- `plan` 只用于确认前的方案输出
+- 用户确认后，应进入 `execute`，而不是重复上一轮方案
+- 最终结果只做一次收口，不原样重复中间进度总结
+
+这条规则的目标不是压缩信息量，而是减少交互漂移、确认后复述和重复输出。
+
 ## 6.4 State Model
 
 统一状态保持为：
@@ -249,7 +261,7 @@ CLI 是工具层，不是协议层前置条件。
 
 当前已落地到：
 
-- [report.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/src/commands/report.js)
+- [report.js](packages/cli/src/commands/report.js)
 
 ## 7. Gate Levels 与当前落地方式
 
@@ -296,8 +308,8 @@ CLI 是工具层，不是协议层前置条件。
 
 当前仓库已经内置：
 
-- [hooks.json](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks.json)
-- [config.toml](/Users/lijianfeng/code/pp/agent-harness/.codex/config.toml)
+- [hooks.json](.codex/hooks.json)
+- [config.toml](.codex/config.toml)
 
 当前行为：
 
@@ -327,9 +339,9 @@ CLI 是工具层，不是协议层前置条件。
 当前已建立：
 
 - 样本集：
-  [task-core-classification.json](/Users/lijianfeng/code/pp/agent-harness/packages/cli/fixtures/task-core-classification.json)
+  [task-core-classification.json](packages/cli/fixtures/task-core-classification.json)
 - 回归脚本：
-  [verify-task-core-classification.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/scripts/verify-task-core-classification.js)
+  [verify-task-core-classification.js](packages/cli/scripts/verify-task-core-classification.js)
 
 后续规则演进原则：
 
@@ -446,5 +458,5 @@ CLI 是工具层，不是协议层前置条件。
 
 相关配置草案见：
 
-- [Harness Config Policy Extension Draft v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-harness-config-policy-extension-draft-v0.1.md)
-- [Harness Config Schema v0.3 更新方案](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-harness-config-schema-v0.3-update-plan.md)
+- [Harness Config Policy Extension Draft v0.1](docs/2026-04-03-harness-config-policy-extension-draft-v0.1.md)
+- [Harness Config Schema v0.3 更新方案](docs/2026-04-04-harness-config-schema-v0.3-update-plan.md)

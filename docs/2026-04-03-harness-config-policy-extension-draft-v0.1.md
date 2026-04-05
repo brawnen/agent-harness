@@ -16,14 +16,14 @@
 当前仓库中的配置层还没有完全收敛，至少存在三层现实：
 
 1. 当前示例配置：
-   - [harness.yaml](/Users/lijianfeng/code/pp/agent-harness/harness.yaml)
+   - [harness.yaml](harness.yaml)
 
 2. 当前 schema：
-   - [harness-config.schema.json](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas/harness-config.schema.json)
+   - [harness-config.schema.json](packages/protocol/schemas/harness-config.schema.json)
 
 3. 当前实现：
-   - [init.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/src/commands/init.js)
-   - [project-config.js](/Users/lijianfeng/code/pp/agent-harness/packages/cli/src/lib/project-config.js)
+   - [init.js](packages/cli/src/commands/init.js)
+   - [project-config.js](packages/cli/src/lib/project-config.js)
 
 这三者目前并不完全一致。
 

@@ -39,8 +39,8 @@
 
 CLI 标准输出必须符合：
 
-- [task-draft.schema.json](/Users/lijianfeng/code/pp/harness/harness/schemas/task-draft.schema.json)
-- [intake-result.schema.json](/Users/lijianfeng/code/pp/harness/harness/schemas/intake-result.schema.json)
+- [task-draft.schema.json](harness/schemas/task-draft.schema.json)
+- [intake-result.schema.json](harness/schemas/intake-result.schema.json)
 
 最小输出对象：
 
@@ -125,7 +125,7 @@ CLI 标准输出必须符合：
 ### 7.1 直接进入计划
 
 示例文件：
-[intake-plan.example.json](/Users/lijianfeng/code/pp/harness/harness/examples/intake-plan.example.json)
+[intake-plan.example.json](harness/examples/intake-plan.example.json)
 
 适用场景：
 
@@ -136,7 +136,7 @@ CLI 标准输出必须符合：
 ### 7.2 进入澄清
 
 示例文件：
-[intake-clarify.example.json](/Users/lijianfeng/code/pp/harness/harness/examples/intake-clarify.example.json)
+[intake-clarify.example.json](harness/examples/intake-clarify.example.json)
 
 适用场景：
 

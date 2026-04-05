@@ -1,6 +1,6 @@
 # Agent Harness 自举与跨项目接入指南 v0.1
 
-[English](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
+[English](docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
 
 这份文档回答两个问题：
 
@@ -11,13 +11,13 @@
 
 当前仓库已经完成自举，核心组成是：
 
-- [harness.yaml](/Users/lijianfeng/code/pp/agent-harness/harness.yaml)：项目策略入口
-- [.harness/tasks](/Users/lijianfeng/code/pp/agent-harness/.harness/tasks)：任务模板
-- [.harness/state](/Users/lijianfeng/code/pp/agent-harness/.harness/state)：任务状态
-- [.harness/audit](/Users/lijianfeng/code/pp/agent-harness/.harness/audit)：审计日志
-- [.harness/reports](/Users/lijianfeng/code/pp/agent-harness/.harness/reports)：完成报告
-- [.codex/config.toml](/Users/lijianfeng/code/pp/agent-harness/.codex/config.toml)：Codex feature flag
-- [.codex/hooks.json](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks.json)：Codex hooks 接入
+- [harness.yaml](harness.yaml)：项目策略入口
+- [.harness/tasks](.harness/tasks)：任务模板
+- [.harness/state](.harness/state)：任务状态
+- [.harness/audit](.harness/audit)：审计日志
+- [.harness/reports](.harness/reports)：完成报告
+- [.codex/config.toml](.codex/config.toml)：Codex feature flag
+- [.codex/hooks.json](.codex/hooks.json)：Codex hooks 接入
 
 在本仓库内最小使用路径是：
 
@@ -37,6 +37,16 @@ node packages/cli/bin/agent-harness.js report --conclusion "结论"
 node packages/cli/bin/agent-harness.js delivery commit
 ```
 
+### 1.1 交互节奏约束
+
+团队日常使用时，建议统一采用以下节奏：
+
+- 确认前：先给方案，等待确认
+- 确认后：直接执行，不重复上一轮完整方案
+- 最终结果：只收口一次，不把中间总结原样再说一遍
+
+这条规则适合写进宿主规则文件和项目约束，避免 agent 在长任务里反复复述同一套方案。
+
 ## 2. 在其他项目中如何使用
 
 目前最现实的接入方式有两种。
@@ -51,11 +61,11 @@ node packages/cli/bin/agent-harness.js delivery commit
 
 做法：
 
-1. 把 [packages/protocol/rules/base.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/base.md) 或 [packages/protocol/rules/full.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/full.md) 复制到目标项目的 `AGENTS.md`、`CLAUDE.md` 或 `GEMINI.md`
+1. 把 [packages/protocol/rules/base.md](packages/protocol/rules/base.md) 或 [packages/protocol/rules/full.md](packages/protocol/rules/full.md) 复制到目标项目的 `AGENTS.md`、`CLAUDE.md` 或 `GEMINI.md`
 2. 按需复制：
-   - [packages/protocol/templates](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/templates)
-   - [packages/protocol/schemas](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas)
-   - [packages/protocol/adapters](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/adapters)
+   - [packages/protocol/templates](packages/protocol/templates)
+   - [packages/protocol/schemas](packages/protocol/schemas)
+   - [packages/protocol/adapters](packages/protocol/adapters)
 
 ### 2.2 直接复用当前仓库里的本地 CLI
 

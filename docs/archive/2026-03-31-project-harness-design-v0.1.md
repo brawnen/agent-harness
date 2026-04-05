@@ -4,7 +4,7 @@
 >
 > 这份文档代表 `agent-harness` 的第一轮问题定义与协议优先思路，保留用于追溯设计起点。
 > 当前主设计基线已切换到：
-> [Agent Harness 设计文档 v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
+> [Agent Harness 设计文档 v0.3](docs/2026-04-03-agent-harness-design-v0.3.md)
 
 ## 1. 设计结论
 

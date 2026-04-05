@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,7 +13,17 @@ const MODES = new Set(["delivery", "explore", "poc"]);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CLI_ROOT = path.resolve(__dirname, "../..");
-const PROTOCOL_ROOT = path.resolve(CLI_ROOT, "../protocol");
+const require = createRequire(import.meta.url);
+const PROTOCOL_ROOT = resolveProtocolRoot();
+
+function resolveProtocolRoot() {
+  try {
+    const protocolPackageJson = require.resolve("@agent-harness/protocol/package.json");
+    return path.dirname(protocolPackageJson);
+  } catch {
+    return path.resolve(CLI_ROOT, "../protocol");
+  }
+}
 
 export function runInit(argv) {
   const parsed = parseInitArgs(argv);

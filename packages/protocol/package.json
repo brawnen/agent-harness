@@ -1,13 +1,34 @@
 {
   "name": "@agent-harness/protocol",
   "version": "0.1.0",
-  "private": true,
   "description": "Protocol assets for agent-harness: rules, schemas, templates, and adapter examples.",
+  "license": "MIT",
   "files": [
     "rules",
     "schemas",
     "templates",
     "adapters",
-    "README.md"
-  ]
+    "LICENSE",
+    "README.md",
+    "README.zh-CN.md"
+  ],
+  "keywords": [
+    "agent",
+    "ai",
+    "protocol",
+    "schema",
+    "workflow"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brawnen/agent-harness.git",
+    "directory": "packages/protocol"
+  },
+  "bugs": {
+    "url": "https://github.com/brawnen/agent-harness/issues"
+  },
+  "homepage": "https://github.com/brawnen/agent-harness/tree/main/packages/protocol",
+  "publishConfig": {
+    "access": "public"
+  }
 }

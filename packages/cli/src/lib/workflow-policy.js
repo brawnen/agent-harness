@@ -85,6 +85,33 @@ export function evaluateTaskWorkflowDecision(taskState, options = {}) {
   };
 }
 
+export function buildWorkflowWarning(decision) {
+  if (!decision || typeof decision !== "object") {
+    return null;
+  }
+
+  if (decision.enforcement_mode !== "warn") {
+    return null;
+  }
+
+  if (decision.effective_mode !== "full") {
+    return null;
+  }
+
+  const reasons = Array.isArray(decision.reasons)
+    ? decision.reasons.filter((item) => typeof item === "string" && item.trim().length > 0)
+    : [];
+  if (reasons.length === 0) {
+    return null;
+  }
+
+  if (decision.upgraded_from === "lite") {
+    return `当前任务已从 lite 升级为 full workflow，建议按完整链路收口（原因: ${reasons.join(", ")}）`;
+  }
+
+  return `当前任务命中 full workflow，建议按完整链路收口（原因: ${reasons.join(", ")}）`;
+}
+
 function buildWorkflowContext(taskState, options) {
   const contract = taskState?.confirmed_contract ?? {};
   const draft = taskState?.task_draft ?? {};

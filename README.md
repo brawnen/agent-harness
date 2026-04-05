@@ -9,6 +9,7 @@
 - 让 agent 在真实项目里按边界工作
 - 让任务有状态、有验证、有交付收口
 - 让高风险写入和越界操作尽量在执行前被拦住
+- 让交互节奏稳定：确认前给方案，确认后只执行，最终不复读
 
 当前项目已经形成一条完整的 `Codex` 主链路：
 
@@ -44,11 +45,11 @@
 
 做法：
 
-1. 把 [packages/protocol/rules/base.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/base.md) 或 [packages/protocol/rules/full.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/full.md) 复制到项目的 `AGENTS.md`、`CLAUDE.md` 或 `GEMINI.md`
+1. 把 [packages/protocol/rules/base.md](packages/protocol/rules/base.md) 或 [packages/protocol/rules/full.md](packages/protocol/rules/full.md) 复制到项目的 `AGENTS.md`、`CLAUDE.md` 或 `GEMINI.md`
 2. 按需引用：
-   - [packages/protocol/templates](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/templates)
-   - [packages/protocol/schemas](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas)
-   - [packages/protocol/adapters](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/adapters)
+   - [packages/protocol/templates](packages/protocol/templates)
+   - [packages/protocol/schemas](packages/protocol/schemas)
+   - [packages/protocol/adapters](packages/protocol/adapters)
 
 你会获得：
 
@@ -106,7 +107,7 @@ node packages/cli/bin/agent-harness.js delivery ready
 
 如果你想看更完整的自举与跨项目接入方式，见：
 
-- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+- [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
 
 ## Quick Start
 
@@ -127,18 +128,18 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 
 更完整的跨项目接入说明见：
 
-- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+- [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
 
 ### Codex
 
 当前仓库已经内置：
 
-- [.codex/config.toml](/Users/lijianfeng/code/pp/agent-harness/.codex/config.toml)
-- [.codex/hooks.json](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks.json)
-- [.codex/hooks/user_prompt_submit_intake.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/user_prompt_submit_intake.js)
-- [.codex/hooks/session_start_restore.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/session_start_restore.js)
-- [.codex/hooks/pre_tool_use_gate.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/pre_tool_use_gate.js)
-- [.codex/hooks/post_tool_use_record_evidence.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/post_tool_use_record_evidence.js)
+- [.codex/config.toml](.codex/config.toml)
+- [.codex/hooks.json](.codex/hooks.json)
+- [.codex/hooks/user_prompt_submit_intake.js](.codex/hooks/user_prompt_submit_intake.js)
+- [.codex/hooks/session_start_restore.js](.codex/hooks/session_start_restore.js)
+- [.codex/hooks/pre_tool_use_gate.js](.codex/hooks/pre_tool_use_gate.js)
+- [.codex/hooks/post_tool_use_record_evidence.js](.codex/hooks/post_tool_use_record_evidence.js)
 
 在当前仓库内直接运行：
 
@@ -211,8 +212,8 @@ codex exec "继续推进当前任务"
 
 更细的命令边界见：
 
-- [packages/cli/README.md](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
-- [packages/protocol/README.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
+- [packages/cli/README.zh-CN.md](packages/cli/README.zh-CN.md)
+- [packages/protocol/README.zh-CN.md](packages/protocol/README.zh-CN.md)
 
 ## What Is Still Missing Before Broader Open Source Adoption
 
@@ -231,16 +232,18 @@ codex exec "继续推进当前任务"
 
 ## Documentation
 
-- [Agent Harness Design v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
-- [Open Source Architecture ADR](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
-- [Codex Auto Intake Design](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-auto-intake-design-v0.1.md)
-- [Codex Hooks Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-hooks-workflow-v0.1.md)
-- [Codex v0.3 Roadmap](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-codex-v0.3-roadmap.md)
-- [CHANGELOG Maintenance Policy](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
-- [Workflow Policy Design v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-workflow-policy-design-v0.1.md)
-- [Task Core Misclassification Fixture Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
-- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
-- [CLI README](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
-- [Protocol README](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
+- [Agent Harness Design v0.3](docs/2026-04-03-agent-harness-design-v0.3.md)
+- [Open Source Architecture ADR](docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
+- [Codex Auto Intake Design](docs/2026-04-03-codex-auto-intake-design-v0.1.md)
+- [Codex Hooks Workflow](docs/2026-04-03-codex-hooks-workflow-v0.1.md)
+- [Codex v0.3 Roadmap](docs/2026-04-04-codex-v0.3-roadmap.md)
+- [CHANGELOG Maintenance Policy](docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
+- [Workflow Policy Design v0.1](docs/2026-04-05-workflow-policy-design-v0.1.md)
+- [Task Core Misclassification Fixture Workflow](docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
+- [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+- [CLI README（中文）](packages/cli/README.zh-CN.md)
+- [Protocol README（中文）](packages/protocol/README.zh-CN.md)
+- [CLI README（English）](packages/cli/README.md)
+- [Protocol README（English）](packages/protocol/README.md)
 
-Historical drafts and early specs are archived under [`docs/archive/`](/Users/lijianfeng/code/pp/agent-harness/docs/archive).
+Historical drafts and early specs are archived under [`docs/archive/`](docs/archive).

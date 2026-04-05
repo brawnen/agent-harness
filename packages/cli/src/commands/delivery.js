@@ -7,7 +7,7 @@ import { normalizeOutputPolicy } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
 import { runtimeRelativeCandidates } from "../lib/runtime-paths.js";
 import { requireTaskState, resolveTaskId } from "../lib/state-store.js";
-import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
+import { buildWorkflowWarning, evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 
 const VALID_ACTIONS = new Set(["commit", "push"]);
 
@@ -47,11 +47,13 @@ function runDeliveryReady(argv) {
     const taskId = resolveTaskId(cwd, parsed.options.taskId);
     const taskState = requireTaskState(cwd, taskId);
     const readiness = buildDeliveryReadiness(cwd, taskState);
+    const workflowDecision = buildWorkflowDecision(cwd, taskState);
 
     printJson({
       task_id: taskId,
       delivery_readiness: readiness,
-      workflow_decision: buildWorkflowDecision(cwd, taskState)
+      workflow_decision: workflowDecision,
+      workflow_warning: buildWorkflowWarning(workflowDecision)
     });
     return 0;
   } catch (error) {
@@ -73,6 +75,7 @@ function runDeliveryRequest(argv) {
     const taskState = requireTaskState(cwd, taskId);
     const readiness = buildDeliveryReadiness(cwd, taskState);
     const actionReadiness = readiness[parsed.options.action];
+    const workflowDecision = buildWorkflowDecision(cwd, taskState);
 
     const result = {
       task_id: taskId,
@@ -80,7 +83,8 @@ function runDeliveryRequest(argv) {
       allowed: actionReadiness?.ready === true,
       via: actionReadiness?.via ?? null,
       delivery_readiness: readiness,
-      workflow_decision: buildWorkflowDecision(cwd, taskState),
+      workflow_decision: workflowDecision,
+      workflow_warning: buildWorkflowWarning(workflowDecision),
       requested_at: new Date().toISOString()
     };
 
@@ -106,6 +110,7 @@ function runDeliveryCommit(argv) {
     const taskState = requireTaskState(cwd, taskId);
     const readiness = buildDeliveryReadiness(cwd, taskState);
     const actionReadiness = readiness.commit;
+    const workflowDecision = buildWorkflowDecision(cwd, taskState);
 
     if (actionReadiness?.ready !== true) {
       printJson({
@@ -114,7 +119,8 @@ function runDeliveryCommit(argv) {
         allowed: false,
         via: actionReadiness?.via ?? null,
         delivery_readiness: readiness,
-        workflow_decision: buildWorkflowDecision(cwd, taskState),
+        workflow_decision: workflowDecision,
+        workflow_warning: buildWorkflowWarning(workflowDecision),
         requested_at: new Date().toISOString()
       });
       return 1;
@@ -139,7 +145,8 @@ function runDeliveryCommit(argv) {
         wide_scope: commitPlan.wide_scope,
         reason: `检测到过宽 scope，需显式使用 --force-wide-scope: ${commitPlan.wide_scope.join(", ")}`,
         delivery_readiness: readiness,
-        workflow_decision: buildWorkflowDecision(cwd, taskState),
+        workflow_decision: workflowDecision,
+        workflow_warning: buildWorkflowWarning(workflowDecision),
         requested_at: new Date().toISOString()
       };
       printJson(result);
@@ -157,7 +164,8 @@ function runDeliveryCommit(argv) {
         staged_paths: commitPlan.paths,
         wide_scope: commitPlan.wide_scope,
         delivery_readiness: readiness,
-        workflow_decision: buildWorkflowDecision(cwd, taskState),
+        workflow_decision: workflowDecision,
+        workflow_warning: buildWorkflowWarning(workflowDecision),
         requested_at: new Date().toISOString()
       });
       return 0;
@@ -176,7 +184,8 @@ function runDeliveryCommit(argv) {
       wide_scope: commitPlan.wide_scope,
       commit_sha: getHeadSha(cwd),
       delivery_readiness: readiness,
-      workflow_decision: buildWorkflowDecision(cwd, taskState),
+      workflow_decision: workflowDecision,
+      workflow_warning: buildWorkflowWarning(workflowDecision),
       requested_at: new Date().toISOString()
     };
 
@@ -197,13 +206,16 @@ function buildDeliveryReadiness(cwd, taskState) {
 }
 
 function buildWorkflowDecision(cwd, taskState) {
+  const projectConfig = loadProjectConfig(cwd);
+  const normalizedPolicy = normalizeWorkflowPolicy(projectConfig?.workflow_policy);
   if (taskState?.workflow_decision && typeof taskState.workflow_decision === "object") {
-    return taskState.workflow_decision;
+    if (taskState.workflow_decision.enforcement_mode === normalizedPolicy.enforcement.mode) {
+      return taskState.workflow_decision;
+    }
   }
 
-  const projectConfig = loadProjectConfig(cwd);
   return evaluateTaskWorkflowDecision(taskState, {
-    workflowPolicy: normalizeWorkflowPolicy(projectConfig?.workflow_policy),
+    workflowPolicy: normalizedPolicy,
     outputPolicy: normalizeOutputPolicy(projectConfig?.output_policy),
     previousDecision: taskState.workflow_decision
   });

@@ -109,7 +109,7 @@ workflow_policy:
     high_risk: true
     override_used: true
   enforcement:
-    mode: recommend
+    mode: warn
     upgrade_only: true
 
 output_policy:

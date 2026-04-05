@@ -10,6 +10,7 @@ It is not about making an agent “better at coding”. It is about making an ag
 - keep task state explicit
 - require verification before claiming completion
 - close the loop with reports, gating, and delivery policies
+- keep the interaction rhythm stable: plan before confirmation, execute after confirmation, no repeated final restatement
 
 Today, the most complete host integration is `Codex`, backed by:
 
@@ -45,11 +46,11 @@ Use this if you:
 
 How:
 
-1. Copy [packages/protocol/rules/base.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/base.md) or [packages/protocol/rules/full.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/full.md) into `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`
+1. Copy [packages/protocol/rules/base.md](packages/protocol/rules/base.md) or [packages/protocol/rules/full.md](packages/protocol/rules/full.md) into `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`
 2. Reuse:
-   - [packages/protocol/templates](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/templates)
-   - [packages/protocol/schemas](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas)
-   - [packages/protocol/adapters](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/adapters)
+   - [packages/protocol/templates](packages/protocol/templates)
+   - [packages/protocol/schemas](packages/protocol/schemas)
+   - [packages/protocol/adapters](packages/protocol/adapters)
 
 You get:
 
@@ -107,7 +108,7 @@ The current self-hosting setup includes:
 
 For the full self-hosting and cross-repo usage guide, see:
 
-- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
+- [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
 
 ## Quick Start
 
@@ -128,18 +129,18 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 
 For the full cross-repo setup guide, see:
 
-- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
+- [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
 
 ### Codex
 
 This repository already includes:
 
-- [.codex/config.toml](/Users/lijianfeng/code/pp/agent-harness/.codex/config.toml)
-- [.codex/hooks.json](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks.json)
-- [.codex/hooks/user_prompt_submit_intake.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/user_prompt_submit_intake.js)
-- [.codex/hooks/session_start_restore.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/session_start_restore.js)
-- [.codex/hooks/pre_tool_use_gate.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/pre_tool_use_gate.js)
-- [.codex/hooks/post_tool_use_record_evidence.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/post_tool_use_record_evidence.js)
+- [.codex/config.toml](.codex/config.toml)
+- [.codex/hooks.json](.codex/hooks.json)
+- [.codex/hooks/user_prompt_submit_intake.js](.codex/hooks/user_prompt_submit_intake.js)
+- [.codex/hooks/session_start_restore.js](.codex/hooks/session_start_restore.js)
+- [.codex/hooks/pre_tool_use_gate.js](.codex/hooks/pre_tool_use_gate.js)
+- [.codex/hooks/post_tool_use_record_evidence.js](.codex/hooks/post_tool_use_record_evidence.js)
 
 In this repository, you can just run:
 
@@ -212,8 +213,8 @@ Current boundaries:
 
 For command-level details, see:
 
-- [packages/cli/README.md](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
-- [packages/protocol/README.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
+- [packages/cli/README.md](packages/cli/README.md)
+- [packages/protocol/README.md](packages/protocol/README.md)
 
 ## What Is Still Missing Before Broader Open Source Adoption
 
@@ -232,16 +233,18 @@ Main remaining work:
 
 ## Documentation
 
-- [Agent Harness Design v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
-- [Open Source Architecture ADR](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
-- [Codex Auto Intake Design](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-auto-intake-design-v0.1.md)
-- [Codex Hooks Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-hooks-workflow-v0.1.md)
-- [Codex v0.3 Roadmap](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-codex-v0.3-roadmap.md)
-- [CHANGELOG Maintenance Policy](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
-- [Workflow Policy Design v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-workflow-policy-design-v0.1.md)
-- [Task Core Misclassification Fixture Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
-- [How To Use Agent Harness In This Repository And Other Projects](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
-- [CLI README](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
-- [Protocol README](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
+- [Agent Harness Design v0.3](docs/2026-04-03-agent-harness-design-v0.3.md)
+- [Open Source Architecture ADR](docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
+- [Codex Auto Intake Design](docs/2026-04-03-codex-auto-intake-design-v0.1.md)
+- [Codex Hooks Workflow](docs/2026-04-03-codex-hooks-workflow-v0.1.md)
+- [Codex v0.3 Roadmap](docs/2026-04-04-codex-v0.3-roadmap.md)
+- [CHANGELOG Maintenance Policy](docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
+- [Workflow Policy Design v0.1](docs/2026-04-05-workflow-policy-design-v0.1.md)
+- [Task Core Misclassification Fixture Workflow](docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
+- [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
+- [CLI README](packages/cli/README.md)
+- [Protocol README](packages/protocol/README.md)
+- [CLI README (Chinese)](packages/cli/README.zh-CN.md)
+- [Protocol README (Chinese)](packages/protocol/README.zh-CN.md)
 
-Historical drafts and early specifications are archived under [`docs/archive/`](/Users/lijianfeng/code/pp/agent-harness/docs/archive).
+Historical drafts and early specifications are archived under [`docs/archive/`](docs/archive).

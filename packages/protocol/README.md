@@ -1,20 +1,61 @@
 # @agent-harness/protocol
 
-这个包承载 `agent-harness` 的协议层资源：
+[中文](README.zh-CN.md)
 
-- `rules/`：协议规则文本
-- `schemas/`：JSON Schema
-- `templates/`：任务模板
-- `adapters/`：宿主适配示例
+`@agent-harness/protocol` contains the protocol-layer assets of `agent-harness`.
 
-设计约束：
+It currently includes:
 
-- 这个包必须可独立使用
-- 协议规则不能只存在于 CLI 内部
-- CLI 可以依赖这个包，但这个包不能反向依赖 CLI
+- `rules/` for protocol rules
+- `schemas/` for JSON Schema files
+- `templates/` for task templates
+- `adapters/` for host integration examples and guidance
 
-当前状态：
+## Purpose
 
-- `schemas/` 与 `templates/` 已进入 `packages/protocol`
-- `rules/` 已拆出 `base.md` 与 `full.md`
-- `adapters/` 先提供宿主接入说明和示例配置
+This package exists so the protocol can be reused independently from the CLI.
+
+That means:
+
+- the protocol must remain usable on its own
+- rules must not exist only inside the CLI
+- the CLI may depend on `protocol`
+- `protocol` must not depend on `cli`
+
+## Current Status
+
+The current repository already places the protocol resources here:
+
+- `schemas/`
+- `templates/`
+- `rules/base.md`
+- `rules/full.md`
+- `adapters/` for host-specific notes and example configuration
+
+## Typical Use
+
+If you only want the behavior contract, without installing the full CLI:
+
+1. Copy `rules/base.md` or `rules/full.md` into `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`
+2. Reuse task templates from `templates/`
+3. Reuse schemas from `schemas/`
+4. Use `adapters/` as host-specific reference material
+
+## Scope
+
+This package is responsible for:
+
+- protocol rules
+- schemas
+- task templates
+- host adapter examples
+
+This package is not responsible for:
+
+- project initialization
+- task state persistence
+- audit log writing
+- gate execution
+- report generation
+
+Those responsibilities belong to `@agent-harness/cli`.
