@@ -464,6 +464,31 @@ function renderHarnessConfig(project, mode) {
         require: ["commit_exists"]
       }
     },
+    workflow_policy: {
+      default_mode: "full",
+      lite_allowed_if: {
+        single_file: true,
+        low_risk: true,
+        docs_only: true,
+        no_behavior_change: true,
+        no_policy_change: true,
+        no_output_artifacts: true
+      },
+      force_full_if: {
+        intents: ["bug", "feature", "refactor"],
+        multi_file_scope: true,
+        config_changed: true,
+        protocol_changed: true,
+        host_adapter_changed: true,
+        output_artifact_required: true,
+        high_risk: true,
+        override_used: true
+      },
+      enforcement: {
+        mode: "recommend",
+        upgrade_only: true
+      }
+    },
     output_policy: {
       report: {
         required: true,

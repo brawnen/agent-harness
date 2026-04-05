@@ -1,5 +1,8 @@
 import { createTaskFromInput, suspendActiveTask } from "../lib/task-core.js";
-import { confirmTaskContract, resolveTaskId } from "../lib/state-store.js";
+import { normalizeOutputPolicy } from "../lib/output-policy.js";
+import { loadProjectConfig } from "../lib/project-config.js";
+import { confirmTaskContract, resolveTaskId, updateTaskState } from "../lib/state-store.js";
+import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 
 export function runTask(argv) {
   const [subcommand, ...rest] = argv;
@@ -70,8 +73,18 @@ function runTaskConfirm(argv) {
   }
 
   try {
-    const taskId = resolveTaskId(process.cwd(), parsed.options.taskId);
-    const result = confirmTaskContract(process.cwd(), taskId, parsed.options);
+    const cwd = process.cwd();
+    const taskId = resolveTaskId(cwd, parsed.options.taskId);
+    const confirmed = confirmTaskContract(cwd, taskId, parsed.options);
+    const projectConfig = loadProjectConfig(cwd);
+    const workflowDecision = evaluateTaskWorkflowDecision(confirmed, {
+      workflowPolicy: normalizeWorkflowPolicy(projectConfig?.workflow_policy),
+      outputPolicy: normalizeOutputPolicy(projectConfig?.output_policy),
+      previousDecision: confirmed.workflow_decision
+    });
+    const result = updateTaskState(cwd, taskId, {
+      workflow_decision: workflowDecision
+    });
     printJson(result);
     return 0;
   } catch (error) {

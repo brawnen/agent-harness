@@ -24,6 +24,7 @@ export function loadProjectConfig(cwd) {
     risk_rules: normalizeObject(parsed.risk_rules),
     skill_policy: normalizeObject(parsed.skill_policy),
     task_templates: normalizeObject(parsed.task_templates),
+    workflow_policy: normalizeObject(parsed.workflow_policy),
     version: parsed.version ?? null
   };
 }

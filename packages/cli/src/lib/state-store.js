@@ -38,7 +38,7 @@ const SCOPE_PLACEHOLDER = "待澄清作用范围";
 const ACCEPTANCE_PLACEHOLDER = "待澄清完成标准";
 const VALID_RISK_LEVELS = new Set(["low", "medium", "high"]);
 
-export function initTaskState(cwd, { taskDraft, taskId }) {
+export function initTaskState(cwd, { taskDraft, taskId, workflowDecision = null }) {
   return withStateWriteLock(cwd, () => {
     const resolvedTaskId = taskId ?? generateTaskId(taskDraft);
     const now = new Date().toISOString();
@@ -49,6 +49,7 @@ export function initTaskState(cwd, { taskDraft, taskId }) {
       current_state: taskDraft?.derived?.state ?? "draft",
       task_draft: taskDraft,
       confirmed_contract: null,
+      workflow_decision: workflowDecision,
       evidence: [],
       open_questions: Array.isArray(taskDraft?.open_questions) ? taskDraft.open_questions : [],
       override_history: [],

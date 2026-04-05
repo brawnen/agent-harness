@@ -11,6 +11,7 @@ import {
   runtimeRelativePathForCwd
 } from "../lib/runtime-paths.js";
 import { getActiveTask } from "../lib/state-store.js";
+import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 
 const REQUIRED_TEMPLATE_FILES = [
   "bug.md",
@@ -46,6 +47,10 @@ export function runStatus(argv) {
   const artifactHintsCheck = inspectActiveTaskArtifactHints(cwd);
   pushCheck(checks, artifactHintsCheck);
   exitCode = maxExitCode(exitCode, artifactHintsCheck.severity);
+
+  const workflowModeCheck = inspectWorkflowMode(cwd);
+  pushCheck(checks, workflowModeCheck);
+  exitCode = maxExitCode(exitCode, workflowModeCheck.severity);
 
   const hosts = detectedHosts.length > 0 ? detectedHosts : ["claude-code", "codex", "gemini-cli"];
   for (const host of hosts) {
@@ -191,6 +196,33 @@ function inspectActiveTaskArtifactHints(cwd) {
   }
 
   return warn("artifact_hints", `active_task=${activeTask.task_id}；建议补齐 ${names.join(", ")}；${hints.join("；")}`);
+}
+
+function inspectWorkflowMode(cwd) {
+  const config = loadProjectConfig(cwd);
+  if (!config) {
+    return skip("workflow_mode", "harness.yaml 缺失，无法检查");
+  }
+
+  const activeTask = getActiveTask(cwd);
+  if (!activeTask) {
+    return skip("workflow_mode", "当前无 active task");
+  }
+
+  const decision = evaluateTaskWorkflowDecision(activeTask, {
+    workflowPolicy: normalizeWorkflowPolicy(config.workflow_policy),
+    outputPolicy: normalizeOutputPolicy(config.output_policy),
+    previousDecision: activeTask.workflow_decision
+  });
+  const reasons = Array.isArray(decision.reasons) && decision.reasons.length > 0
+    ? decision.reasons.join(", ")
+    : "none";
+  const upgraded = decision.upgraded_from ? `；upgraded_from=${decision.upgraded_from}` : "";
+
+  return ok(
+    "workflow_mode",
+    `active_task=${activeTask.task_id}；recommended=${decision.recommended_mode}；effective=${decision.effective_mode}${upgraded}；reasons=${reasons}`
+  );
 }
 
 function inspectHostRules(cwd, host, fallback) {

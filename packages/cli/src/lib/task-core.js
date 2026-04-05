@@ -6,6 +6,9 @@ import {
   setActiveTaskId,
   updateTaskState
 } from "./state-store.js";
+import { loadProjectConfig } from "./project-config.js";
+import { normalizeOutputPolicy } from "./output-policy.js";
+import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "./workflow-policy.js";
 
 const CONTINUE_KEYWORDS = [
   "继续",
@@ -125,9 +128,21 @@ export function createTaskFromInput(cwd, sourceInput, options = {}) {
   }
 
   const taskDraft = buildTaskDraftFromInput(sourceInput, options);
+  const projectConfig = loadProjectConfig(cwd);
+  const workflowDecision = evaluateTaskWorkflowDecision({
+    task_id: options.taskId ?? null,
+    current_state: taskDraft?.derived?.state ?? "draft",
+    task_draft: taskDraft,
+    confirmed_contract: null,
+    override_history: []
+  }, {
+    workflowPolicy: normalizeWorkflowPolicy(projectConfig?.workflow_policy),
+    outputPolicy: normalizeOutputPolicy(projectConfig?.output_policy)
+  });
   return initTaskState(cwd, {
     taskDraft,
-    taskId: options.taskId
+    taskId: options.taskId,
+    workflowDecision
   });
 }
 

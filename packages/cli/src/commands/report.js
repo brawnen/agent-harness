@@ -6,6 +6,7 @@ import { evaluateTaskDeliveryReadiness, normalizeDeliveryPolicy } from "../lib/d
 import { normalizeOutputPolicy, validateTaskOutputArtifacts } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
 import { requireTaskState, resolveTaskId, updateTaskState } from "../lib/state-store.js";
+import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 import { verifyTaskState } from "./verify.js";
 
 const SCHEMA_VERSION = "0.3";
@@ -50,13 +51,21 @@ export function runReport(argv) {
       reportPolicy,
       reportWillBeGenerated: true
     });
-    const report = buildReport(cwd, taskState, parsed.options, outputArtifacts, deliveryReadiness);
+    const workflowDecision = evaluateTaskWorkflowDecision(taskState, {
+      workflowPolicy: normalizeWorkflowPolicy(projectConfig?.workflow_policy),
+      outputPolicy,
+      actualScope: parsed.options.actualScope,
+      outputArtifacts,
+      previousDecision: taskState.workflow_decision
+    });
+    const report = buildReport(cwd, taskState, parsed.options, outputArtifacts, deliveryReadiness, workflowDecision);
     validateReportAgainstPolicy(report, reportPolicy);
     writeReport(cwd, report, reportPolicy);
 
     updateTaskState(cwd, taskId, {
       current_phase: "close",
-      current_state: "done"
+      current_state: "done",
+      workflow_decision: workflowDecision
     });
 
     console.log(`${JSON.stringify(report, null, 2)}\n`);
@@ -147,7 +156,7 @@ function parseReportArgs(argv) {
   return { ok: true, options };
 }
 
-function buildReport(cwd, taskState, options, outputArtifacts, deliveryReadiness) {
+function buildReport(cwd, taskState, options, outputArtifacts, deliveryReadiness, workflowDecision) {
   const contract = taskState.confirmed_contract ?? {};
   const draft = taskState.task_draft ?? {};
   const evidence = Array.isArray(taskState.evidence) ? taskState.evidence : [];
@@ -178,6 +187,7 @@ function buildReport(cwd, taskState, options, outputArtifacts, deliveryReadiness
       .map((entry) => entry.description),
     output_artifacts: outputArtifacts,
     delivery_readiness: deliveryReadiness,
+    workflow_decision: workflowDecision,
     next_steps: options.nextSteps,
     completed_at: new Date().toISOString()
   };

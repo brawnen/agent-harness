@@ -7,6 +7,7 @@ import { normalizeOutputPolicy } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
 import { runtimeRelativeCandidates } from "../lib/runtime-paths.js";
 import { requireTaskState, resolveTaskId } from "../lib/state-store.js";
+import { evaluateTaskWorkflowDecision, normalizeWorkflowPolicy } from "../lib/workflow-policy.js";
 
 const VALID_ACTIONS = new Set(["commit", "push"]);
 
@@ -49,7 +50,8 @@ function runDeliveryReady(argv) {
 
     printJson({
       task_id: taskId,
-      delivery_readiness: readiness
+      delivery_readiness: readiness,
+      workflow_decision: buildWorkflowDecision(cwd, taskState)
     });
     return 0;
   } catch (error) {
@@ -78,6 +80,7 @@ function runDeliveryRequest(argv) {
       allowed: actionReadiness?.ready === true,
       via: actionReadiness?.via ?? null,
       delivery_readiness: readiness,
+      workflow_decision: buildWorkflowDecision(cwd, taskState),
       requested_at: new Date().toISOString()
     };
 
@@ -111,6 +114,7 @@ function runDeliveryCommit(argv) {
         allowed: false,
         via: actionReadiness?.via ?? null,
         delivery_readiness: readiness,
+        workflow_decision: buildWorkflowDecision(cwd, taskState),
         requested_at: new Date().toISOString()
       });
       return 1;
@@ -135,6 +139,7 @@ function runDeliveryCommit(argv) {
         wide_scope: commitPlan.wide_scope,
         reason: `检测到过宽 scope，需显式使用 --force-wide-scope: ${commitPlan.wide_scope.join(", ")}`,
         delivery_readiness: readiness,
+        workflow_decision: buildWorkflowDecision(cwd, taskState),
         requested_at: new Date().toISOString()
       };
       printJson(result);
@@ -152,6 +157,7 @@ function runDeliveryCommit(argv) {
         staged_paths: commitPlan.paths,
         wide_scope: commitPlan.wide_scope,
         delivery_readiness: readiness,
+        workflow_decision: buildWorkflowDecision(cwd, taskState),
         requested_at: new Date().toISOString()
       });
       return 0;
@@ -170,6 +176,7 @@ function runDeliveryCommit(argv) {
       wide_scope: commitPlan.wide_scope,
       commit_sha: getHeadSha(cwd),
       delivery_readiness: readiness,
+      workflow_decision: buildWorkflowDecision(cwd, taskState),
       requested_at: new Date().toISOString()
     };
 
@@ -186,6 +193,19 @@ function buildDeliveryReadiness(cwd, taskState) {
   return evaluateTaskDeliveryReadiness(cwd, taskState, {
     deliveryPolicy: normalizeDeliveryPolicy(projectConfig?.delivery_policy),
     reportPolicy: normalizeOutputPolicy(projectConfig?.output_policy).report
+  });
+}
+
+function buildWorkflowDecision(cwd, taskState) {
+  if (taskState?.workflow_decision && typeof taskState.workflow_decision === "object") {
+    return taskState.workflow_decision;
+  }
+
+  const projectConfig = loadProjectConfig(cwd);
+  return evaluateTaskWorkflowDecision(taskState, {
+    workflowPolicy: normalizeWorkflowPolicy(projectConfig?.workflow_policy),
+    outputPolicy: normalizeOutputPolicy(projectConfig?.output_policy),
+    previousDecision: taskState.workflow_decision
   });
 }
 
