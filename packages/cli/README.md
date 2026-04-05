@@ -179,7 +179,28 @@ Codex `PreToolUse` 当前行为：
 - `needs_clarification / draft / blocked / failed / done / suspended` 状态下的写入会被前置阻断
 - 会结合 task state 与 `harness.yaml risk_rules.path_matches` 动态判断高风险写入
 - 高风险写入且未确认时，会在工具执行前阻断并要求先确认
-- 当前对 `Write / Edit / NotebookEdit` 的路径识别更可靠；`Bash` 的路径级判断取决于宿主 payload 是否提供目标路径
+- `Bash` 当前已支持最小高置信路径提取，例如：
+  - `echo ... > file`
+  - `cat <<EOF > file`
+  - `tee file`
+  - `printf ... | tee file`
+  - `mkdir -p dir`
+  - `touch file`
+  - `sed -i file`
+  - `perl -pi file`
+  - `chmod/chown/chgrp target`
+  - `rm file`
+  - `truncate -s ... file`
+  - `dd ... of=file`
+  - `mv src dst`
+  - `cp src dst`
+  - `install -d dir`
+  - `install -D/-m ... dst`
+  - `install -Dm644 src dst`
+  - `install src dst`
+  - `ln -s src dst`
+  - `rsync ... dst`
+- 无法高置信提取目标路径时，会保守降级为仅做状态级门禁
 
 本地验证提示：
 
