@@ -10,6 +10,7 @@ All notable changes to `agent-harness` will be documented in this file.
 - Made `gate` consume `harness.yaml risk_rules.path_matches` to derive path-based high-risk writes and require confirmation.
 - Expanded Codex `PreToolUse` Bash path extraction to cover heredoc and common file-writing commands such as `tee`, `install`, `dd`, `rsync`, `chmod`, and `truncate`.
 - Documented the current high-confidence Bash command patterns handled by `PreToolUse` in the CLI README.
+- Added task-level `commit_exists` detection so `delivery ready` can infer whether task-related files have already been committed.
 
 ### 2026-04-04
 

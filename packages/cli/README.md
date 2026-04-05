@@ -133,7 +133,8 @@ npm --prefix packages/cli run verify:task-core
 - `commit` 保留为 skill 化的显式动作
 - `push` 保留为人工动作，不作为 skill 默认能力
 - 当前只做 readiness 计算，不会自动执行 `git commit` 或 `git push`
-- `commit_exists` 目前仍是保守信号，默认不会自动判定为 true
+- `commit_exists` 会基于任务报告中的 `actual_scope + output_artifacts` 检查相关文件是否仍有未提交改动
+- 若任务相关文件已经干净，则视为该任务已完成本地 `commit`
 
 `delivery commit` 当前行为：
 
