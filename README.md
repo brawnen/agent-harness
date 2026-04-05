@@ -1,34 +1,70 @@
 # agent-harness
 
-`agent-harness` 是一套面向 Claude Code、Codex、Gemini CLI 等宿主的任务收敛协议与工具集。
+[English](README.en.md)
 
-它关注的不是“让 agent 会写代码”，而是“让 agent 在真实项目里按边界、状态和验证要求稳定收敛”：
+`agent-harness` 是一套面向 `Codex`、`Claude Code`、`Gemini CLI` 等宿主的任务收敛协议与工具集。
 
-- 协议层定义 intake / clarify / observe / verify / report 行为约束
-- CLI 层提供 init / status / state / verify / report / gate / audit 最小工具链
-- 项目侧通过少量配置接入 protected paths、风险规则和宿主适配
+它解决的不是“让 agent 更会写代码”，而是：
 
-## Quick Start
+- 让 agent 在真实项目里按边界工作
+- 让任务有状态、有验证、有交付收口
+- 让高风险写入和越界操作尽量在执行前被拦住
 
-### 1. 只用协议，不装 CLI
+当前项目已经形成一条完整的 `Codex` 主链路：
 
-适合只需要 L2 行为约束的场景。
+- `protocol` 负责规则、schema、模板、宿主适配说明
+- `cli` 负责 `init / status / task / state / verify / report / gate / audit / delivery / docs`
+- `Codex hooks` 负责自动 intake、前置门禁、自动 evidence 和上下文恢复
+
+## Why Agent Harness
+
+大部分 AI coding agent 在 demo 里看起来很强，但进入真实项目后常见问题是：
+
+- 不知道当前是不是同一个任务
+- 需求还没闭合就开始修改文件
+- 越过 scope 或写到高风险目录
+- 做完后没有验证证据
+- 说“完成”时没有 report、没有交付边界、没有提交收口
+
+`agent-harness` 的目标是给这些行为加上最小但明确的工程约束：
+
+- `intake / clarify / observe / verify / report`
+- `state / audit / gate / delivery`
+- `protected_paths / risk_rules / output_policy / delivery_policy`
+
+## Two Ways To Use It
+
+### 1. Protocol only
+
+适合：
+
+- 只想要行为规则
+- 不想装 CLI
+- 先在现有项目里低成本试用
 
 做法：
 
-1. 把 [full.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/full.md) 或 [base.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/base.md) 的内容复制到项目的 `CLAUDE.md`、`AGENTS.md` 或 `GEMINI.md`
-2. 按需引用 [templates](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/templates) 和 [schemas](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas)
-3. 需要宿主接入示例时，查看 [adapters](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/adapters)
+1. 把 [packages/protocol/rules/base.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/base.md) 或 [packages/protocol/rules/full.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/rules/full.md) 复制到项目的 `AGENTS.md`、`CLAUDE.md` 或 `GEMINI.md`
+2. 按需引用：
+   - [packages/protocol/templates](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/templates)
+   - [packages/protocol/schemas](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/schemas)
+   - [packages/protocol/adapters](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/adapters)
 
-获得能力：
+你会获得：
 
-- intake / clarify / observe / verify / report 规则
+- intake / clarify / observe / verify / report 的规则约束
 - 任务模板与 schema
-- Claude Code / Codex / Gemini CLI 的规则注入示例
+- 各宿主的规则注入示例
 
-### 2. 用 CLI 初始化项目
+### 2. Protocol + CLI
 
-当前仓库内可直接本地运行：
+适合：
+
+- 希望有状态持久化
+- 希望有前置门禁、审计和报告
+- 希望把任务闭环真正接进工程交付流程
+
+当前本仓库的可用入口：
 
 ```bash
 node packages/cli/bin/agent-harness.js init --dry-run
@@ -36,14 +72,7 @@ node packages/cli/bin/agent-harness.js init --host codex
 node packages/cli/bin/agent-harness.js status
 ```
 
-如果当前项目使用 Codex，当前仓库已经通过项目级 `.codex/config.toml` 默认开启 `codex_hooks`。显式传参仍然可用：
-
-```bash
-codex
-codex exec "继续推进当前任务"
-```
-
-未来发布后的默认入口会是：
+未来发布后的目标入口：
 
 ```bash
 npx @agent-harness/cli init
@@ -52,12 +81,95 @@ npx @agent-harness/cli init --protocol-only
 
 说明：
 
-- 仓库当前尚未发布到 npm，README 中的 `npx` 入口是目标分发形态
+- 当前仓库尚未发布到 npm
+- README 中出现的 `npx @agent-harness/cli ...` 是目标分发形态，不是已发布事实
 - 本地运行要求 `Node.js >= 18`
 
-## 当前能力
+## Quick Start
 
-`packages/cli` 当前已经具备以下 MVP 命令：
+### Protocol only
+
+1. 复制规则文件到目标仓库的 `AGENTS.md` / `CLAUDE.md` / `GEMINI.md`
+2. 根据需要复制模板和 schema
+3. 在宿主里开始按规则使用
+
+### Local CLI
+
+如果你现在就想在其他项目里试用当前仓库里的 CLI，可以直接用本地路径：
+
+```bash
+node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js init --host codex
+node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
+```
+
+### Codex
+
+当前仓库已经内置：
+
+- [.codex/config.toml](/Users/lijianfeng/code/pp/agent-harness/.codex/config.toml)
+- [.codex/hooks.json](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks.json)
+- [.codex/hooks/user_prompt_submit_intake.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/user_prompt_submit_intake.js)
+- [.codex/hooks/session_start_restore.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/session_start_restore.js)
+- [.codex/hooks/pre_tool_use_gate.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/pre_tool_use_gate.js)
+- [.codex/hooks/post_tool_use_record_evidence.js](/Users/lijianfeng/code/pp/agent-harness/.codex/hooks/post_tool_use_record_evidence.js)
+
+在当前仓库内直接运行：
+
+```bash
+codex
+```
+
+或：
+
+```bash
+codex exec "继续推进当前任务"
+```
+
+当前 `Codex` 已接入：
+
+- `SessionStart`：恢复 active task 摘要
+- `UserPromptSubmit`：自动 intake / continue / clarify / override
+- `PreToolUse`：前置 `gate before-tool`
+- `PostToolUse`：自动 evidence 记录
+
+## Current Status
+
+当前最完整的宿主是 `Codex`。
+
+已经形成完整最小闭环的能力包括：
+
+- `task intake / confirm / suspend-active`
+- `state`
+- `verify`
+- `report`
+- `gate`
+- `audit`
+- `delivery ready / request / commit`
+- `docs scaffold`
+- `Codex` 的 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse`
+
+当前边界：
+
+- `commit`：支持显式请求触发，并推荐由 skill 承载
+- `push`：保留为人工动作，不自动化
+- `Bash` 的前置路径识别只覆盖高置信常见写命令
+- 复杂 shell 语法仍会保守降级
+
+## Repository Layout
+
+```text
+.
+├── docs/           # 设计文档、ADR、roadmap、策略说明
+├── packages/
+│   ├── protocol/   # rules / schemas / templates / adapters
+│   └── cli/        # Node.js CLI
+├── harness/        # 运行时 state / audit / reports / schemas / tasks
+└── package.json    # workspace 根配置
+```
+
+## Current Commands
+
+`packages/cli` 当前已具备这些核心命令：
 
 - `init`
 - `status`
@@ -67,151 +179,37 @@ npx @agent-harness/cli init --protocol-only
 - `report`
 - `gate`
 - `audit`
+- `delivery`
+- `docs`
 
-这些命令当前覆盖的能力边界是：
+更细的命令边界见：
 
-- 初始化 `harness.yaml`、规则块、任务模板与最小运行时目录
-- 维护本地 JSON 状态文件和 active task
-- 执行最小完成门禁检查
-- 生成任务报告
-- 对写入动作执行最小 before-tool 门禁
-- 记录并读取最小审计日志
-- 提供 `.codex/hooks.json` 的最小自动 intake 接入点
+- [packages/cli/README.md](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
+- [packages/protocol/README.md](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
 
-## 在本仓库中使用 Codex Hooks
+## What Is Still Missing Before Broader Open Source Adoption
 
-当前仓库已经内置以下文件：
+当前项目已经达到“个人/团队内部可用”的阶段，但还没到“全球开发者低摩擦采用”的阶段。
 
-- `.codex/hooks.json`
-- `.codex/hooks/user_prompt_submit_intake.js`
-- `.codex/hooks/session_start_restore.js`
+主要还差：
 
-启用方式：
+- npm 发布与版本化分发
+- README / Quick Start 的进一步收口
+- 更多宿主支持
+  - `Claude Code`
+  - `Gemini CLI`
+  - `Antigravity`
+- 更完整的 CI / release 流程
+- 更丰富的宿主 E2E 与误判样本回归
 
-```bash
-codex
-```
+## Documentation
 
-或：
-
-```bash
-codex exec "你的任务描述"
-```
-
-当前接入行为：
-
-- `SessionStart`：恢复当前 `active task` 摘要
-- `UserPromptSubmit`：自动判断是续写、新任务还是先澄清
-- 高风险且归属不明的 prompt 会被直接阻断
-
-降级路径：
-
-- 自动 intake 失败时，hook 会 fail-open，不阻塞正常会话
-- 失败提示会明确说明“已降级到手动模式”以及下一步 fallback 命令
-- 需要人工补录时，执行 `node packages/cli/bin/agent-harness.js task intake "任务描述"`
-- 需要人工切换任务时，执行 `node packages/cli/bin/agent-harness.js task suspend-active --reason "原因"`
-
-说明：
-
-- 当前仓库通过 `.codex/config.toml` 默认设置 `features.codex_hooks = true`
-- 若项目未被 Codex 视为 trusted project，可继续显式使用 `--enable codex_hooks`
-- 可执行 `npm run codex:hooks:check` 做语法自检，执行 `npm run codex:hooks:status` 查看当前仓库的 Codex hooks 接入状态
-
-还未完成的重点不是“再加新命令”，而是：
-
-- 更深的宿主 hooks 集成
-- 发布流程与包分发收口
-- 过渡命名收敛
-
-当前交付边界：
-
-- `commit`：允许通过显式请求触发，并推荐由 skill 承载
-- `push`：保留为人工动作，不作为 skill 默认能力
-
-## 包边界
-
-### `@agent-harness/protocol`
-
-负责：
-
-- `rules/`
-- `schemas/`
-- `templates/`
-- `adapters/`
-
-不负责：
-
-- 初始化项目
-- 状态写入
-- 审计写入
-- 执行门禁逻辑
-
-这意味着 `protocol` 可以单独传播和使用，不依赖 CLI。
-
-### `@agent-harness/cli`
-
-负责：
-
-- `init`
-- `status`
-- `state`
-- `verify`
-- `report`
-- `gate`
-- `audit`
-
-约束：
-
-- `cli` 可以依赖 `protocol`
-- `protocol` 不能反向依赖 `cli`
-- 协议规则、模板和 schema 不应只存在于 CLI 内部副本中
-
-## v0.1 发布范围
-
-`v0.1` 的目标是先把“首次接入”和“最小闭环”做扎实，而不是一次性补齐所有长期能力。
-
-`v0.1` 包含：
-
-- `protocol` 独立分包
-- `cli` 的 `init/status/state/verify/report/gate/audit` MVP
-- 本地文件系统状态持久化
-- 基础宿主接入样板
-
-`v0.1` 不包含：
-
-- `update` 命令
-- 复杂升级器或深度 merge
-- 完整宿主自动化 hooks 管理
-- Homebrew / 二进制分发
-
-`update` 被明确延后，原因很直接：当前优先级是先稳定首装、初始化、状态闭环和验证闭环，而不是处理跨版本升级。
-
-## 仓库结构
-
-```text
-.
-├── docs/           # 设计文档与 ADR
-├── packages/
-│   ├── protocol/   # 规则、schema、模板、adapter 示例
-│   └── cli/        # Node.js CLI
-├── harness/        # 运行时状态、schema、模板与报告
-└── package.json    # workspace 根配置
-```
-
-## 当前约束
-
-- `harness.yaml` 仍是过渡配置名
-- 状态文件仍位于 `harness/` 目录
-- 对外主叙事已切换到 Node.js + npm / npx
-
-## 参考文档
-
-- [Agent Harness 设计文档 v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
-- [Agent Harness 开源架构 ADR v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
-- [Codex 自动 Intake 设计稿 v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-auto-intake-design-v0.1.md)
-- [Codex Hooks 开发流接入说明](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-hooks-workflow-v0.1.md)
-- [Codex 链路 v0.3 实施 Roadmap](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-codex-v0.3-roadmap.md)
-- [CHANGELOG 维护规范 v0.1](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
-- [Task Core 误判样本记录流程](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
+- [Agent Harness Design v0.3](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-agent-harness-design-v0.3.md)
+- [Open Source Architecture ADR](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
+- [Codex Auto Intake Design](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-auto-intake-design-v0.1.md)
+- [Codex Hooks Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-codex-hooks-workflow-v0.1.md)
+- [Codex v0.3 Roadmap](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-codex-v0.3-roadmap.md)
+- [CHANGELOG Maintenance Policy](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
+- [Task Core Misclassification Fixture Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
 - [CLI README](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
 - [Protocol README](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)

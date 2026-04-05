@@ -11,6 +11,7 @@ All notable changes to `agent-harness` will be documented in this file.
 - Expanded Codex `PreToolUse` Bash path extraction to cover heredoc and common file-writing commands such as `tee`, `install`, `dd`, `rsync`, `chmod`, and `truncate`.
 - Documented the current high-confidence Bash command patterns handled by `PreToolUse` in the CLI README.
 - Added task-level `commit_exists` detection so `delivery ready` can infer whether task-related files have already been committed.
+- Rewrote the repository homepage README for open-source onboarding and added an English README entrypoint.
 
 ### 2026-04-04
 
