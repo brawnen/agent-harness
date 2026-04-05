@@ -173,6 +173,14 @@ Codex 自动 evidence：
 - 在高风险任务上，`UserPromptSubmit` 会把显式确认语句自动记录为 `manual_confirmation`
 - `别问了直接做`、`跳过验证` 这类显式 override 语句会自动记录为 `force_override`
 
+Codex `PreToolUse` 当前行为：
+
+- 会在 `Write / Edit / NotebookEdit / Bash` 前调用 `gate before-tool`
+- `needs_clarification / draft / blocked / failed / done / suspended` 状态下的写入会被前置阻断
+- 会结合 task state 与 `harness.yaml risk_rules.path_matches` 动态判断高风险写入
+- 高风险写入且未确认时，会在工具执行前阻断并要求先确认
+- 当前对 `Write / Edit / NotebookEdit` 的路径识别更可靠；`Bash` 的路径级判断取决于宿主 payload 是否提供目标路径
+
 本地验证提示：
 
 - 如果当前工作目录不是仓库根目录，调用 CLI 时应使用绝对路径，例如：

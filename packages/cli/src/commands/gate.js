@@ -89,7 +89,8 @@ function beforeTool(cwd, options) {
   const currentState = taskState.current_state;
   const currentPhase = taskState.current_phase;
   const filePath = normalizeFilePath(cwd, options.filePath);
-  const riskLevel = deriveRiskLevel(taskState);
+  const riskAssessment = deriveRiskAssessment(taskState, config, filePath);
+  const riskLevel = riskAssessment.level;
 
   if (currentState === "needs_clarification" && isWriteTool(options.tool)) {
     return block(cwd, taskState.task_id, currentPhase, riskLevel, "任务处于 needs_clarification 状态，禁止执行写入操作");
@@ -103,7 +104,7 @@ function beforeTool(cwd, options) {
     return block(cwd, taskState.task_id, currentPhase, riskLevel, `任务处于 ${currentState} 状态，禁止执行写入操作`);
   }
 
-  if (riskLevel === "high" && isWriteTool(options.tool) && !hasRiskConfirmation(taskState)) {
+  if (riskAssessment.requiresConfirmation && isWriteTool(options.tool) && !hasRiskConfirmation(taskState)) {
     return requireConfirmation(cwd, taskState.task_id, currentPhase, "high", "任务命中高风险范围，需要用户确认后继续");
   }
 
@@ -122,8 +123,54 @@ function beforeTool(cwd, options) {
   return allow("门禁通过");
 }
 
-function deriveRiskLevel(taskState) {
-  return taskState?.confirmed_contract?.risk_level ?? taskState?.task_draft?.derived?.risk_level ?? "medium";
+function deriveRiskAssessment(taskState, config, filePath) {
+  const baseLevel = normalizeRiskLevel(
+    taskState?.confirmed_contract?.risk_level ?? taskState?.task_draft?.derived?.risk_level ?? "medium"
+  );
+  const matchedRule = matchRiskRule(config?.risk_rules, filePath);
+  const effectiveLevel = pickHigherRiskLevel(baseLevel, matchedRule?.level ?? null);
+
+  return {
+    level: effectiveLevel,
+    requiresConfirmation: baseLevel === "high" || matchedRule?.requiresConfirmation === true
+  };
+}
+
+function matchRiskRule(riskRules, filePath) {
+  if (!riskRules || typeof riskRules !== "object" || !filePath) {
+    return null;
+  }
+
+  for (const level of ["high", "medium", "low"]) {
+    const rule = riskRules[level];
+    if (!rule || typeof rule !== "object") {
+      continue;
+    }
+
+    const patterns = Array.isArray(rule.path_matches) ? rule.path_matches : [];
+    if (patterns.some((pattern) => pathMatch(filePath, String(pattern)))) {
+      return {
+        level,
+        requiresConfirmation: rule.requires_confirmation === true
+      };
+    }
+  }
+
+  return null;
+}
+
+function pickHigherRiskLevel(current, next) {
+  const order = ["low", "medium", "high"];
+  const currentIndex = order.indexOf(normalizeRiskLevel(current));
+  const nextIndex = order.indexOf(normalizeRiskLevel(next));
+  return currentIndex >= nextIndex ? normalizeRiskLevel(current) : normalizeRiskLevel(next);
+}
+
+function normalizeRiskLevel(value) {
+  if (value === "low" || value === "medium" || value === "high") {
+    return value;
+  }
+  return "medium";
 }
 
 function hasRiskConfirmation(taskState) {
