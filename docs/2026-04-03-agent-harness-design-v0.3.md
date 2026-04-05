@@ -425,9 +425,9 @@ CLI 是工具层，不是协议层前置条件。
 当前文档体系建议这样理解：
 
 - `v0.1`：
-  初始问题定义与 protocol-first 思路
+  已归档到 `docs/archive/`，保留初始问题定义与 protocol-first 思路
 - `v0.2`：
-  agent-native 方向收敛
+  已归档到 `docs/archive/`，保留 agent-native 方向收敛
 - `v0.3`：
   当前真实实现基线
 - 开源 ADR：

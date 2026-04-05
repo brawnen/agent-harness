@@ -214,3 +214,5 @@ Main remaining work:
 - [Task Core Misclassification Fixture Workflow](/Users/lijianfeng/code/pp/agent-harness/docs/2026-04-03-task-core-misclassification-fixture-workflow-v0.1.md)
 - [CLI README](/Users/lijianfeng/code/pp/agent-harness/packages/cli/README.md)
 - [Protocol README](/Users/lijianfeng/code/pp/agent-harness/packages/protocol/README.md)
+
+Historical drafts and early specifications are archived under [`docs/archive/`](/Users/lijianfeng/code/pp/agent-harness/docs/archive).

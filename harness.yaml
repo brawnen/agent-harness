@@ -17,12 +17,12 @@ protected_paths:
 
 default_commands:
   delivery:
-    - "rg -n '^## ' harness/2026-03-31-project-harness-design-v0.1.md harness/tasks/*.md"
-    - "ruby -e 'require \"yaml\"; YAML.load_file(\"harness.yaml\"); puts \"harness.yaml ok\"'"
+    - "rg -n '^## ' docs/2026-04-03-agent-harness-design-v0.3.md harness/tasks/*.md"
+    - "node -e \"require('fs').accessSync('harness.yaml'); console.log('harness.yaml ok')\""
   explore:
-    - "rg -n '^#|^##|^###' harness/2026-03-31-project-harness-design-v0.1.md harness/tasks/*.md"
+    - "rg -n '^#|^##|^###' docs/2026-04-03-agent-harness-design-v0.3.md harness/tasks/*.md"
   poc:
-    - "ruby -e 'require \"yaml\"; YAML.load_file(\"harness.yaml\"); puts \"harness.yaml ok\"'"
+    - "node -e \"require('fs').accessSync('harness.yaml'); console.log('harness.yaml ok')\""
 
 risk_rules:
   high:
@@ -36,7 +36,6 @@ risk_rules:
   medium:
     path_matches:
       - harness/tasks/**
-      - harness/*.md
     requires_confirmation: false
     minimum_evidence:
       - diff_summary

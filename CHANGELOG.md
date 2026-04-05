@@ -6,6 +6,8 @@ All notable changes to `agent-harness` will be documented in this file.
 
 ### 2026-04-05
 
+- Cleaned `harness/` by removing unused `examples`, `templates`, and duplicated `schemas` assets, and updated `harness.yaml` to stop referencing removed Ruby-based commands and stale design paths.
+- Archived early design and integration drafts under `docs/archive/` and kept only the current documentation baseline in `docs/`.
 - Added Codex `PreToolUse` gating so write tools are checked by `gate before-tool` before execution.
 - Made `gate` consume `harness.yaml risk_rules.path_matches` to derive path-based high-risk writes and require confirmation.
 - Expanded Codex `PreToolUse` Bash path extraction to cover heredoc and common file-writing commands such as `tee`, `install`, `dd`, `rsync`, `chmod`, and `truncate`.
