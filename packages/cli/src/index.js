@@ -2,6 +2,7 @@ import { runAudit } from "./commands/audit.js";
 import { runDelivery } from "./commands/delivery.js";
 import { runDocs } from "./commands/docs.js";
 import { runGate } from "./commands/gate.js";
+import { runHook } from "./commands/hook.js";
 import { runInit } from "./commands/init.js";
 import { runReport } from "./commands/report.js";
 import { runState } from "./commands/state.js";
@@ -21,6 +22,7 @@ Usage:
   agent-harness delivery <ready|request|commit>
   agent-harness docs scaffold --type <design-note|adr>
   agent-harness gate before-tool --tool <tool>
+  agent-harness hook claude <session-start|user-prompt-submit|stop>
   agent-harness status
   agent-harness task intake "<任务描述>"
   agent-harness task confirm [--task-id <task-id>]
@@ -73,6 +75,10 @@ export function run(argv) {
 
   if (command === "gate") {
     return runGate(argv.slice(1));
+  }
+
+  if (command === "hook") {
+    return runHook(argv.slice(1));
   }
 
   if (command === "status") {

@@ -150,7 +150,7 @@ Use `protocol-only` if you only want:
 This guide reflects the current implementation today:
 
 - `Codex` is the most complete host
-- `Claude Code` already supports a minimum loop via `CLAUDE.md + .claude/settings.json`
+- `Claude Code` already supports a hook-integrated loop via `CLAUDE.md + .claude/settings.json`
 - `Gemini CLI` already supports a minimum L2 loop via `GEMINI.md + .harness + CLI`
 - `Antigravity` is still future work
 - `commit` is supported as an explicit local delivery step

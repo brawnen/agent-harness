@@ -158,10 +158,13 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 
 `Claude Code` 当前支持边界：
 
+- `SessionStart`：恢复 active task 摘要
+- `UserPromptSubmit`：自动 intake / continue / clarify / override
 - `PreToolUse`：前置 `gate before-tool`
 - `PostToolUse`：工具后 `state update`
-- `CLAUDE.md` 继续承担 intake / clarify / completion gate 的 L2 规则约束
-- 暂不具备 `Codex` 那样的 `SessionStart / UserPromptSubmit` 自动 intake / 恢复能力
+- `Stop`：当模型明显宣称任务完成时，要求先补齐 verify / report
+- `CLAUDE.md` 继续承担 task contract 与执行策略的 L2 规则约束
+- 相比 `Codex`，当前 `Claude Code` 的 Stop 门禁仍是最小完成门禁，不是全面语义审查
 
 `Gemini CLI` 当前支持边界：
 

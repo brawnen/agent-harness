@@ -180,7 +180,7 @@ Current Codex integration includes:
 
 ## Current Status
 
-`Codex` is currently the most complete host. `Claude Code` already has a minimum loop through `CLAUDE.md + PreToolUse / PostToolUse`, and `Gemini CLI` already has a minimum L2 loop through `GEMINI.md + CLI`.
+`Codex` is still the most complete reference host. `Claude Code` now has a hook-integrated loop through `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`, and `Gemini CLI` already has a minimum L2 loop through `GEMINI.md + CLI`.
 
 The following minimum loop is already working:
 

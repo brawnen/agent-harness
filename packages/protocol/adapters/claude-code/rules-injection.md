@@ -11,6 +11,8 @@
 当前阶段说明：
 
 - `init --host claude-code` 当前已经会生成 `CLAUDE.md` 规则块并合并 `.claude/settings.json`
-- `Claude Code` 当前支持 `PreToolUse / PostToolUse` 的工具级 hooks
-- `Claude Code` 仍不具备 `SessionStart / UserPromptSubmit` 这类 response-level 自动 intake 能力
+- `Claude Code` 当前已接入 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`
+- `SessionStart` 用于恢复 active task 摘要，`UserPromptSubmit` 用于 intake / continue / clarify / override
+- `Stop` 当前承担最小完成门禁：当模型明显宣称任务完成时，要求先补齐 verify / report
+- `PreToolUse / PostToolUse` 继续负责工具级 gate 与工具后状态更新
 - 若要让 hooks 在目标项目里稳定可用，推荐在项目内安装 `@brawnen/agent-harness-cli`；模板中的 `npx @brawnen/agent-harness-cli ...` 也可作为零预装 fallback

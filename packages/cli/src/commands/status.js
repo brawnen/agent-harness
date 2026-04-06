@@ -354,15 +354,41 @@ function inspectClaudeHooks(cwd, runtimeMode, hasClaudeHost) {
 
   const hasPreTool = commands.some((command) =>
     command.includes("agent-harness gate before-tool") ||
-    command.includes("@brawnen/agent-harness-cli gate before-tool")
+    command.includes("@brawnen/agent-harness-cli gate before-tool") ||
+    command.includes("packages/cli/bin/agent-harness.js\" gate before-tool") ||
+    command.includes("packages/cli/bin/agent-harness.js gate before-tool")
   );
   const hasPostTool = commands.some((command) =>
     command.includes("agent-harness state update") ||
-    command.includes("@brawnen/agent-harness-cli state update")
+    command.includes("@brawnen/agent-harness-cli state update") ||
+    command.includes("packages/cli/bin/agent-harness.js\" state update") ||
+    command.includes("packages/cli/bin/agent-harness.js state update")
+  );
+  const hasSessionStart = commands.some((command) =>
+    command.includes("agent-harness hook claude session-start") ||
+    command.includes("@brawnen/agent-harness-cli hook claude session-start") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook claude session-start") ||
+    command.includes("packages/cli/bin/agent-harness.js hook claude session-start")
+  );
+  const hasUserPromptSubmit = commands.some((command) =>
+    command.includes("agent-harness hook claude user-prompt-submit") ||
+    command.includes("@brawnen/agent-harness-cli hook claude user-prompt-submit") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook claude user-prompt-submit") ||
+    command.includes("packages/cli/bin/agent-harness.js hook claude user-prompt-submit")
+  );
+  const hasStop = commands.some((command) =>
+    command.includes("agent-harness hook claude stop") ||
+    command.includes("@brawnen/agent-harness-cli hook claude stop") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook claude stop") ||
+    command.includes("packages/cli/bin/agent-harness.js hook claude stop")
   );
 
+  if (hasSessionStart && hasUserPromptSubmit && hasPreTool && hasPostTool && hasStop) {
+    return ok(".claude/settings.json", "Claude Code hooks 已配置（SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop）");
+  }
+
   if (hasPreTool && hasPostTool) {
-    return ok(".claude/settings.json", "Claude Code hooks 已配置");
+    return warn(".claude/settings.json", "检测到旧版 Claude Code 最小 hooks，缺少 SessionStart / UserPromptSubmit / Stop");
   }
 
   return warn(".claude/settings.json", "hooks 存在，但 Claude Code adapter 命令不完整");

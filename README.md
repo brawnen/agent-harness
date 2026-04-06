@@ -188,14 +188,17 @@ codex exec "继续推进当前任务"
 - `init --host claude-code` 会注入 `CLAUDE.md` 规则块
 - `init --host claude-code` 会创建或合并 `.claude/settings.json`
 - `.claude/settings.json` 当前接入：
+  - `SessionStart`：恢复 active task 摘要
+  - `UserPromptSubmit`：自动 intake / continue / clarify / override
   - `PreToolUse`：前置 `gate before-tool`
   - `PostToolUse`：工具后 `state update`
+  - `Stop`：完成宣告前的最小完成门禁
 
 当前边界：
 
-- `Claude Code` 仍没有 `SessionStart / UserPromptSubmit` 这类 response-level hook
-- 因此任务 intake、澄清和完成门禁仍主要依赖 `CLAUDE.md` 规则与 CLI
-- 相比 `Codex`，当前 `Claude Code` 接入更偏工具级门禁，而不是完整自动任务状态机
+- `Claude Code` 现在已经具备 session / prompt / tool / stop 四层 hook 接入
+- 但 `Stop` 仍是“完成宣告门禁”，不是对所有自然语言回复做全面语义审查
+- 相比当前仓库内置的 `Codex` 链路，`Claude Code` 仍缺少同等级的 repo-local运行时文档与回归脚本沉淀
 
 ### Gemini CLI
 
@@ -213,7 +216,7 @@ codex exec "继续推进当前任务"
 
 ## Current Status
 
-当前最完整的宿主仍是 `Codex`。`Claude Code` 已支持 `CLAUDE.md + PreToolUse / PostToolUse` 的最小接入闭环，`Gemini CLI` 已支持 `GEMINI.md + CLI` 的最小 L2 接入闭环。
+当前最完整的参考链路仍是 `Codex`。`Claude Code` 已支持 `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` 的 hook 集成闭环，`Gemini CLI` 已支持 `GEMINI.md + CLI` 的最小 L2 接入闭环。
 
 已经形成完整最小闭环的能力包括：
 

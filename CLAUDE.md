@@ -113,13 +113,13 @@ Override 不能跳过：
 
 ## Harness State 持久化（CLI 集成）
 
-本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`），并已为 `Claude Code` 配置 `.claude/settings.json` 中的 `PreToolUse / PostToolUse` hooks。
+本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`），并已为 `Claude Code` 配置 `.claude/settings.json` 中的 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` hooks。
 
 当前边界：
 
-- `Claude Code` 可以做工具级门禁与工具后状态记录
-- `Claude Code` 仍没有 `SessionStart / UserPromptSubmit` 这类自动 intake / 恢复 hook
-- 因此任务持久化与完成收口仍需要依赖 `CLAUDE.md` 规则和现有 CLI 命令
+- `Claude Code` 当前已经可以做 active task 恢复、prompt intake / clarify / override、工具级门禁、工具后状态记录，以及 stop 前的最小完成门禁
+- `Stop` 当前按“完成宣告门禁”工作：当模型明显宣称任务已完成时，会要求先补齐 verify / report 收口
+- 任务 contract 语义和高层执行策略仍需要 `CLAUDE.md` 规则持续约束，不是所有判断都能仅靠 hooks 硬拦截
 
 需要显式查看或操作任务状态时，继续使用这些命令：
 
