@@ -50,7 +50,7 @@
 - 说明被阻断的原因
 - 给出需要用户确认或补充的内容
 
-> **注意**：当前宿主无原生 hook 机制，执行门禁完全依赖本规则（L2）。请严格遵守，不要在规则未满足时执行写入操作。
+> **注意**：当前 `Gemini CLI` 宿主无原生 hook 机制，执行门禁完全依赖本规则（L2）。请严格遵守，不要在规则未满足时执行写入操作。
 
 ## Harness 完成门禁（L2）
 
@@ -111,9 +111,9 @@ Override 不能跳过：
 - 无法确定时，主动询问用户："你说的是刚才 XXX 的任务，还是一个新问题？"
 - 切换任务前必须先保存当前任务状态
 
-## Harness State 持久化（手动模式）
+## Harness State 持久化（Gemini CLI 手动模式）
 
-本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`），宿主仍无自动 hook；需要持久化时手动调用现有命令：
+本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`）。`Gemini CLI` 当前无自动 hook，需要持久化时手动调用现有命令：
 
 - 任务初始化：准备 task draft JSON 后执行 `node packages/cli/bin/agent-harness.js state init --draft-file <path>`
 - 查看当前活跃任务：`node packages/cli/bin/agent-harness.js state active`
@@ -122,14 +122,14 @@ Override 不能跳过：
 - 任务完成后：`node packages/cli/bin/agent-harness.js report --task-id <id> --conclusion "结论"`
 
 状态文件位置：
-- 任务状态：`harness/state/tasks/<task_id>.json`
-- 任务索引：`harness/state/index.json`
-- 审计日志：`harness/audit/<task_id>.jsonl`
-- 完成报告：`harness/reports/<task_id>.json`
+- 任务状态：`.harness/state/tasks/<task_id>.json`
+- 任务索引：`.harness/state/index.json`
+- 审计日志：`.harness/audit/<task_id>.jsonl`
+- 完成报告：`.harness/reports/<task_id>.json`
 
 ## 项目配置
 
 - 配置文件：`harness.yaml`
 - protected_paths：`.idea/**`
-- 任务模板：`harness/tasks/` 下 bug.md / feature.md / explore.md
+- 任务模板：`.harness/tasks/` 下 bug.md / feature.md / explore.md
 - 风险规则见 harness.yaml 中 risk_rules 部分

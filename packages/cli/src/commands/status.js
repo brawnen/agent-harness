@@ -72,6 +72,10 @@ export function runStatus(argv) {
   pushCheck(checks, claudeHooksCheck);
   exitCode = maxExitCode(exitCode, claudeHooksCheck.severity);
 
+  const geminiAdapterCheck = inspectGeminiAdapter(cwd, runtimeMode, hosts.includes("gemini-cli"));
+  pushCheck(checks, geminiAdapterCheck);
+  exitCode = maxExitCode(exitCode, geminiAdapterCheck.severity);
+
   const runtimeDirsCheck = inspectRuntimeDirectories(cwd, runtimeMode);
   pushCheck(checks, runtimeDirsCheck);
   exitCode = maxExitCode(exitCode, runtimeDirsCheck.severity);
@@ -362,6 +366,23 @@ function inspectClaudeHooks(cwd, runtimeMode, hasClaudeHost) {
   }
 
   return warn(".claude/settings.json", "hooks 存在，但 Claude Code adapter 命令不完整");
+}
+
+function inspectGeminiAdapter(cwd, runtimeMode, hasGeminiHost) {
+  if (!hasGeminiHost) {
+    return skip("Gemini adapter", "当前项目未检测到 Gemini CLI 宿主");
+  }
+
+  const hostPath = path.join(cwd, "GEMINI.md");
+  if (!fs.existsSync(hostPath)) {
+    return warn("Gemini adapter", "缺少 GEMINI.md，无法注入 Gemini CLI 宿主规则");
+  }
+
+  const modeSummary = runtimeMode === "protocol-only"
+    ? "当前为 protocol-only，仅依赖 GEMINI.md 规则注入"
+    : "已检测到 .harness 运行时目录，可配合 CLI 做手动 state / verify / report";
+
+  return ok("Gemini adapter", `Gemini CLI 采用 GEMINI.md 的 L2 接入，无原生 hooks；${modeSummary}`);
 }
 
 function hasCodexHookCommand(parsedHooks, eventName, commandFragment) {

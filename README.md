@@ -197,9 +197,23 @@ codex exec "继续推进当前任务"
 - 因此任务 intake、澄清和完成门禁仍主要依赖 `CLAUDE.md` 规则与 CLI
 - 相比 `Codex`，当前 `Claude Code` 接入更偏工具级门禁，而不是完整自动任务状态机
 
+### Gemini CLI
+
+当前仓库已具备 `Gemini CLI` 宿主接入的最小闭环：
+
+- `init --host gemini-cli` 会注入 `GEMINI.md` 规则块
+- 默认会创建 `.harness/` 运行时目录与任务模板
+- `status` 会明确识别 `Gemini CLI` 的 L2 宿主接入状态
+
+当前边界：
+
+- `Gemini CLI` 当前无 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse` 这类宿主原生 hook
+- 因此 intake、澄清、完成门禁与状态持久化仍主要依赖 `GEMINI.md` 规则和 CLI
+- 相比 `Claude Code` 与 `Codex`，当前 `Gemini CLI` 接入是规则注入 + 手动状态机，不提供工具级自动拦截
+
 ## Current Status
 
-当前最完整的宿主仍是 `Codex`，但 `Claude Code` 已支持 `CLAUDE.md + PreToolUse / PostToolUse` 的最小接入闭环。
+当前最完整的宿主仍是 `Codex`。`Claude Code` 已支持 `CLAUDE.md + PreToolUse / PostToolUse` 的最小接入闭环，`Gemini CLI` 已支持 `GEMINI.md + CLI` 的最小 L2 接入闭环。
 
 已经形成完整最小闭环的能力包括：
 
@@ -260,7 +274,8 @@ codex exec "继续推进当前任务"
 2. 让 CLI 生成：
    - `harness.yaml`
    - `.harness/`
-   - 宿主规则 block 与 hooks 配置
+   - 宿主规则 block
+   - 宿主支持时的 hooks 配置
 3. 日常使用：
    - `agent-harness status`
    - `agent-harness task intake`
@@ -282,9 +297,9 @@ codex exec "继续推进当前任务"
 
 - README / Quick Start 的进一步收口
 - 更多宿主支持
-  - `Gemini CLI`
   - `Antigravity`
 - `Claude Code` 与 `Codex` 之间更高等级的能力对齐
+- `Gemini CLI` 与 `Claude Code` / `Codex` 之间更高等级的能力对齐
 - 更完整的 CI / release 流程
 - 更丰富的宿主 E2E 与误判样本回归
 

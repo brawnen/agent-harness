@@ -180,7 +180,7 @@ Current Codex integration includes:
 
 ## Current Status
 
-`Codex` is currently the most complete host.
+`Codex` is currently the most complete host. `Claude Code` already has a minimum loop through `CLAUDE.md + PreToolUse / PostToolUse`, and `Gemini CLI` already has a minimum L2 loop through `GEMINI.md + CLI`.
 
 The following minimum loop is already working:
 
@@ -263,9 +263,8 @@ Main remaining work:
 
 - tighter README / Quick Start polish
 - more host coverage
-  - `Claude Code`
-  - `Gemini CLI`
   - `Antigravity`
+- higher-level parity between `Gemini CLI`, `Claude Code`, and `Codex`
 - stronger CI / release flow
 - more host E2E coverage and misclassification fixtures
 

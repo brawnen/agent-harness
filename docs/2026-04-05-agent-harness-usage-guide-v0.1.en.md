@@ -150,7 +150,9 @@ Use `protocol-only` if you only want:
 This guide reflects the current implementation today:
 
 - `Codex` is the most complete host
-- `Claude Code`, `Gemini CLI`, and `Antigravity` are still future work
+- `Claude Code` already supports a minimum loop via `CLAUDE.md + .claude/settings.json`
+- `Gemini CLI` already supports a minimum L2 loop via `GEMINI.md + .harness + CLI`
+- `Antigravity` is still future work
 - `commit` is supported as an explicit local delivery step
 - `push` remains manual
 - npm packages are now available, so cross-repo adoption should prefer the npm CLI path
