@@ -4,6 +4,8 @@ All notable changes to `agent-harness` will be documented in this file.
 
 ## Unreleased
 
+- Reduced custom Codex hook status noise by removing repo-local `statusMessage` fields while keeping all four core hooks enabled, made `writeContinue()` return an empty object on continue paths, added a read-only Bash fast path in `PreToolUse`, and documented the control-plane visibility policy for hooks.
+
 ## 0.1.0 - 2026-04-06
 
 ### 2026-04-05

@@ -32,7 +32,7 @@ try {
 
   const result = autoIntakePrompt(cwd, prompt);
   if (result.block) {
-    writeBlock(result.reason ?? "当前输入需要先澄清任务归属。");
+    writeBlock("当前请求需要先确认后再继续。");
     process.exit(0);
   }
 

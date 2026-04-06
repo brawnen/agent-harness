@@ -26,6 +26,14 @@ try {
     setActiveTaskId(cwd, taskId);
   }
 
+  if (toolName === "Bash") {
+    const command = resolveCommand(payload);
+    if (isReadOnlyBashCommand(command)) {
+      writeContinue("PreToolUse");
+      process.exit(0);
+    }
+  }
+
   const gateArgs = [
     path.join(repoRoot, "packages/cli/bin/agent-harness.js"),
     "gate",
@@ -60,7 +68,7 @@ try {
 
   const result = JSON.parse(raw || "{}");
   if (result.signal === "block_execution" || result.signal === "require_confirmation") {
-    writeBlock(result.reason ?? "当前工具调用被 agent-harness 门禁阻断");
+    writeBlock("当前操作暂不可执行，请先完成必要确认后再继续。");
     process.exit(0);
   }
 
@@ -235,6 +243,89 @@ function inferBashTargetPath(command) {
   }
 
   return null;
+}
+
+function isReadOnlyBashCommand(command) {
+  const unwrapped = unwrapShellCommand(command);
+  if (!unwrapped) {
+    return false;
+  }
+
+  if (hasShellControlOperator(unwrapped) || hasOutputRedirection(unwrapped)) {
+    return false;
+  }
+
+  const tokens = tokenizeShellLike(unwrapped);
+  if (tokens.length === 0) {
+    return false;
+  }
+
+  const commandName = tokens[0];
+  if (commandName === "git") {
+    return isReadOnlyGitCommand(tokens.slice(1));
+  }
+
+  if (commandName === "sed") {
+    return !tokens.some((token) => isInPlaceFlag(token, "sed"));
+  }
+
+  if (commandName === "perl") {
+    return !tokens.some((token) => isInPlaceFlag(token, "perl"));
+  }
+
+  if (READ_ONLY_COMMANDS.has(commandName)) {
+    return true;
+  }
+
+  return false;
+}
+
+function hasShellControlOperator(command) {
+  return /(^|[^\\])(?:\|\||&&|[|;])/.test(command);
+}
+
+function hasOutputRedirection(command) {
+  return /(^|[^\\])(?:>>|>\||\d?>|<<?)/.test(command);
+}
+
+function isReadOnlyGitCommand(args) {
+  if (args.length === 0) {
+    return false;
+  }
+
+  const filteredArgs = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const token = args[index];
+    if (!token) {
+      continue;
+    }
+
+    if (token === "-C" || token === "--git-dir" || token === "--work-tree" || token === "-c") {
+      index += 1;
+      continue;
+    }
+
+    if (token.startsWith("-")) {
+      continue;
+    }
+
+    filteredArgs.push(token);
+  }
+
+  if (filteredArgs.length === 0) {
+    return false;
+  }
+
+  const subcommand = filteredArgs[0];
+  if (READ_ONLY_GIT_SUBCOMMANDS.has(subcommand)) {
+    return true;
+  }
+
+  if (subcommand === "config") {
+    return filteredArgs.includes("--get") || filteredArgs.includes("--get-all");
+  }
+
+  return false;
 }
 
 function unwrapShellCommand(command) {
@@ -476,3 +567,31 @@ function firstString(values) {
   }
   return null;
 }
+
+const READ_ONLY_COMMANDS = new Set([
+  "cat",
+  "find",
+  "grep",
+  "head",
+  "less",
+  "ls",
+  "pwd",
+  "readlink",
+  "realpath",
+  "rg",
+  "stat",
+  "tail",
+  "wc",
+  "which"
+]);
+
+const READ_ONLY_GIT_SUBCOMMANDS = new Set([
+  "branch",
+  "diff",
+  "log",
+  "remote",
+  "rev-parse",
+  "show",
+  "status",
+  "symbolic-ref"
+]);

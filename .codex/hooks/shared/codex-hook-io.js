@@ -13,17 +13,8 @@ export function readHookPayload() {
   }
 }
 
-export function writeContinue(hookEventName, additionalContext = "") {
-  const result = additionalContext
-    ? {
-        hookSpecificOutput: {
-          hookEventName,
-          additionalContext
-        }
-      }
-    : {};
-
-  process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+export function writeContinue(_hookEventName, _additionalContext = "") {
+  process.stdout.write("{}\n");
 }
 
 export function writeBlock(reason) {

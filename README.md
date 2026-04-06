@@ -177,6 +177,10 @@ codex exec "继续推进当前任务"
 - `PreToolUse`：前置 `gate before-tool`
 - `PostToolUse`：自动 evidence 记录
 
+相关设计规范见：
+
+- [Codex Hook 可见性规范 v0.1](docs/2026-04-06-codex-hook-visibility-policy-v0.1.md)
+
 ## Current Status
 
 当前最完整的宿主是 `Codex`。

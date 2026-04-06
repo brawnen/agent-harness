@@ -6,8 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/user_prompt_submit_intake.js\"",
-            "statusMessage": "Running agent-harness automatic intake"
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/user_prompt_submit_intake.js\""
           }
         ]
       }
@@ -18,8 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_restore.js\"",
-            "statusMessage": "Restoring agent-harness active task"
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_restore.js\""
           }
         ]
       }
@@ -29,8 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/pre_tool_use_gate.js\"",
-            "statusMessage": "Checking agent-harness tool gate"
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/pre_tool_use_gate.js\""
           }
         ]
       }
@@ -41,8 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_record_evidence.js\"",
-            "statusMessage": "Recording agent-harness evidence"
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/post_tool_use_record_evidence.js\""
           }
         ]
       }
