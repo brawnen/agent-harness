@@ -348,14 +348,20 @@ function inspectClaudeHooks(cwd, runtimeMode, hasClaudeHost) {
     .map((hook) => hook.command)
     .filter(Boolean);
 
-  const hasPreTool = commands.some((command) => command.includes("agent-harness gate before-tool"));
-  const hasPostTool = commands.some((command) => command.includes("agent-harness state update"));
+  const hasPreTool = commands.some((command) =>
+    command.includes("agent-harness gate before-tool") ||
+    command.includes("@brawnen/agent-harness-cli gate before-tool")
+  );
+  const hasPostTool = commands.some((command) =>
+    command.includes("agent-harness state update") ||
+    command.includes("@brawnen/agent-harness-cli state update")
+  );
 
   if (hasPreTool && hasPostTool) {
     return ok(".claude/settings.json", "Claude Code hooks 已配置");
   }
 
-  return warn(".claude/settings.json", "hooks 存在，但 agent-harness 命令不完整");
+  return warn(".claude/settings.json", "hooks 存在，但 Claude Code adapter 命令不完整");
 }
 
 function hasCodexHookCommand(parsedHooks, eventName, commandFragment) {

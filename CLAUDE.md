@@ -113,7 +113,15 @@ Override 不能跳过：
 
 ## Harness State 持久化（CLI 集成）
 
-本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`），宿主仍无自动 hook；需要持久化时手动调用现有命令：
+本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`），并已为 `Claude Code` 配置 `.claude/settings.json` 中的 `PreToolUse / PostToolUse` hooks。
+
+当前边界：
+
+- `Claude Code` 可以做工具级门禁与工具后状态记录
+- `Claude Code` 仍没有 `SessionStart / UserPromptSubmit` 这类自动 intake / 恢复 hook
+- 因此任务持久化与完成收口仍需要依赖 `CLAUDE.md` 规则和现有 CLI 命令
+
+需要显式查看或操作任务状态时，继续使用这些命令：
 
 - 任务初始化：准备 task draft JSON 后执行 `node packages/cli/bin/agent-harness.js state init --draft-file <path>`
 - 查看当前活跃任务：`node packages/cli/bin/agent-harness.js state active`
@@ -122,14 +130,14 @@ Override 不能跳过：
 - 任务完成后：`node packages/cli/bin/agent-harness.js report --task-id <id> --conclusion "结论"`
 
 状态文件位置：
-- 任务状态：`harness/state/tasks/<task_id>.json`
-- 任务索引：`harness/state/index.json`
-- 审计日志：`harness/audit/<task_id>.jsonl`
-- 完成报告：`harness/reports/<task_id>.json`
+- 任务状态：`.harness/state/tasks/<task_id>.json`
+- 任务索引：`.harness/state/index.json`
+- 审计日志：`.harness/audit/<task_id>.jsonl`
+- 完成报告：`.harness/reports/<task_id>.json`
 
 ## 项目配置
 
 - 配置文件：`harness.yaml`
 - protected_paths：`.idea/**`
-- 任务模板：`harness/tasks/` 下 bug.md / feature.md / explore.md
+- 任务模板：`.harness/tasks/` 下 bug.md / feature.md / explore.md
 - 风险规则见 harness.yaml 中 risk_rules 部分

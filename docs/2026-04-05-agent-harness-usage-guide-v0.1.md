@@ -148,7 +148,15 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 当前接入说明基于今天的真实实现：
 
 - `Codex` 是支持最完整的宿主
-- `Claude Code`、`Gemini CLI`、`Antigravity` 还在后续计划中
+- `Claude Code` 已支持 `CLAUDE.md + .claude/settings.json` 的最小闭环接入
+- `Gemini CLI`、`Antigravity` 还在后续计划中
 - `commit` 已支持显式本地交付
 - `push` 仍然保持人工动作
 - 当前已提供 npm 包，跨项目接入优先推荐 npm CLI
+
+`Claude Code` 当前支持边界：
+
+- `PreToolUse`：前置 `gate before-tool`
+- `PostToolUse`：工具后 `state update`
+- `CLAUDE.md` 继续承担 intake / clarify / completion gate 的 L2 规则约束
+- 暂不具备 `Codex` 那样的 `SessionStart / UserPromptSubmit` 自动 intake / 恢复能力

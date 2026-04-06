@@ -10,5 +10,7 @@
 
 当前阶段说明：
 
-- 本目录只提供协议层接入示例
-- 未来正式命令以 `@brawnen/agent-harness-cli init` 为准
+- `init --host claude-code` 当前已经会生成 `CLAUDE.md` 规则块并合并 `.claude/settings.json`
+- `Claude Code` 当前支持 `PreToolUse / PostToolUse` 的工具级 hooks
+- `Claude Code` 仍不具备 `SessionStart / UserPromptSubmit` 这类 response-level 自动 intake 能力
+- 若要让 hooks 在目标项目里稳定可用，推荐在项目内安装 `@brawnen/agent-harness-cli`；模板中的 `npx @brawnen/agent-harness-cli ...` 也可作为零预装 fallback

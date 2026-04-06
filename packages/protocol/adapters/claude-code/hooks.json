@@ -1,5 +1,5 @@
 {
-  "$comment": "Claude Code hooks template for the future Node.js CLI. This file is an adapter example, not a final contract.",
+  "$comment": "Claude Code hooks template used by agent-harness init --host claude-code.",
   "hooks": {
     "PreToolUse": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "agent-harness gate before-tool --tool \"$TOOL_NAME\""
+            "command": "npx @brawnen/agent-harness-cli gate before-tool --tool \"$TOOL_NAME\""
           }
         ]
       }
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "agent-harness state update --tool \"$TOOL_NAME\" --exit-code \"$EXIT_CODE\""
+            "command": "npx @brawnen/agent-harness-cli state update --tool \"$TOOL_NAME\" --exit-code \"$EXIT_CODE\""
           }
         ]
       }

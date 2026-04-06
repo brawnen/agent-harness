@@ -181,9 +181,25 @@ codex exec "继续推进当前任务"
 
 - [Codex Hook 可见性规范 v0.1](docs/2026-04-06-codex-hook-visibility-policy-v0.1.md)
 
+### Claude Code
+
+当前仓库已具备 `Claude Code` 宿主接入的最小闭环：
+
+- `init --host claude-code` 会注入 `CLAUDE.md` 规则块
+- `init --host claude-code` 会创建或合并 `.claude/settings.json`
+- `.claude/settings.json` 当前接入：
+  - `PreToolUse`：前置 `gate before-tool`
+  - `PostToolUse`：工具后 `state update`
+
+当前边界：
+
+- `Claude Code` 仍没有 `SessionStart / UserPromptSubmit` 这类 response-level hook
+- 因此任务 intake、澄清和完成门禁仍主要依赖 `CLAUDE.md` 规则与 CLI
+- 相比 `Codex`，当前 `Claude Code` 接入更偏工具级门禁，而不是完整自动任务状态机
+
 ## Current Status
 
-当前最完整的宿主是 `Codex`。
+当前最完整的宿主仍是 `Codex`，但 `Claude Code` 已支持 `CLAUDE.md + PreToolUse / PostToolUse` 的最小接入闭环。
 
 已经形成完整最小闭环的能力包括：
 
@@ -266,9 +282,9 @@ codex exec "继续推进当前任务"
 
 - README / Quick Start 的进一步收口
 - 更多宿主支持
-  - `Claude Code`
   - `Gemini CLI`
   - `Antigravity`
+- `Claude Code` 与 `Codex` 之间更高等级的能力对齐
 - 更完整的 CI / release 流程
 - 更丰富的宿主 E2E 与误判样本回归
 
