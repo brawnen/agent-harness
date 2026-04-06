@@ -13,10 +13,10 @@
     "codex:hooks:check": "node --check .codex/hooks/user_prompt_submit_intake.js && node --check .codex/hooks/session_start_restore.js && node --check .codex/hooks/pre_tool_use_gate.js && node --check .codex/hooks/post_tool_use_record_evidence.js",
     "codex:hooks:status": "node packages/cli/bin/agent-harness.js status",
     "codex:e2e": "node packages/cli/scripts/verify-codex-e2e.js",
-    "release:pack:protocol": "npm pack --dry-run --workspace @agent-harness/protocol --cache ./.npm-cache",
-    "release:pack:cli": "npm pack --dry-run --workspace @agent-harness/cli --cache ./.npm-cache",
-    "release:publish:protocol": "npm publish --workspace @agent-harness/protocol --cache ./.npm-cache",
-    "release:publish:cli": "npm publish --workspace @agent-harness/cli --cache ./.npm-cache"
+    "release:pack:protocol": "npm pack --dry-run --workspace @brawnen/agent-harness-protocol --cache ./.npm-cache",
+    "release:pack:cli": "npm pack --dry-run --workspace @brawnen/agent-harness-cli --cache ./.npm-cache",
+    "release:publish:protocol": "npm publish --workspace @brawnen/agent-harness-protocol --cache ./.npm-cache",
+    "release:publish:cli": "npm publish --workspace @brawnen/agent-harness-cli --cache ./.npm-cache"
   },
   "engines": {
     "node": ">=18"

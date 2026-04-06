@@ -74,18 +74,19 @@ node packages/cli/bin/agent-harness.js init --host codex
 node packages/cli/bin/agent-harness.js status
 ```
 
-Target published entrypoint in the future:
+Current npm entrypoint:
 
 ```bash
-npx @agent-harness/cli init
-npx @agent-harness/cli init --protocol-only
+npx @brawnen/agent-harness-cli init
+npx @brawnen/agent-harness-cli init --protocol-only
 ```
 
 Notes:
 
-- the project is not published to npm yet
-- any `npx @agent-harness/cli ...` command in this README describes the target distribution shape, not a currently available package
+- the npm packages are now published
+- the recommended npm entrypoint is `npx @brawnen/agent-harness-cli init`
 - local usage requires `Node.js >= 18`
+- if you only want rules, templates, and schemas, you can install `@brawnen/agent-harness-protocol`
 
 ## Use Agent Harness In This Repository
 
@@ -118,9 +119,25 @@ For the full self-hosting and cross-repo usage guide, see:
 2. Reuse templates and schemas as needed
 3. Start using the host with those rules in place
 
+### npm CLI
+
+If you want to use `agent-harness` in an existing project today, the recommended path is npm:
+
+```bash
+npx @brawnen/agent-harness-cli init --host codex
+npx @brawnen/agent-harness-cli status
+```
+
+Or install it into the project first:
+
+```bash
+npm install -D @brawnen/agent-harness-cli
+npx agent-harness init --host codex
+```
+
 ### Local CLI
 
-If you want to try the current CLI in another repo before npm publishing, use the local path directly:
+If you want to reuse the development CLI directly from this repository, use the local path:
 
 ```bash
 node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js init --host codex
@@ -216,13 +233,34 @@ For command-level details, see:
 - [packages/cli/README.md](packages/cli/README.md)
 - [packages/protocol/README.md](packages/protocol/README.md)
 
+## How To Use It In A Project
+
+The recommended adoption path is:
+
+1. Run `npx @brawnen/agent-harness-cli init --host codex` in the target repository
+2. Let the CLI generate:
+   - `harness.yaml`
+   - `.harness/`
+   - host rule blocks and hook config
+3. Use the day-to-day commands:
+   - `agent-harness status`
+   - `agent-harness task intake`
+   - `agent-harness verify`
+   - `agent-harness report`
+   - `agent-harness delivery commit`
+
+If you only want the protocol layer without runtime directories:
+
+1. Install or copy `@brawnen/agent-harness-protocol`
+2. Place `rules/base.md` or `rules/full.md` into `AGENTS.md` / `CLAUDE.md` / `GEMINI.md`
+3. Reuse `templates/` and `schemas/` as needed
+
 ## What Is Still Missing Before Broader Open Source Adoption
 
 The project is already usable for you or an internal team, but it is not yet at the “low-friction public open source adoption” stage.
 
 Main remaining work:
 
-- npm publishing and versioned distribution
 - tighter README / Quick Start polish
 - more host coverage
   - `Claude Code`

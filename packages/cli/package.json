@@ -1,5 +1,5 @@
 {
-  "name": "@agent-harness/cli",
+  "name": "@brawnen/agent-harness-cli",
   "version": "0.1.0",
   "description": "CLI for task convergence, verification, reporting, and delivery in agent-harness projects.",
   "license": "MIT",
@@ -35,7 +35,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@agent-harness/protocol": "^0.1.0"
+    "@brawnen/agent-harness-protocol": "^0.1.0"
   },
   "scripts": {
     "start": "node ./bin/agent-harness.js --help"

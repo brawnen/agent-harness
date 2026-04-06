@@ -67,9 +67,42 @@ node packages/cli/bin/agent-harness.js delivery commit
    - [packages/protocol/schemas](packages/protocol/schemas)
    - [packages/protocol/adapters](packages/protocol/adapters)
 
-### 2.2 直接复用当前仓库里的本地 CLI
+### 2.2 通过 npm 接入 CLI
 
-在 npm 发布前，这是最适合你自己和团队的方式。
+这是现在最推荐的方式。
+
+在目标项目目录下执行：
+
+```bash
+npx @brawnen/agent-harness-cli init --host codex
+```
+
+或者先安装到项目里：
+
+```bash
+npm install -D @brawnen/agent-harness-cli
+npx agent-harness init --host codex
+```
+
+初始化完成后，常用命令是：
+
+```bash
+npx agent-harness status
+npx agent-harness task intake "任务描述"
+npx agent-harness verify
+npx agent-harness report --conclusion "结论"
+npx agent-harness delivery ready
+```
+
+如果你只想使用协议层，可以安装：
+
+```bash
+npm install -D @brawnen/agent-harness-protocol
+```
+
+### 2.3 直接复用当前仓库里的本地 CLI
+
+如果你想直接复用源码仓库里的开发版本，这是最适合你自己和团队的方式。
 
 在目标项目目录下执行：
 
@@ -93,7 +126,7 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 
 1. 先选一个你常用的 `Codex` 项目做完整 CLI 接入
 2. 团队里其他项目先从 `protocol-only` 开始
-3. 等 npm 发布后，再统一切到 `npx @agent-harness/cli init`
+3. 优先统一切到 `npx @brawnen/agent-harness-cli init`
 
 ## 4. 什么时候用完整 CLI
 
@@ -118,4 +151,4 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 - `Claude Code`、`Gemini CLI`、`Antigravity` 还在后续计划中
 - `commit` 已支持显式本地交付
 - `push` 仍然保持人工动作
-- npm 还没有正式发布，所以跨项目接入当前以“本地 CLI 路径”最现实
+- 当前已提供 npm 包，跨项目接入优先推荐 npm CLI

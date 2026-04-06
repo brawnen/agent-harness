@@ -6,7 +6,7 @@ All notable changes to `agent-harness` will be documented in this file.
 
 ### 2026-04-05
 
-- Finalized npm release preparation by adding MIT license metadata and package-level LICENSE files, making package README strategy English-first for npm, wiring `@agent-harness/cli` to depend explicitly on `@agent-harness/protocol`, and cleaning repository text to avoid exposing the original personal name.
+- Finalized npm release preparation by adding MIT license metadata and package-level LICENSE files, making package README strategy English-first for npm, wiring `@brawnen/agent-harness-cli` to depend explicitly on `@brawnen/agent-harness-protocol`, and cleaning repository text to avoid exposing the original personal name.
 - Moved `workflow_policy` from `recommend` to `warn` so full-workflow tasks now emit explicit warnings in `status`, `report`, and `delivery` without becoming hard-blocking.
 - Added the interaction rhythm rule to protocol rules and documentation: plan before confirmation, execute after confirmation, and avoid repeating the same summary twice.
 - Added the first `workflow_policy` implementation so tasks can be auto-classified into `full` or `lite`, upgraded from `lite` to `full`, and surfaced in `status`, `report`, and `delivery`.

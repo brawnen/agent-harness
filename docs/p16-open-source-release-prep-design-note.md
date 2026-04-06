@@ -26,7 +26,7 @@
 
 - 为根仓库、`packages/cli`、`packages/protocol` 统一补齐 MIT 许可证文本与 license 元数据
 - 把包级 npm README 收口成英文 `README.md` 为默认展示页，中文说明迁到 `README.zh-CN.md`
-- 让 `@agent-harness/cli` 显式依赖 `@agent-harness/protocol`，并在 `init` 中优先从已安装依赖解析 protocol 资源
+- 让 `@brawnen/agent-harness-cli` 显式依赖 `@brawnen/agent-harness-protocol`，并在 `init` 中优先从已安装依赖解析 protocol 资源
 - 将 `workflow_policy` 默认 enforcement 从 `recommend` 升到 `warn`，但保持只告警不阻断
 - 把“确认前给方案、确认后只执行、最终不复读”写入 protocol rules、设计文档和 usage guide
 - 清理仓库中的本机绝对路径与原始姓名暴露，统一改为相对路径和 `brawnen`

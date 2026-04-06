@@ -11,4 +11,4 @@
 当前阶段说明：
 
 - 本目录只提供协议层接入示例
-- 未来正式命令以 `@agent-harness/cli init` 为准
+- 未来正式命令以 `@brawnen/agent-harness-cli init` 为准

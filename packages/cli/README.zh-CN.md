@@ -1,4 +1,4 @@
-# @agent-harness/cli
+# @brawnen/agent-harness-cli
 
 [English](README.md)
 
@@ -226,7 +226,7 @@ Codex E2E 回归：
 
 设计约束：
 
-- CLI 依赖 `@agent-harness/protocol`
-- 从 npm 安装 `@agent-harness/cli` 时，应自动带上 `@agent-harness/protocol`
-- 未来默认入口是 `npx @agent-harness/cli init`
+- CLI 依赖 `@brawnen/agent-harness-protocol`
+- 从 npm 安装 `@brawnen/agent-harness-cli` 时，应自动带上 `@brawnen/agent-harness-protocol`
+- 默认 npm 入口是 `npx @brawnen/agent-harness-cli init`
 - 当前仓库以 Node.js CLI 作为唯一主线实现

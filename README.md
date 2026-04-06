@@ -73,18 +73,19 @@ node packages/cli/bin/agent-harness.js init --host codex
 node packages/cli/bin/agent-harness.js status
 ```
 
-未来发布后的目标入口：
+当前 npm 入口：
 
 ```bash
-npx @agent-harness/cli init
-npx @agent-harness/cli init --protocol-only
+npx @brawnen/agent-harness-cli init
+npx @brawnen/agent-harness-cli init --protocol-only
 ```
 
 说明：
 
-- 当前仓库尚未发布到 npm
-- README 中出现的 `npx @agent-harness/cli ...` 是目标分发形态，不是已发布事实
+- 当前 npm 包已发布
+- 推荐 npm 入口：`npx @brawnen/agent-harness-cli init`
 - 本地运行要求 `Node.js >= 18`
+- 如果你只想复用规则与模板，也可以直接安装 `@brawnen/agent-harness-protocol`
 
 ## Use Agent Harness In This Repository
 
@@ -117,9 +118,25 @@ node packages/cli/bin/agent-harness.js delivery ready
 2. 根据需要复制模板和 schema
 3. 在宿主里开始按规则使用
 
+### npm CLI
+
+如果你要在一个现有项目里正式使用 `agent-harness`，现在推荐直接走 npm：
+
+```bash
+npx @brawnen/agent-harness-cli init --host codex
+npx @brawnen/agent-harness-cli status
+```
+
+或先安装到项目里：
+
+```bash
+npm install -D @brawnen/agent-harness-cli
+npx agent-harness init --host codex
+```
+
 ### Local CLI
 
-如果你现在就想在其他项目里试用当前仓库里的 CLI，可以直接用本地路径：
+如果你想直接复用本机源码仓库里的开发版 CLI，也可以继续用本地路径：
 
 ```bash
 node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js init --host codex
@@ -215,13 +232,34 @@ codex exec "继续推进当前任务"
 - [packages/cli/README.zh-CN.md](packages/cli/README.zh-CN.md)
 - [packages/protocol/README.zh-CN.md](packages/protocol/README.zh-CN.md)
 
+## How To Use It In A Project
+
+最推荐的接入路径是：
+
+1. 在目标项目执行 `npx @brawnen/agent-harness-cli init --host codex`
+2. 让 CLI 生成：
+   - `harness.yaml`
+   - `.harness/`
+   - 宿主规则 block 与 hooks 配置
+3. 日常使用：
+   - `agent-harness status`
+   - `agent-harness task intake`
+   - `agent-harness verify`
+   - `agent-harness report`
+   - `agent-harness delivery commit`
+
+如果你只想要协议规则，不想引入运行时目录：
+
+1. 安装或复制 `@brawnen/agent-harness-protocol`
+2. 把 `rules/base.md` 或 `rules/full.md` 写入 `AGENTS.md` / `CLAUDE.md` / `GEMINI.md`
+3. 按需复用 `templates/` 与 `schemas/`
+
 ## What Is Still Missing Before Broader Open Source Adoption
 
 当前项目已经达到“个人/团队内部可用”的阶段，但还没到“全球开发者低摩擦采用”的阶段。
 
 主要还差：
 
-- npm 发布与版本化分发
 - README / Quick Start 的进一步收口
 - 更多宿主支持
   - `Claude Code`

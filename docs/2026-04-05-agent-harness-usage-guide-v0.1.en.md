@@ -69,9 +69,42 @@ How:
    - [packages/protocol/schemas](packages/protocol/schemas)
    - [packages/protocol/adapters](packages/protocol/adapters)
 
-### 2.2 Reuse The Current Local CLI Directly
+### 2.2 Install The CLI From npm
 
-Before npm publishing, this is the most practical path for you or your team.
+This is the recommended path now.
+
+From the target repository:
+
+```bash
+npx @brawnen/agent-harness-cli init --host codex
+```
+
+Or install it first:
+
+```bash
+npm install -D @brawnen/agent-harness-cli
+npx agent-harness init --host codex
+```
+
+After initialization, the common commands are:
+
+```bash
+npx agent-harness status
+npx agent-harness task intake "task description"
+npx agent-harness verify
+npx agent-harness report --conclusion "summary"
+npx agent-harness delivery ready
+```
+
+If you only want the protocol layer, install:
+
+```bash
+npm install -D @brawnen/agent-harness-protocol
+```
+
+### 2.3 Reuse The Current Local CLI Directly
+
+If you want to reuse the development CLI directly from this repository, this is still useful for you or your team.
 
 From the target repository:
 
@@ -95,7 +128,7 @@ If you want to roll this out across your local projects, the suggested order is:
 
 1. Start with one frequently used `Codex` repo and adopt the full CLI
 2. Let other team repos start with `protocol-only`
-3. Move to `npx @agent-harness/cli init` after npm publishing
+3. Standardize on `npx @brawnen/agent-harness-cli init`
 
 ## 4. When To Use The Full CLI
 
@@ -120,4 +153,4 @@ This guide reflects the current implementation today:
 - `Claude Code`, `Gemini CLI`, and `Antigravity` are still future work
 - `commit` is supported as an explicit local delivery step
 - `push` remains manual
-- npm is not published yet, so cross-repo adoption is currently most realistic through the local CLI path
+- npm packages are now available, so cross-repo adoption should prefer the npm CLI path

@@ -1,8 +1,8 @@
-# @agent-harness/protocol
+# @brawnen/agent-harness-protocol
 
 [中文](README.zh-CN.md)
 
-`@agent-harness/protocol` contains the protocol-layer assets of `agent-harness`.
+`@brawnen/agent-harness-protocol` contains the protocol-layer assets of `agent-harness`.
 
 It currently includes:
 
@@ -58,4 +58,4 @@ This package is not responsible for:
 - gate execution
 - report generation
 
-Those responsibilities belong to `@agent-harness/cli`.
+Those responsibilities belong to `@brawnen/agent-harness-cli`.

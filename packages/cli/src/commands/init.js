@@ -18,7 +18,7 @@ const PROTOCOL_ROOT = resolveProtocolRoot();
 
 function resolveProtocolRoot() {
   try {
-    const protocolPackageJson = require.resolve("@agent-harness/protocol/package.json");
+    const protocolPackageJson = require.resolve("@brawnen/agent-harness-protocol/package.json");
     return path.dirname(protocolPackageJson);
   } catch {
     return path.resolve(CLI_ROOT, "../protocol");

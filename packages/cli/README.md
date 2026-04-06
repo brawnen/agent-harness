@@ -1,8 +1,8 @@
-# @agent-harness/cli
+# @brawnen/agent-harness-cli
 
 [中文](README.zh-CN.md)
 
-`@agent-harness/cli` is the Node.js CLI for `agent-harness`.
+`@brawnen/agent-harness-cli` is the Node.js CLI for `agent-harness`.
 
 It is the runtime layer that turns protocol rules into a working task loop with:
 
@@ -217,8 +217,8 @@ Do not assume `node packages/cli/bin/agent-harness.js ...` will work from an arb
 
 ## Design Constraint
 
-- the CLI depends on `@agent-harness/protocol`
-- installing `@agent-harness/cli` from npm should automatically pull `@agent-harness/protocol`
+- the CLI depends on `@brawnen/agent-harness-protocol`
+- installing `@brawnen/agent-harness-cli` from npm should automatically pull `@brawnen/agent-harness-protocol`
 - the protocol must not depend on the CLI
-- the long-term default entrypoint is intended to be `npx @agent-harness/cli init`
+- the default npm entrypoint is `npx @brawnen/agent-harness-cli init`
 - this repository currently treats the Node.js CLI as the only mainline implementation

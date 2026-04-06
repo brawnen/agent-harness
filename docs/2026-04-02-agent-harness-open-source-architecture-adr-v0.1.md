@@ -70,13 +70,13 @@ CLI 采用 Node.js 重写，不再以 Ruby 作为开源主入口。
 
 `v0.1` 只承诺两类发布物：
 
-- `@agent-harness/protocol`
-- `@agent-harness/cli`
+- `@brawnen/agent-harness-protocol`
+- `@brawnen/agent-harness-cli`
 
 其中：
 
-- `@agent-harness/protocol` 面向所有用户，强调零门槛传播
-- `@agent-harness/cli` 面向需要初始化、状态、门禁和审计闭环的用户
+- `@brawnen/agent-harness-protocol` 面向所有用户，强调零门槛传播
+- `@brawnen/agent-harness-cli` 面向需要初始化、状态、门禁和审计闭环的用户
 
 `update` 不进入 `v0.1` 发布范围。
 

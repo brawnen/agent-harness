@@ -1,4 +1,4 @@
-# @agent-harness/protocol
+# @brawnen/agent-harness-protocol
 
 [English](README.md)
 
