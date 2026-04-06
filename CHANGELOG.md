@@ -4,6 +4,8 @@ All notable changes to `agent-harness` will be documented in this file.
 
 ## Unreleased
 
+## 0.1.0 - 2026-04-06
+
 ### 2026-04-05
 
 - Finalized npm release preparation by adding MIT license metadata and package-level LICENSE files, making package README strategy English-first for npm, wiring `@brawnen/agent-harness-cli` to depend explicitly on `@brawnen/agent-harness-protocol`, and cleaning repository text to avoid exposing the original personal name.

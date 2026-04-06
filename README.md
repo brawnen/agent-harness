@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-`agent-harness` 是一套面向 `Codex`、`Claude Code`、`Gemini CLI` 等宿主的任务收敛协议与工具集。
+`agent-harness` 是一套基于 harness engineering 思想与方法论的协议与工具集，面向 `Codex`、`Claude Code`、`Gemini CLI` 等 AI coding agent 宿主。
 
 它解决的不是“让 agent 更会写代码”，而是：
 
@@ -256,7 +256,7 @@ codex exec "继续推进当前任务"
 
 ## What Is Still Missing Before Broader Open Source Adoption
 
-当前项目已经达到“个人/团队内部可用”的阶段，但还没到“全球开发者低摩擦采用”的阶段。
+当前项目已经具备个人与团队试用条件，欢迎更多开发者在真实项目中尝试接入并反馈。
 
 主要还差：
 

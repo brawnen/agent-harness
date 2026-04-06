@@ -2,7 +2,7 @@
 
 [中文](README.md)
 
-`agent-harness` is a task-convergence protocol and toolchain for hosts such as `Codex`, `Claude Code`, and `Gemini CLI`.
+`agent-harness` is a protocol and toolchain based on harness engineering for AI coding agent hosts such as `Codex`, `Claude Code`, and `Gemini CLI`.
 
 It is not about making an agent “better at coding”. It is about making an agent behave predictably in a real project:
 
@@ -257,7 +257,7 @@ If you only want the protocol layer without runtime directories:
 
 ## What Is Still Missing Before Broader Open Source Adoption
 
-The project is already usable for you or an internal team, but it is not yet at the “low-friction public open source adoption” stage.
+The project is already ready for individual developers and teams to try in real repositories, and feedback from broader adoption is welcome.
 
 Main remaining work:
 
