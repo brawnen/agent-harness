@@ -1,6 +1,6 @@
 # Gemini CLI Rules Injection
 
-Gemini CLI 当前采用 `GEMINI.md` 规则注入的 L2 接入方式，无原生 hooks。
+Gemini CLI 当前采用 `GEMINI.md` 规则注入 + `.gemini/settings.json` hooks 的接入方式。
 
 推荐接入方式：
 
@@ -10,12 +10,19 @@ Gemini CLI 当前采用 `GEMINI.md` 规则注入的 L2 接入方式，无原生 
    - `.harness/tasks/`
    - `.harness/state/`、`.harness/audit/`、`.harness/reports/`
    - `GEMINI.md` 中的 agent-harness managed rules block
-3. Gemini CLI 在运行时主要依赖 `GEMINI.md` 约束 intake / clarify / completion gate
-4. 任务状态持久化、验证、报告与交付收口仍通过 CLI 手动执行
+   - `.gemini/settings.json` 中的 hook 配置
+3. Gemini CLI 在运行时通过 hooks 接入：
+   - `SessionStart`
+   - `BeforeAgent`
+   - `BeforeTool`
+   - `AfterTool`
+   - `AfterAgent`
+4. `GEMINI.md` 仍负责 L2 行为规则，状态持久化、验证、报告与交付收口继续通过 CLI 状态机承接
 
 当前支持边界：
 
 - 有 `GEMINI.md` 规则注入
+- 有 `.gemini/settings.json` hook 配置
 - 有 `.harness` 运行时目录与 CLI 状态机
-- 无 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse` 这类宿主原生 hook
-- `gate / audit / verify / report / delivery` 仍由 CLI 提供
+- 有 `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent` 的最小 hook 闭环
+- `gate / audit / verify / report / delivery` 仍由 CLI 核心逻辑提供

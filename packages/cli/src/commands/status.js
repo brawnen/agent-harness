@@ -311,14 +311,21 @@ function inspectCodexHooks(cwd, hasCodexHost) {
     return warn(".codex/hooks", "hooks.json 存在，但 JSON 解析失败");
   }
 
-  const checks = [
-    hasCodexHookCommand(parsedHooks, "UserPromptSubmit", "user_prompt_submit_intake.js"),
-    hasCodexHookCommand(parsedHooks, "SessionStart", "session_start_restore.js"),
-    hasCodexHookCommand(parsedHooks, "PostToolUse", "post_tool_use_record_evidence.js")
-  ];
+  const hasUserPromptSubmit = hasCodexHookCommand(parsedHooks, "UserPromptSubmit", "user_prompt_submit_intake.js");
+  const hasSessionStart = hasCodexHookCommand(parsedHooks, "SessionStart", "session_start_restore.js");
+  const hasPreToolUse = hasCodexHookCommand(parsedHooks, "PreToolUse", "pre_tool_use_gate.js");
+  const hasPostToolUse = hasCodexHookCommand(parsedHooks, "PostToolUse", "post_tool_use_record_evidence.js");
 
-  if (checks.some((item) => item === false)) {
-    return warn(".codex/hooks", "hooks.json 存在，但 agent-harness Codex hooks 不完整");
+  if (!hasUserPromptSubmit || !hasSessionStart) {
+    return warn(".codex/hooks", "hooks.json 存在，但缺少最小 Codex hooks：SessionStart / UserPromptSubmit");
+  }
+
+  if (!hasPreToolUse && !hasPostToolUse) {
+    return ok(".codex/hooks", "Codex hooks 已配置；已启用 SessionStart / UserPromptSubmit，工具级 hooks 当前关闭");
+  }
+
+  if (hasPreToolUse !== hasPostToolUse) {
+    return warn(".codex/hooks", "hooks.json 存在，但工具级 hooks 仅部分启用");
   }
 
   return ok(".codex/hooks", "Codex hooks 已配置；trusted project 默认启用，untrusted 请显式使用 codex --enable codex_hooks");
@@ -400,15 +407,72 @@ function inspectGeminiAdapter(cwd, runtimeMode, hasGeminiHost) {
   }
 
   const hostPath = path.join(cwd, "GEMINI.md");
+  const settingsPath = path.join(cwd, ".gemini", "settings.json");
   if (!fs.existsSync(hostPath)) {
     return warn("Gemini adapter", "缺少 GEMINI.md，无法注入 Gemini CLI 宿主规则");
   }
 
-  const modeSummary = runtimeMode === "protocol-only"
-    ? "当前为 protocol-only，仅依赖 GEMINI.md 规则注入"
-    : "已检测到 .harness 运行时目录，可配合 CLI 做手动 state / verify / report";
+  if (!fs.existsSync(settingsPath)) {
+    if (runtimeMode === "protocol-only") {
+      return skip("Gemini adapter", "protocol-only 模式，仅依赖 GEMINI.md 规则注入");
+    }
 
-  return ok("Gemini adapter", `Gemini CLI 采用 GEMINI.md 的 L2 接入，无原生 hooks；${modeSummary}`);
+    return warn("Gemini adapter", "未发现 .gemini/settings.json，Gemini CLI hooks 尚未配置");
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(settingsPath, "utf8"));
+  } catch {
+    return warn("Gemini adapter", ".gemini/settings.json 存在，但 JSON 解析失败");
+  }
+
+  const commands = Object.values(parsed.hooks ?? {})
+    .flatMap((entries) => entries ?? [])
+    .flatMap((entry) => entry.hooks ?? [])
+    .map((hook) => hook.command)
+    .filter(Boolean);
+
+  const hasSessionStart = commands.some((command) =>
+    command.includes("agent-harness hook gemini session-start") ||
+    command.includes("@brawnen/agent-harness-cli hook gemini session-start") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook gemini session-start") ||
+    command.includes("packages/cli/bin/agent-harness.js hook gemini session-start")
+  );
+  const hasBeforeAgent = commands.some((command) =>
+    command.includes("agent-harness hook gemini before-agent") ||
+    command.includes("@brawnen/agent-harness-cli hook gemini before-agent") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook gemini before-agent") ||
+    command.includes("packages/cli/bin/agent-harness.js hook gemini before-agent")
+  );
+  const hasBeforeTool = commands.some((command) =>
+    command.includes("agent-harness hook gemini before-tool") ||
+    command.includes("@brawnen/agent-harness-cli hook gemini before-tool") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook gemini before-tool") ||
+    command.includes("packages/cli/bin/agent-harness.js hook gemini before-tool")
+  );
+  const hasAfterTool = commands.some((command) =>
+    command.includes("agent-harness hook gemini after-tool") ||
+    command.includes("@brawnen/agent-harness-cli hook gemini after-tool") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook gemini after-tool") ||
+    command.includes("packages/cli/bin/agent-harness.js hook gemini after-tool")
+  );
+  const hasAfterAgent = commands.some((command) =>
+    command.includes("agent-harness hook gemini after-agent") ||
+    command.includes("@brawnen/agent-harness-cli hook gemini after-agent") ||
+    command.includes("packages/cli/bin/agent-harness.js\" hook gemini after-agent") ||
+    command.includes("packages/cli/bin/agent-harness.js hook gemini after-agent")
+  );
+
+  const modeSummary = runtimeMode === "protocol-only"
+    ? "当前为 protocol-only，但 hooks 已可用"
+    : "已检测到 .harness 运行时目录，可配合 hooks 与 CLI 做 state / verify / report";
+
+  if (hasSessionStart && hasBeforeAgent && hasBeforeTool && hasAfterTool && hasAfterAgent) {
+    return ok("Gemini adapter", `Gemini CLI hooks 已配置（SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent）；${modeSummary}`);
+  }
+
+  return warn("Gemini adapter", "Gemini CLI hooks 已部分配置，但命令集合不完整");
 }
 
 function hasCodexHookCommand(parsedHooks, eventName, commandFragment) {

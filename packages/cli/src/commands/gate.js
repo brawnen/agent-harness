@@ -67,7 +67,7 @@ function parseBeforeToolArgs(argv) {
   return { ok: true, options };
 }
 
-function beforeTool(cwd, options) {
+export function beforeTool(cwd, options) {
   const taskId = options.taskId ?? resolveActiveTaskId(cwd);
   const taskState = taskId ? getTaskState(cwd, taskId) : null;
   const config = loadProjectConfig(cwd);

@@ -37,6 +37,8 @@ The current implementation also covers:
 - host rule injection
 - base project config generation
 - minimal `.codex/hooks.json` integration
+- `.claude/settings.json` hook integration
+- `.gemini/settings.json` hook integration
 
 ## Current Boundaries
 
@@ -144,7 +146,7 @@ Current responsibilities:
 - `docs scaffold --type design-note|adr`
 - generate minimal Markdown skeletons from task context
 
-## Codex Support
+## Host Support
 
 The current repository has the most complete host integration for `Codex`.
 
@@ -152,15 +154,43 @@ Current Codex coverage includes:
 
 - `SessionStart`
 - `UserPromptSubmit`
+
+Currently disabled by default:
+
 - `PreToolUse`
 - `PostToolUse`
 
 Highlights:
 
 - automatic intake / continue / clarify
-- pre-tool gating
-- automatic evidence capture
 - active task restore
+
+Current Codex boundary:
+
+- tool-level hooks remain implemented but are not enabled by default because of host visibility noise
+
+Current Gemini CLI coverage includes:
+
+- `SessionStart`
+- `BeforeAgent`
+- `BeforeTool`
+- `AfterTool`
+- `AfterAgent`
+
+Highlights:
+
+- automatic intake / continue / clarify
+- before-tool gating for supported Gemini tools
+- shell evidence capture through `AfterTool`
+- completion gating through `AfterAgent`
+
+Current Claude Code coverage includes:
+
+- `SessionStart`
+- `UserPromptSubmit`
+- `PreToolUse`
+- `PostToolUse`
+- `Stop`
 
 ### Current `PreToolUse` Coverage For `Bash`
 

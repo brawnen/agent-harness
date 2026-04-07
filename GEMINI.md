@@ -50,7 +50,7 @@
 - 说明被阻断的原因
 - 给出需要用户确认或补充的内容
 
-> **注意**：当前 `Gemini CLI` 宿主无原生 hook 机制，执行门禁完全依赖本规则（L2）。请严格遵守，不要在规则未满足时执行写入操作。
+> **注意**：当前项目已为 `Gemini CLI` 提供 `.gemini/settings.json` hook 接入，可自动执行 `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent`。即便有 hook，执行门禁仍不能只依赖 hook，本规则（L2）依旧有效。
 
 ## Harness 完成门禁（L2）
 
@@ -111,9 +111,17 @@ Override 不能跳过：
 - 无法确定时，主动询问用户："你说的是刚才 XXX 的任务，还是一个新问题？"
 - 切换任务前必须先保存当前任务状态
 
-## Harness State 持久化（Gemini CLI 手动模式）
+## Harness State 持久化（Gemini CLI 自动模式 + 手动 fallback）
 
-本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`）。`Gemini CLI` 当前无自动 hook，需要持久化时手动调用现有命令：
+本项目当前使用 Node 版 harness CLI（`node packages/cli/bin/agent-harness.js`）。当前仓库已提供 `.gemini/settings.json`：
+
+- `SessionStart`：恢复 active task 摘要
+- `BeforeAgent`：自动 intake / continue / clarify / override
+- `BeforeTool`：前置 `gate before-tool`
+- `AfterTool`：自动记录 shell evidence
+- `AfterAgent`：完成宣告前的最小完成门禁
+
+当 hook 未启用、自动链路失败，或需要人工修正任务归属时，手动调用现有命令：
 
 - 任务初始化：准备 task draft JSON 后执行 `node packages/cli/bin/agent-harness.js state init --draft-file <path>`
 - 查看当前活跃任务：`node packages/cli/bin/agent-harness.js state active`

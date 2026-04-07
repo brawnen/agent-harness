@@ -175,12 +175,20 @@ Current Codex integration includes:
 
 - `SessionStart` for restoring active task context
 - `UserPromptSubmit` for intake / continue / clarify / override
+
+Currently disabled by default:
+
 - `PreToolUse` for `gate before-tool`
 - `PostToolUse` for automatic evidence capture
 
+Reason:
+
+- current Codex hook lifecycle visibility still creates too much user-facing noise for tool-level hooks
+- the repository keeps those hooks implemented, but does not enable them by default in `.codex/hooks.json`
+
 ## Current Status
 
-`Codex` is still the most complete reference host. `Claude Code` now has a hook-integrated loop through `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`, and `Gemini CLI` already has a minimum L2 loop through `GEMINI.md + CLI`.
+`Codex` is still the most complete reference host. `Claude Code` now has a hook-integrated loop through `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`, and `Gemini CLI` now has a minimum hook-integrated loop through `.gemini/settings.json + GEMINI.md + CLI`.
 
 The following minimum loop is already working:
 
@@ -192,7 +200,8 @@ The following minimum loop is already working:
 - `audit`
 - `delivery ready / request / commit`
 - `docs scaffold`
-- `Codex` hooks for `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse`
+- `Codex` hooks for `SessionStart / UserPromptSubmit`
+- `Gemini CLI` hooks for `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent`
 
 Current boundaries:
 

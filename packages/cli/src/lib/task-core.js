@@ -25,6 +25,12 @@ const CONTINUE_KEYWORDS = [
   "follow-up"
 ];
 
+const AFFIRMATIVE_SHORT_REPLIES = [
+  "ok", "okay", "好", "好的", "嗯", "对", "是的", "可以",
+  "行", "没问题", "同意", "确认", "yes", "yep", "sure", "lgtm",
+  "先这样", "就这样", "开始吧", "搞起", "go"
+];
+
 const NEW_TASK_KEYWORDS = [
   "新任务",
   "另一个问题",
@@ -245,7 +251,7 @@ export function autoIntakePrompt(cwd, prompt) {
     return {
       action: "continue",
       task: activeTask,
-      additionalContext: buildCurrentTaskContext(activeTask),
+      additionalContext: "",
       decision
     };
   }
@@ -389,6 +395,15 @@ function classifyPromptAgainstTask(prompt, activeTask) {
     });
   }
 
+  if (isAffirmativeShortReply(normalizedPrompt)) {
+    return buildDecision("continue", {
+      reasonCode: "affirmative_short_reply",
+      reason: "输入为确认性短回复，视为延续当前任务。",
+      matchedSignals: ["affirmative_short_reply"],
+      confidence: "medium"
+    });
+  }
+
   const ambiguous = isAmbiguousPrompt(prompt);
   if (ambiguous) {
     const matchedHighRiskKeyword = findMatchedKeyword(normalizedPrompt, HIGH_RISK_KEYWORDS);
@@ -397,8 +412,8 @@ function classifyPromptAgainstTask(prompt, activeTask) {
       block: highRisk,
       reasonCode: highRisk ? "ambiguous_high_risk_prompt" : "ambiguous_prompt",
       reason: highRisk
-        ? "当前输入任务归属不明且包含高风险信号。先澄清是在延续旧任务还是新任务，再继续执行。"
-        : "当前输入无法可靠判断是在延续旧任务还是新任务。先向用户澄清任务归属，再继续执行。",
+        ? "输入任务归属不明且含高风险信号，请先澄清。"
+        : "输入归属不明，请先澄清是延续当前任务还是新任务。",
       matchedSignals: highRisk
         ? [`high_risk_keyword:${matchedHighRiskKeyword}`, "ambiguous_prompt"]
         : ["ambiguous_prompt"],
@@ -426,6 +441,11 @@ function isAmbiguousPrompt(prompt) {
   }
 
   return ["看一下这个", "有个问题", "帮我处理一下", "处理下", "看看这个"].some((text) => normalized.includes(text));
+}
+
+function isAffirmativeShortReply(normalizedPrompt) {
+  const trimmed = normalizedPrompt.trim();
+  return AFFIRMATIVE_SHORT_REPLIES.some((reply) => trimmed === reply);
 }
 
 function inferIntent(input) {

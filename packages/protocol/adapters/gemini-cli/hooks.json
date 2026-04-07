@@ -1,0 +1,60 @@
+{
+  "$comment": "Gemini CLI hooks template used by agent-harness init --host gemini-cli.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx @brawnen/agent-harness-cli hook gemini session-start"
+          }
+        ]
+      }
+    ],
+    "BeforeAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx @brawnen/agent-harness-cli hook gemini before-agent"
+          }
+        ]
+      }
+    ],
+    "BeforeTool": [
+      {
+        "matcher": "run_shell_command|write_file|replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx @brawnen/agent-harness-cli hook gemini before-tool"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "run_shell_command|write_file|replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx @brawnen/agent-harness-cli hook gemini after-tool"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx @brawnen/agent-harness-cli hook gemini after-agent"
+          }
+        ]
+      }
+    ]
+  }
+}

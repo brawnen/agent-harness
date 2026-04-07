@@ -151,7 +151,7 @@ This guide reflects the current implementation today:
 
 - `Codex` is the most complete host
 - `Claude Code` already supports a hook-integrated loop via `CLAUDE.md + .claude/settings.json`
-- `Gemini CLI` already supports a minimum L2 loop via `GEMINI.md + .harness + CLI`
+- `Gemini CLI` already supports a minimum hook-integrated loop via `.gemini/settings.json + GEMINI.md + .harness + CLI`
 - `Antigravity` is still future work
 - `commit` is supported as an explicit local delivery step
 - `push` remains manual

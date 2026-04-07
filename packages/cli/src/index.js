@@ -22,7 +22,7 @@ Usage:
   agent-harness delivery <ready|request|commit>
   agent-harness docs scaffold --type <design-note|adr>
   agent-harness gate before-tool --tool <tool>
-  agent-harness hook claude <session-start|user-prompt-submit|stop>
+  agent-harness hook <claude|codex|gemini> <event>
   agent-harness status
   agent-harness task intake "<任务描述>"
   agent-harness task confirm [--task-id <task-id>]

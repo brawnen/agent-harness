@@ -50,7 +50,7 @@
 - 说明被阻断的原因
 - 给出需要用户确认或补充的内容
 
-> **注意**：当前项目已为 Codex 接入 repo-local hooks（`.codex/hooks.json`），可自动执行最小 intake 与 active task 恢复；Claude Code / Gemini CLI 仍主要依赖本规则（L2）。即便在 Codex 下，执行门禁也不能只依赖 hook，规则未满足时仍不得写入。
+> **注意**：当前项目已为 Codex、Claude Code、Gemini CLI 提供宿主 hook 接入；其中 Codex 仍只默认启用最小 hook 集合，Gemini / Claude 已可接入 session / prompt(or agent) / tool / completion gate。即便有 hook，执行门禁也不能只依赖 hook，规则未满足时仍不得写入。
 
 ## Harness 完成门禁（L2）
 

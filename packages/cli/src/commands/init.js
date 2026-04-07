@@ -295,6 +295,9 @@ function queueInitActions(context) {
     if (hosts.includes("claude-code")) {
       queueClaudeSettingsMerge(actions, cwd);
     }
+    if (hosts.includes("gemini-cli")) {
+      queueGeminiSettingsMerge(actions, cwd);
+    }
   }
 }
 
@@ -352,6 +355,25 @@ function queueClaudeSettingsMerge(actions, cwd) {
 
   actions.push({
     description: fs.existsSync(targetPath) ? "合并 Claude Code hooks" : "创建 Claude Code hooks 配置",
+    relativePath: path.relative(cwd, targetPath),
+    run: () => {
+      ensureDirectory(path.dirname(targetPath));
+      fs.writeFileSync(targetPath, content, "utf8");
+    },
+    skip: false
+  });
+}
+
+function queueGeminiSettingsMerge(actions, cwd) {
+  const targetPath = path.join(cwd, ".gemini", "settings.json");
+  const templatePath = path.join(PROTOCOL_ROOT, "adapters", "gemini-cli", "hooks.json");
+  const template = JSON.parse(readText(templatePath));
+  const existing = fs.existsSync(targetPath) ? readJson(targetPath) : {};
+  const merged = mergeClaudeSettings(existing, template);
+  const content = `${JSON.stringify(merged, null, 2)}\n`;
+
+  actions.push({
+    description: fs.existsSync(targetPath) ? "合并 Gemini CLI hooks" : "创建 Gemini CLI hooks 配置",
     relativePath: path.relative(cwd, targetPath),
     run: () => {
       ensureDirectory(path.dirname(targetPath));

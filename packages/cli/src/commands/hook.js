@@ -1,26 +1,23 @@
-import {
-  handleClaudeSessionStart,
-  handleClaudeStop,
-  handleClaudeUserPromptSubmit,
-  readHookPayload
-} from "../lib/claude-hooks.js";
+import { runClaudeHook, readHookPayload } from "../lib/claude-hooks.js";
+import { runCodexHook } from "../lib/codex-hooks.js";
+import { runGeminiHook } from "../lib/gemini-hooks.js";
 
 export function runHook(argv) {
   const [host, event] = argv;
 
   if (!host || !event) {
-    console.error("用法: hook claude <session-start|user-prompt-submit|stop>");
+    console.error("用法: hook <claude|codex|gemini> <event>");
     return 1;
   }
 
-  if (host !== "claude" && host !== "claude-code") {
+  if (!["claude", "claude-code", "codex", "gemini", "gemini-cli"].includes(host)) {
     console.error(`未知 hook 宿主: ${host}`);
     return 1;
   }
 
   try {
     const payload = readHookPayload();
-    const result = runClaudeHook(event, payload);
+    const result = runHostHook(host, event, payload);
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return 0;
   } catch (error) {
@@ -29,18 +26,18 @@ export function runHook(argv) {
   }
 }
 
-function runClaudeHook(event, payload) {
-  if (event === "session-start") {
-    return handleClaudeSessionStart(payload);
+function runHostHook(host, event, payload) {
+  if (host === "claude" || host === "claude-code") {
+    return runClaudeHook(event, payload);
   }
 
-  if (event === "user-prompt-submit") {
-    return handleClaudeUserPromptSubmit(payload);
+  if (host === "codex") {
+    return runCodexHook(event, payload);
   }
 
-  if (event === "stop") {
-    return handleClaudeStop(payload);
+  if (host === "gemini" || host === "gemini-cli") {
+    return runGeminiHook(event, payload);
   }
 
-  throw new Error(`未知 Claude hook 事件: ${event}`);
+  throw new Error(`未知 hook 宿主: ${host}`);
 }

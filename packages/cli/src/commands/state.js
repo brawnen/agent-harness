@@ -110,7 +110,9 @@ function runStateUpdate(argv) {
     }
 
     const result = updateTaskState(process.cwd(), taskId, changes);
-    printJson(result);
+    if (parsed.options.verbose) {
+      printJson(result);
+    }
     return 0;
   } catch (error) {
     console.error(error.message);
@@ -208,7 +210,8 @@ function parseStateUpdateArgs(argv) {
     phase: null,
     state: null,
     taskId: null,
-    tool: null
+    tool: null,
+    verbose: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -248,6 +251,11 @@ function parseStateUpdateArgs(argv) {
     if (arg === "--evidence") {
       options.evidence = argv[index + 1] ?? null;
       index += 1;
+      continue;
+    }
+
+    if (arg === "--verbose") {
+      options.verbose = true;
       continue;
     }
 
