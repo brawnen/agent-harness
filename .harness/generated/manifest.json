@@ -1,0 +1,95 @@
+{
+  "layout": "converged-host-layout-v1",
+  "version": "0.1.1",
+  "hosts": [
+    "codex",
+    "claude-code",
+    "gemini-cli"
+  ],
+  "files": [
+    {
+      "path": ".harness/package.json",
+      "kind": "layout_source"
+    },
+    {
+      "path": ".harness/rules/shared.md",
+      "kind": "rule_source"
+    },
+    {
+      "path": ".harness/hosts/codex/config.toml",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/codex/hooks.json",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/codex/hooks/user_prompt_submit_intake.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/codex/hooks/session_start_restore.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/codex/hooks/pre_tool_use_gate.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/codex/hooks/post_tool_use_record_evidence.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/codex/hooks/shared/codex-hook-io.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/rules/codex.md",
+      "kind": "rule_source"
+    },
+    {
+      "path": ".harness/hosts/claude/settings.json",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/rules/claude.md",
+      "kind": "rule_source"
+    },
+    {
+      "path": ".harness/hosts/gemini/settings.json",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/rules/gemini.md",
+      "kind": "rule_source"
+    },
+    {
+      "path": ".codex/config.toml",
+      "kind": "generated_host"
+    },
+    {
+      "path": ".codex/hooks.json",
+      "kind": "generated_host"
+    },
+    {
+      "path": "AGENTS.md",
+      "kind": "generated_rule"
+    },
+    {
+      "path": ".claude/settings.json",
+      "kind": "generated_host"
+    },
+    {
+      "path": "CLAUDE.md",
+      "kind": "generated_rule"
+    },
+    {
+      "path": ".gemini/settings.json",
+      "kind": "generated_host"
+    },
+    {
+      "path": "GEMINI.md",
+      "kind": "generated_rule"
+    }
+  ]
+}

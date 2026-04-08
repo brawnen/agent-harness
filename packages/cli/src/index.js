@@ -5,6 +5,7 @@ import { runGate } from "./commands/gate.js";
 import { runHook } from "./commands/hook.js";
 import { runInit } from "./commands/init.js";
 import { runReport } from "./commands/report.js";
+import { runSync } from "./commands/sync.js";
 import { runState } from "./commands/state.js";
 import { runStatus } from "./commands/status.js";
 import { runTask } from "./commands/task.js";
@@ -23,6 +24,7 @@ Usage:
   agent-harness docs scaffold --type <design-note|adr>
   agent-harness gate before-tool --tool <tool>
   agent-harness hook <claude|codex|gemini> <event>
+  agent-harness sync [--check] [--rewrite]
   agent-harness status
   agent-harness task intake "<任务描述>"
   agent-harness task confirm [--task-id <task-id>]
@@ -41,7 +43,7 @@ Options:
   --force
 
 Status:
-  task/init/status/state/verify/report/gate/audit/delivery/docs MVP are implemented.
+  task/init/sync/status/state/verify/report/gate/audit/delivery/docs MVP are implemented.
 `;
 
 export function run(argv) {
@@ -83,6 +85,10 @@ export function run(argv) {
 
   if (command === "status") {
     return runStatus(argv.slice(1));
+  }
+
+  if (command === "sync") {
+    return runSync(argv.slice(1));
   }
 
   if (command === "task") {

@@ -165,7 +165,8 @@ node packages/cli/bin/agent-harness.js delivery ready
 
 - `harness.yaml` 作为项目策略入口
 - `.harness/state`、`.harness/audit`、`.harness/reports` 作为运行时目录
-- `.codex/config.toml` 与 `.codex/hooks.json` 作为 Codex 宿主接入层
+- `.harness/hosts/*` 与 `.harness/rules/*` 作为宿主与规则的真实源目录
+- `.codex/.claude/.gemini` 作为宿主发现用的薄壳入口
 - `delivery commit` 作为本地提交标准入口
 
 如果你想看更完整的自举与跨项目接入方式，见：
@@ -178,10 +179,15 @@ node packages/cli/bin/agent-harness.js delivery ready
 
 - [.codex/config.toml](.codex/config.toml)
 - [.codex/hooks.json](.codex/hooks.json)
-- [.codex/hooks/user_prompt_submit_intake.js](.codex/hooks/user_prompt_submit_intake.js)
-- [.codex/hooks/session_start_restore.js](.codex/hooks/session_start_restore.js)
-- [.codex/hooks/pre_tool_use_gate.js](.codex/hooks/pre_tool_use_gate.js)
-- [.codex/hooks/post_tool_use_record_evidence.js](.codex/hooks/post_tool_use_record_evidence.js)
+- [.harness/hosts/codex/hooks/user_prompt_submit_intake.js](.harness/hosts/codex/hooks/user_prompt_submit_intake.js)
+- [.harness/hosts/codex/hooks/session_start_restore.js](.harness/hosts/codex/hooks/session_start_restore.js)
+- [.harness/hosts/codex/hooks/pre_tool_use_gate.js](.harness/hosts/codex/hooks/pre_tool_use_gate.js)
+- [.harness/hosts/codex/hooks/post_tool_use_record_evidence.js](.harness/hosts/codex/hooks/post_tool_use_record_evidence.js)
+
+其中：
+
+- 根目录 `.codex/` 只保留宿主发现需要的薄壳配置
+- 真实 hook 实现在 `.harness/hosts/codex/`
 
 在当前仓库内直接运行：
 

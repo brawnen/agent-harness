@@ -9,9 +9,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "../../..");
 const CLI_BIN = path.join(REPO_ROOT, "packages/cli/bin/agent-harness.js");
-const USER_PROMPT_HOOK = path.join(REPO_ROOT, ".codex/hooks/user_prompt_submit_intake.js");
-const SESSION_START_HOOK = path.join(REPO_ROOT, ".codex/hooks/session_start_restore.js");
-const POST_TOOL_HOOK = path.join(REPO_ROOT, ".codex/hooks/post_tool_use_record_evidence.js");
+const USER_PROMPT_HOOK = path.join(REPO_ROOT, ".harness/hosts/codex/hooks/user_prompt_submit_intake.js");
+const SESSION_START_HOOK = path.join(REPO_ROOT, ".harness/hosts/codex/hooks/session_start_restore.js");
+const POST_TOOL_HOOK = path.join(REPO_ROOT, ".harness/hosts/codex/hooks/post_tool_use_record_evidence.js");
 
 const SCENARIOS = [
   runNewTaskAutoIntakeScenario,

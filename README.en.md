@@ -154,10 +154,15 @@ This repository already includes:
 
 - [.codex/config.toml](.codex/config.toml)
 - [.codex/hooks.json](.codex/hooks.json)
-- [.codex/hooks/user_prompt_submit_intake.js](.codex/hooks/user_prompt_submit_intake.js)
-- [.codex/hooks/session_start_restore.js](.codex/hooks/session_start_restore.js)
-- [.codex/hooks/pre_tool_use_gate.js](.codex/hooks/pre_tool_use_gate.js)
-- [.codex/hooks/post_tool_use_record_evidence.js](.codex/hooks/post_tool_use_record_evidence.js)
+- [.harness/hosts/codex/hooks/user_prompt_submit_intake.js](.harness/hosts/codex/hooks/user_prompt_submit_intake.js)
+- [.harness/hosts/codex/hooks/session_start_restore.js](.harness/hosts/codex/hooks/session_start_restore.js)
+- [.harness/hosts/codex/hooks/pre_tool_use_gate.js](.harness/hosts/codex/hooks/pre_tool_use_gate.js)
+- [.harness/hosts/codex/hooks/post_tool_use_record_evidence.js](.harness/hosts/codex/hooks/post_tool_use_record_evidence.js)
+
+Where:
+
+- root `.codex/` is only the host-discovery shell
+- the actual hook implementation lives under `.harness/hosts/codex/`
 
 In this repository, you can just run:
 

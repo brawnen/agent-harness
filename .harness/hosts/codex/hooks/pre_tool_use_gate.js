@@ -1,6 +1,6 @@
-import { handleBeforeTool } from "../../packages/cli/src/lib/hook-core.js";
-import { buildCodexHookOutput } from "../../packages/cli/src/lib/hook-io/codex.js";
-import { readHookPayload, resolvePayloadCwd } from "../../packages/cli/src/lib/hook-io/shared.js";
+import { handleBeforeTool } from "../../../../packages/cli/src/lib/hook-core.js";
+import { buildCodexHookOutput } from "../../../../packages/cli/src/lib/hook-io/codex.js";
+import { readHookPayload, resolvePayloadCwd } from "../../../../packages/cli/src/lib/hook-io/shared.js";
 
 try {
   const payload = readHookPayload();

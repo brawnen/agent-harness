@@ -233,7 +233,10 @@ From the repository root:
 ```bash
 npm run codex:hooks:check
 npm run codex:e2e
+node packages/cli/bin/agent-harness.js sync --check
 ```
+
+`codex:hooks:check` validates the source-of-truth hook files under `.harness/hosts/codex/hooks/`, not the generated root `.codex/` shell.
 
 ## Local Invocation Note
 

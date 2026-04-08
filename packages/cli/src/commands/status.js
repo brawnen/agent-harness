@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { evaluateTaskDeliveryReadiness, summarizeDeliveryReadiness } from "../lib/delivery-policy.js";
+import { hasConvergedHostLayout, HOST_LAYOUT_VERSION } from "../lib/host-layout.js";
 import { evaluateTaskArtifactPolicy, inspectOutputPolicyWorkspace, normalizeOutputPolicy } from "../lib/output-policy.js";
 import { loadProjectConfig } from "../lib/project-config.js";
 import {
@@ -35,6 +36,10 @@ export function runStatus(argv) {
   const harnessConfig = inspectHarnessConfig(cwd);
   pushCheck(checks, harnessConfig);
   exitCode = maxExitCode(exitCode, harnessConfig.severity);
+
+  const hostLayoutCheck = inspectHostLayout(cwd);
+  pushCheck(checks, hostLayoutCheck);
+  exitCode = maxExitCode(exitCode, hostLayoutCheck.severity);
 
   const deliveryPolicyCheck = inspectDeliveryPolicy(cwd);
   pushCheck(checks, deliveryPolicyCheck);
@@ -142,6 +147,28 @@ function inspectDeliveryPolicy(cwd) {
   });
 
   return ok("delivery_policy", `active_task=${activeTask.task_id}；${summarizeDeliveryReadiness(readiness)}`);
+}
+
+function inspectHostLayout(cwd) {
+  if (!hasConvergedHostLayout(cwd)) {
+    return warn("host_layout", "未检测到 .harness/hosts 与 .harness/rules，当前仍可能处于旧布局");
+  }
+
+  const manifestPath = path.join(cwd, ".harness", "generated", "manifest.json");
+  if (!fs.existsSync(manifestPath)) {
+    return warn("host_layout", "已检测到收敛布局源目录，但缺少 .harness/generated/manifest.json");
+  }
+
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    const version = manifest.version ?? HOST_LAYOUT_VERSION;
+    const hosts = Array.isArray(manifest.hosts) && manifest.hosts.length > 0
+      ? manifest.hosts.join(", ")
+      : "unknown";
+    return ok("host_layout", `已启用收敛布局（version=${version}, hosts=${hosts}）`);
+  } catch {
+    return warn("host_layout", ".harness/generated/manifest.json 存在，但 JSON 解析失败");
+  }
 }
 
 function inspectOutputPolicy(cwd) {

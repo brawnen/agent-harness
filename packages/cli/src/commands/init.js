@@ -3,9 +3,10 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { collectHostLayoutWrites } from "../lib/host-layout.js";
 import { DEFAULT_RUNTIME_DIR, defaultRuntimeRelativePath } from "../lib/runtime-paths.js";
 
-const CLI_VERSION = "0.1.0";
+const CLI_VERSION = "0.1.1";
 const RULE_MODES = new Set(["base", "full"]);
 const HOSTS = new Set(["auto", "claude-code", "codex", "gemini-cli"]);
 const MODES = new Set(["delivery", "explore", "poc"]);
@@ -36,16 +37,19 @@ export function runInit(argv) {
   const project = detectProject(cwd);
   const hosts = resolveHosts(cwd, parsed.options.host);
   const actions = [];
+  const warnings = [];
 
   queueInitActions({
     cwd,
     project,
     hosts,
     options: parsed.options,
-    actions
+    actions,
+    warnings
   });
 
   printPlan(actions, parsed.options.dryRun, cwd, project, hosts);
+  printWarnings(warnings);
 
   if (parsed.options.dryRun) {
     return 0;
@@ -277,8 +281,7 @@ function resolveHosts(cwd, explicitHost) {
 }
 
 function queueInitActions(context) {
-  const { actions, cwd, hosts, options, project } = context;
-  const ruleText = readText(path.join(PROTOCOL_ROOT, "rules", `${options.rules}.md`));
+  const { actions, cwd, hosts, options, project, warnings } = context;
 
   queueWriteAction({
     actions,
@@ -288,16 +291,34 @@ function queueInitActions(context) {
   });
 
   queueProtocolTemplates(actions, cwd, options.force);
-  queueRulesInjection(actions, cwd, hosts, options, ruleText);
+  queueHostLayoutActions(actions, warnings, cwd, hosts, options);
 
   if (!options.protocolOnly) {
     queueRuntimeFiles(actions, cwd);
-    if (hosts.includes("claude-code")) {
-      queueClaudeSettingsMerge(actions, cwd);
-    }
-    if (hosts.includes("gemini-cli")) {
-      queueGeminiSettingsMerge(actions, cwd);
-    }
+  }
+}
+
+function queueHostLayoutActions(actions, warnings, cwd, hosts, options) {
+  const layout = collectHostLayoutWrites(cwd, {
+    hosts,
+    includeConfigs: !options.protocolOnly,
+    includeRules: true,
+    rewrite: options.force,
+    seedMissing: true
+  });
+
+  warnings.push(...layout.warnings);
+
+  for (const write of layout.writes) {
+    actions.push({
+      description: describeHostLayoutWrite(write),
+      relativePath: path.relative(cwd, write.targetPath),
+      run: () => {
+        ensureDirectory(path.dirname(write.targetPath));
+        fs.writeFileSync(write.targetPath, write.content, "utf8");
+      },
+      skip: false
+    });
   }
 }
 
@@ -686,6 +707,38 @@ function printPlan(actions, dryRun, cwd, project, hosts) {
     const prefix = action.skip ? "[skip]" : dryRun ? "[dry-run]" : "[write]";
     console.log(`${prefix} ${action.description}: ${action.relativePath}`);
   }
+}
+
+function printWarnings(warnings) {
+  if (!Array.isArray(warnings) || warnings.length === 0) {
+    return;
+  }
+
+  console.log("");
+  console.log("提示：");
+  for (const warning of warnings) {
+    console.log(`  - ${warning}`);
+  }
+}
+
+function describeHostLayoutWrite(write) {
+  if (write.type === "source") {
+    return "写入收敛布局源文件";
+  }
+
+  if (write.type === "host") {
+    return "生成宿主薄壳配置";
+  }
+
+  if (write.type === "rule") {
+    return "生成宿主规则文件";
+  }
+
+  if (write.type === "generated") {
+    return "生成布局清单";
+  }
+
+  return "写入布局文件";
 }
 
 function readText(filePath) {
