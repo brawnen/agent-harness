@@ -1,12 +1,13 @@
-import { handleBeforeTool } from "../../../../packages/cli/src/lib/hook-core.js";
-import { buildCodexHookOutput } from "../../../../packages/cli/src/lib/hook-io/codex.js";
-import { readHookPayload, resolvePayloadCwd } from "../../../../packages/cli/src/lib/hook-io/shared.js";
+import { firstString, readHookPayload, resolvePayloadCwd } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
 
 try {
   const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleBeforeTool, buildCodexHookOutput } = await importRuntimeModule("runtime-host", cwd);
   const result = handleBeforeTool({
     command: resolveCommand(payload),
-    cwd: resolvePayloadCwd(payload),
+    cwd,
     filePath: resolveFilePath(payload),
     taskId: resolveTaskId(payload),
     toolName: resolveToolName(payload)
@@ -62,14 +63,4 @@ function resolveCommand(payload) {
     payload?.toolUse?.input?.command,
     payload?.command
   ]);
-}
-
-function firstString(values) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
-  }
-
-  return null;
 }

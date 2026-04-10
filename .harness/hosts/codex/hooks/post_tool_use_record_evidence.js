@@ -1,12 +1,13 @@
-import { handleAfterTool } from "../../../../packages/cli/src/lib/hook-core.js";
-import { buildCodexHookOutput } from "../../../../packages/cli/src/lib/hook-io/codex.js";
-import { readHookPayload, resolvePayloadCwd } from "../../../../packages/cli/src/lib/hook-io/shared.js";
+import { firstDefined, firstString, readHookPayload, resolvePayloadCwd } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
 
 try {
   const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleAfterTool, buildCodexHookOutput } = await importRuntimeModule("runtime-host", cwd);
   const result = handleAfterTool({
     command: resolveCommand(payload),
-    cwd: resolvePayloadCwd(payload),
+    cwd,
     exitCode: resolveExitCode(payload),
     output: resolveOutput(payload),
     toolName: "Bash"
@@ -63,24 +64,4 @@ function resolveOutput(payload) {
     payload?.tool_output?.output,
     payload?.toolOutput?.output
   ]) ?? "";
-}
-
-function firstString(values) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
-  }
-
-  return null;
-}
-
-function firstDefined(values) {
-  for (const value of values) {
-    if (value !== undefined && value !== null) {
-      return value;
-    }
-  }
-
-  return null;
 }

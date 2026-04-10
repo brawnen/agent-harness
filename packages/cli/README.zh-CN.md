@@ -2,7 +2,9 @@
 
 [English](README.md)
 
-这是 `agent-harness` 的 Node.js CLI。
+这是 `agent-harness` 的兼容 CLI。
+
+当前产品方向已经明确：宿主运行时逐步前移到 repo-local hooks，`CLI` 主要负责初始化、状态检查、人工 fallback 和显式交付动作。
 
 当前已完成：
 
@@ -218,7 +220,13 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js audit read --t
 Codex E2E 回归：
 
 - 可执行 `npm --prefix packages/cli run verify:codex-e2e`
+- 可执行 `npm --prefix packages/cli run verify:host-hooks`
+- 可执行 `npm --prefix packages/cli run verify:init-status`
+- 可执行 `npm --prefix packages/cli run verify:status-compat`
 - 或在仓库根目录执行 `npm run codex:e2e`
+- 或在仓库根目录执行 `npm run runtime:host-hooks`
+- 或在仓库根目录执行 `npm run runtime:init-status`
+- 或在仓库根目录执行 `npm run runtime:p1:check`
 - 当前最小回归覆盖：新任务自动 intake、follow-up 不误切、高风险确认链路、hook 降级提示
 - 当前回归采用“真实 `codex exec` smoke + hook 主链路回归”混合方式，优先验证我们自己的接入链路
 - 当前脚本会在**当前 trusted 仓库**里执行真实 Codex 回归，并清理自己创建的 task/audit/report 文件
@@ -229,4 +237,5 @@ Codex E2E 回归：
 - CLI 依赖 `@brawnen/agent-harness-protocol`
 - 从 npm 安装 `@brawnen/agent-harness-cli` 时，应自动带上 `@brawnen/agent-harness-protocol`
 - 默认 npm 入口是 `npx @brawnen/agent-harness-cli init`
-- 当前仓库以 Node.js CLI 作为唯一主线实现
+- 当前仓库将 Node.js CLI 视为 `Agent Harness Runtime` 的 compatibility layer
+- repo-local hooks 当前应通过 `@brawnen/agent-harness-cli/runtime-host` 这一稳定入口接入 runtime

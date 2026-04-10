@@ -12,6 +12,14 @@
       "kind": "layout_source"
     },
     {
+      "path": ".harness/hosts/shared/payload-io.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/shared/runtime-loader.js",
+      "kind": "host_source"
+    },
+    {
       "path": ".harness/rules/shared.md",
       "kind": "rule_source"
     },
@@ -52,11 +60,51 @@
       "kind": "host_source"
     },
     {
+      "path": ".harness/hosts/claude/hooks/session_start.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/claude/hooks/user_prompt_submit.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/claude/hooks/pre_tool_use.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/claude/hooks/post_tool_use.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/claude/hooks/stop.js",
+      "kind": "host_source"
+    },
+    {
       "path": ".harness/rules/claude.md",
       "kind": "rule_source"
     },
     {
       "path": ".harness/hosts/gemini/settings.json",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/gemini/hooks/session_start.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/gemini/hooks/before_agent.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/gemini/hooks/before_tool.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/gemini/hooks/after_tool.js",
+      "kind": "host_source"
+    },
+    {
+      "path": ".harness/hosts/gemini/hooks/after_agent.js",
       "kind": "host_source"
     },
     {

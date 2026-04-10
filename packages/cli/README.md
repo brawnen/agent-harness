@@ -2,11 +2,14 @@
 
 [中文](README.zh-CN.md)
 
-`@brawnen/agent-harness-cli` is the Node.js CLI for `agent-harness`.
+`@brawnen/agent-harness-cli` is the compatibility CLI for `agent-harness`.
 
-It is the runtime layer that turns protocol rules into a working task loop with:
+Its focus is no longer to be the long-term product center. It is the compatibility layer for:
 
 - initialization
+- host/runtime bootstrap
+- status inspection
+- manual fallback commands
 - task state
 - verification
 - reports
@@ -14,6 +17,8 @@ It is the runtime layer that turns protocol rules into a working task loop with:
 - audit
 - delivery
 - documentation scaffolding
+
+The repo-local host runtime is becoming the primary execution surface. The CLI remains for initialization, diagnostics, and explicit manual operations.
 
 ## Current Coverage
 
@@ -226,6 +231,8 @@ Useful local checks:
 ```bash
 npm --prefix packages/cli run verify:task-core
 npm --prefix packages/cli run verify:codex-e2e
+npm --prefix packages/cli run verify:host-hooks
+npm --prefix packages/cli run verify:init-status
 ```
 
 From the repository root:
@@ -233,6 +240,9 @@ From the repository root:
 ```bash
 npm run codex:hooks:check
 npm run codex:e2e
+npm run runtime:host-hooks
+npm run runtime:init-status
+npm run runtime:p1:check
 node packages/cli/bin/agent-harness.js sync --check
 ```
 
@@ -254,4 +264,5 @@ Do not assume `node packages/cli/bin/agent-harness.js ...` will work from an arb
 - installing `@brawnen/agent-harness-cli` from npm should automatically pull `@brawnen/agent-harness-protocol`
 - the protocol must not depend on the CLI
 - the default npm entrypoint is `npx @brawnen/agent-harness-cli init`
-- this repository currently treats the Node.js CLI as the only mainline implementation
+- this repository now treats the Node.js CLI as the compatibility layer of `Agent Harness Runtime`
+- repo-local hooks should now consume the stable runtime entry `@brawnen/agent-harness-cli/runtime-host`

@@ -2,7 +2,8 @@
 
 [中文](README.md)
 
-`agent-harness` is a protocol and toolchain based on harness engineering for AI coding agent hosts such as `Codex`, `Claude Code`, and `Gemini CLI`.
+`agent-harness` is a protocol and toolchain for AI coding agent hosts such as `Codex`, `Claude Code`, and `Gemini CLI`.
+The current product direction is explicit: move the runtime center into agent/host hooks, and reduce the CLI to a bootstrap, diagnostics, and manual-fallback compatibility layer.
 
 It is not about making an agent “better at coding”. It is about making an agent behave predictably in a real project:
 
@@ -58,13 +59,14 @@ You get:
 - task templates and schemas
 - host adapter examples
 
-### 2. Protocol + CLI
+### 2. Protocol + repo-local hooks + compatibility CLI
 
 Use this if you want:
 
 - persistent task state
 - pre-tool gating and audit logs
 - a real delivery close-out path
+- a compatibility CLI for setup and fallback, not a long-term product center
 
 Current local entrypoint from this repository:
 
@@ -84,7 +86,7 @@ npx @brawnen/agent-harness-cli init --protocol-only
 Notes:
 
 - the npm packages are now published
-- the recommended npm entrypoint is `npx @brawnen/agent-harness-cli init`
+- treat the CLI as a bootstrap / status / fallback entrypoint instead of the core runtime
 - local usage requires `Node.js >= 18`
 - if you only want rules, templates, and schemas, you can install `@brawnen/agent-harness-protocol`
 
@@ -105,6 +107,8 @@ The current self-hosting setup includes:
 - `harness.yaml` as the project policy entrypoint
 - `.harness/state`, `.harness/audit`, and `.harness/reports` as runtime directories
 - `.codex/config.toml` and `.codex/hooks.json` as the Codex host integration layer
+- `.harness/hosts/*` as the repo-local hook runtime source
+- `packages/cli` as the compatibility CLI
 - `delivery commit` as the standard local commit entrypoint
 
 For the full self-hosting and cross-repo usage guide, see:
@@ -147,6 +151,8 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 For the full cross-repo setup guide, see:
 
 - [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.en.md)
+- [Agent Harness Runtime Team Trial Checklist](docs/2026-04-10-runtime-team-trial-checklist-v0.1.md)
+- [Agent Harness Runtime Stability Surface And Frozen Scope](docs/2026-04-10-runtime-stability-surface-and-frozen-scope-v0.1.md)
 
 ### Codex
 
@@ -193,7 +199,9 @@ Reason:
 
 ## Current Status
 
-`Codex` is still the most complete reference host. `Claude Code` now has a hook-integrated loop through `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`, and `Gemini CLI` now has a minimum hook-integrated loop through `.gemini/settings.json + GEMINI.md + CLI`.
+`Codex` is still the most complete reference host. `Claude Code` now has a hook-integrated loop through `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`, and `Gemini CLI` now has a minimum hook-integrated loop through `.gemini/settings.json + GEMINI.md + repo-local hooks`, while the CLI is being intentionally narrowed to compatibility duties.
+
+This repository is also maintained as the reference `Agent Harness Runtime` implementation, so `sync --check` should stay green here.
 
 The following minimum loop is already working:
 
@@ -288,6 +296,7 @@ Main remaining work:
 - [Open Source Architecture ADR](docs/2026-04-02-agent-harness-open-source-architecture-adr-v0.1.md)
 - [Codex Auto Intake Design](docs/2026-04-03-codex-auto-intake-design-v0.1.md)
 - [Codex Hooks Workflow](docs/2026-04-03-codex-hooks-workflow-v0.1.md)
+- [CLI Closure And Agent-Native Runtime Transition Plan](docs/2026-04-10-cli-closure-agent-native-transition-plan-v0.1.md)
 - [Codex v0.3 Roadmap](docs/2026-04-04-codex-v0.3-roadmap.md)
 - [CHANGELOG Maintenance Policy](docs/2026-04-04-changelog-maintenance-policy-v0.1.md)
 - [Workflow Policy Design v0.1](docs/2026-04-05-workflow-policy-design-v0.1.md)

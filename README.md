@@ -4,7 +4,10 @@
 
 让 AI coding agent 在真实仓库里更可控，而不只是“更会写代码”。
 
-`agent-harness` 面向 `Codex`、`Claude Code`、`Gemini CLI` 等宿主，提供一层统一的任务控制与交付约束：
+`agent-harness` 面向 `Codex`、`Claude Code`、`Gemini CLI` 等宿主，提供一层统一的任务控制与交付约束。
+当前产品方向已经明确：能力中心逐步前移到 agent / host runtime，`CLI` 收敛为初始化、诊断和人工 fallback 的兼容层。
+
+它解决的核心问题是：
 
 - 让 agent 先 intake、再澄清、再执行，而不是一上来就改文件
 - 让任务有状态、有门禁、有验证、有交付收口
@@ -82,13 +85,14 @@
 - 任务模板与 schema
 - 各宿主的接入示例
 
-### 2. 协议规则 + CLI + hooks
+### 2. 协议规则 + repo-local hooks + 兼容 CLI
 
 适合：
 
 - 希望任务有状态持久化
 - 希望执行前有门禁，完成前有验证
 - 希望把 agent 工作流真正接进工程交付流程
+- 接受 `CLI` 主要负责初始化、状态诊断和人工兜底，而不是长期主入口
 
 当前 npm 入口：
 
@@ -108,7 +112,7 @@ node packages/cli/bin/agent-harness.js status
 说明：
 
 - 当前 npm 包已发布
-- 推荐优先使用 npm 入口：`npx @brawnen/agent-harness-cli init`
+- 推荐把 `CLI` 理解为 bootstrap / status / fallback 入口，而不是产品主形态
 - 本地运行要求 `Node.js >= 18`
 - 如果你只想复用规则与模板，也可以直接安装 `@brawnen/agent-harness-protocol`
 
@@ -148,6 +152,8 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 更完整的跨项目接入说明见：
 
 - [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+- [Agent Harness Runtime 小团队试用清单](docs/2026-04-10-runtime-team-trial-checklist-v0.1.md)
+- [Agent Harness Runtime 稳定面与冻结面](docs/2026-04-10-runtime-stability-surface-and-frozen-scope-v0.1.md)
 
 ## 在本仓库里怎么用
 
@@ -167,7 +173,10 @@ node packages/cli/bin/agent-harness.js delivery ready
 - `.harness/state`、`.harness/audit`、`.harness/reports` 作为运行时目录
 - `.harness/hosts/*` 与 `.harness/rules/*` 作为宿主与规则的真实源目录
 - `.codex/.claude/.gemini` 作为宿主发现用的薄壳入口
+- `packages/cli` 作为兼容 CLI 与人工 fallback 入口
 - `delivery commit` 作为本地提交标准入口
+
+当前仓库也作为 `Agent Harness Runtime` 的参考实现维护，要求 `sync --check` 能持续收敛到无 drift。
 
 如果你想看更完整的自举与跨项目接入方式，见：
 
@@ -218,6 +227,7 @@ codex exec "继续推进当前任务"
 
 相关设计规范见：
 
+- [CLI 收口与 agent-native runtime 迁移方案](docs/2026-04-10-cli-closure-agent-native-transition-plan-v0.1.md)
 - [Codex Hook 可见性规范 v0.1](docs/2026-04-06-codex-hook-visibility-policy-v0.1.md)
 
 ### Claude Code
@@ -230,14 +240,14 @@ codex exec "继续推进当前任务"
   - `SessionStart`：恢复 active task 摘要
   - `UserPromptSubmit`：自动 intake / continue / clarify / override
   - `PreToolUse`：前置 `gate before-tool`
-  - `PostToolUse`：工具后 `state update`
+  - `PostToolUse`：工具后写入 repo-local evidence
   - `Stop`：完成宣告前的最小完成门禁
 
 当前边界：
 
 - `Claude Code` 现在已经具备 session / prompt / tool / stop 四层 hook 接入
 - 但 `Stop` 仍是“完成宣告门禁”，不是对所有自然语言回复做全面语义审查
-- 相比当前仓库内置的 `Codex` 链路，`Claude Code` 仍缺少同等级的 repo-local运行时文档与回归脚本沉淀
+- 相比当前仓库内置的 `Codex` 链路，`Claude Code` 仍缺少同等级的回归脚本沉淀
 
 ### Gemini CLI
 
@@ -258,11 +268,11 @@ codex exec "继续推进当前任务"
 
 - `Gemini CLI` 当前接入的是最小 hook 闭环，不是完整宿主抽象能力对齐
 - `AfterTool` 当前只对 shell 工具记录高价值 evidence，不把所有工具结果都写入 state
-- 即便有 hooks，`GEMINI.md` 规则与 CLI 状态机仍是协议约束的最后兜底
+- 即便有 hooks，`GEMINI.md` 规则与兼容 CLI 仍是协议约束的最后兜底
 
 ## Current Status
 
-当前最完整的参考链路仍是 `Codex`。其中 `Codex` 当前默认启用 `SessionStart / UserPromptSubmit`，`PreToolUse / PostToolUse` 因视觉噪音问题暂时关闭；`Claude Code` 已支持 `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` 的 hook 集成闭环，`Gemini CLI` 已支持 `.gemini/settings.json + GEMINI.md + CLI` 的最小 hook 闭环。
+当前最完整的参考链路仍是 `Codex`。其中 `Codex` 当前默认启用 `SessionStart / UserPromptSubmit`，`PreToolUse / PostToolUse` 因视觉噪音问题暂时关闭；`Claude Code` 已支持 `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` 的 hook 集成闭环，`Gemini CLI` 已支持 `.gemini/settings.json + GEMINI.md + repo-local hooks` 的最小 hook 闭环。
 
 已经形成完整最小闭环的能力包括：
 

@@ -51,8 +51,9 @@ const DEFAULT_SHARED_RULES = `# Harness 任务收敛规则
 
 推断完成后，根据字段完整性和风险信号决定 \`next_action\`：
 - 所有必填字段已闭合且无阻断问题 → \`plan\`
-- scope 有方向但需先阅读代码确认边界 → \`observe\`（只读）
-- 存在阻断缺口 → \`clarify\`
+- scope / acceptance 尚未闭合，但可先通过阅读代码、状态或上下文自行收敛时 → \`observe\`（只读）
+- 输入只是当前任务内的简短回复 / 步骤选择时 → \`observe\`（只读）
+- 只有存在真实阻断缺口时才 \`clarify\`
 
 ## Harness Clarify 规则
 
@@ -68,6 +69,7 @@ const DEFAULT_SHARED_RULES = `# Harness 任务收敛规则
 - 可以通过阅读代码自行确认的技术细节
 - 已有合理默认值的可选配置
 - 与当前阻断无关的低优先级问题
+- 低风险的任务归属不确定，且可以先按当前任务 \`observe\` 消化的情况
 
 ## Harness 执行门禁（L2）
 
@@ -129,17 +131,19 @@ Override 不能跳过：
 
 ## Harness 交互输出格式
 
-每轮任务相关输出必须包含以下信息（可用自然语言表达，不要求固定模板）：
+对外输出默认极简，内部状态继续严格维护。
 
-1. **我的理解**：当前对任务的收敛理解（intent + goal + scope 的摘要）
-2. **当前假设**：已采用但未确认的假设列表
-3. **阻断缺口**：若存在，只列出一个最高优先级的；若无，明确说"无"
-4. **下一步动作**：clarify / observe / plan / execute / verify 中的一个
+- 默认只输出用户真正需要的信息：结论、必要原因、必要问题、必要验证
+- 无阻断时，不要输出“阻断缺口：无”“下一步动作：plan”这类模板字段
+- 需要用户决策时，只问一个最高价值问题
+- 高风险时，简短说明风险和需要确认的点
+- 只有用户明确要求细节时，才展开内部状态或完整推理
 
 ## Harness 多任务规则
 
 - 新输入默认先判断是否属于当前活跃任务
 - 若明显是新任务，新建任务并将当前任务挂起
+- 若只是对上轮问题的回答、步骤选择或简短确认，默认视为当前任务续接
 - 无法确定时，主动询问用户："你说的是刚才 XXX 的任务，还是一个新问题？"
 - 切换任务前必须先保存当前任务状态
 
@@ -248,7 +252,7 @@ const DEFAULT_CLAUDE_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\\" hook claude session-start"
+            "command": "node \\"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/session_start.js\\""
           }
         ]
       }
@@ -258,7 +262,7 @@ const DEFAULT_CLAUDE_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\\" hook claude user-prompt-submit"
+            "command": "node \\"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/user_prompt_submit.js\\""
           }
         ]
       }
@@ -269,7 +273,7 @@ const DEFAULT_CLAUDE_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\\" gate before-tool --tool \\"$TOOL_NAME\\""
+            "command": "node \\"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/pre_tool_use.js\\""
           }
         ]
       }
@@ -280,7 +284,7 @@ const DEFAULT_CLAUDE_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\\" state update --tool \\"$TOOL_NAME\\" --exit-code \\"$EXIT_CODE\\""
+            "command": "node \\"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/post_tool_use.js\\""
           }
         ]
       }
@@ -290,7 +294,7 @@ const DEFAULT_CLAUDE_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\\" hook claude stop"
+            "command": "node \\"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/stop.js\\""
           }
         ]
       }
@@ -307,7 +311,7 @@ const DEFAULT_GEMINI_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\\" hook gemini session-start"
+            "command": "node \\"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/session_start.js\\""
           }
         ]
       }
@@ -318,7 +322,7 @@ const DEFAULT_GEMINI_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\\" hook gemini before-agent"
+            "command": "node \\"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/before_agent.js\\""
           }
         ]
       }
@@ -329,7 +333,7 @@ const DEFAULT_GEMINI_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\\" hook gemini before-tool"
+            "command": "node \\"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/before_tool.js\\""
           }
         ]
       }
@@ -340,7 +344,7 @@ const DEFAULT_GEMINI_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\\" hook gemini after-tool"
+            "command": "node \\"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/after_tool.js\\""
           }
         ]
       }
@@ -351,12 +355,168 @@ const DEFAULT_GEMINI_SETTINGS = `{
         "hooks": [
           {
             "type": "command",
-            "command": "node \\"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\\" hook gemini after-agent"
+            "command": "node \\"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/after_agent.js\\""
           }
         ]
       }
     ]
   }
+}
+`;
+
+const DEFAULT_SHARED_PAYLOAD_IO = `import fs from "node:fs";
+
+export function readHookPayload() {
+  const raw = fs.readFileSync(0, "utf8").trim();
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error("hook stdin 不是合法 JSON");
+  }
+}
+
+export function resolvePayloadCwd(payload) {
+  if (typeof payload?.cwd === "string" && payload.cwd.trim()) {
+    return payload.cwd.trim();
+  }
+
+  return process.cwd();
+}
+
+export function resolvePayloadPrompt(payload) {
+  if (typeof payload?.prompt === "string" && payload.prompt.trim()) {
+    return payload.prompt.trim();
+  }
+
+  if (typeof payload?.user_prompt === "string" && payload.user_prompt.trim()) {
+    return payload.user_prompt.trim();
+  }
+
+  return "";
+}
+
+export function firstString(values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+export function firstDefined(values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+export function writeHookOutput(result) {
+  process.stdout.write(\`\${JSON.stringify(result, null, 2)}\\n\`);
+}
+`;
+
+const DEFAULT_SHARED_RUNTIME_LOADER = `import fs from "node:fs";
+import path from "node:path";
+import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
+
+const require = createRequire(import.meta.url);
+
+const RUNTIME_MODULES = {
+  "runtime-host": {
+    monorepoPath: ["packages", "cli", "src", "runtime-host", "index.js"],
+    packageFilePath: ["node_modules", "@brawnen", "agent-harness-cli", "src", "runtime-host", "index.js"],
+    packageSpecifier: "@brawnen/agent-harness-cli/runtime-host"
+  }
+};
+
+export async function importRuntimeModule(moduleName, cwd = process.cwd()) {
+  const definition = RUNTIME_MODULES[String(moduleName ?? "").trim()];
+  if (!definition) {
+    throw new Error(\`未知 runtime 模块：\${moduleName}\`);
+  }
+
+  const repoRoot = resolveRepoRoot(cwd);
+  const candidates = [
+    path.join(repoRoot, ...definition.monorepoPath),
+    path.join(repoRoot, ...definition.packageFilePath)
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return import(pathToFileURL(candidate).href);
+    }
+  }
+
+  try {
+    const resolved = require.resolve(definition.packageSpecifier, {
+      paths: [repoRoot]
+    });
+    return import(pathToFileURL(resolved).href);
+  } catch {
+    throw new Error(
+      \`无法解析 agent-harness runtime 模块：\${moduleName}。请确认目标仓库已安装 @brawnen/agent-harness-cli，或当前在 agent-harness monorepo 内执行。\`
+    );
+  }
+}
+
+export async function importCliModule(moduleRelativePath, cwd = process.cwd()) {
+  const repoRoot = resolveRepoRoot(cwd);
+  const normalizedPath = String(moduleRelativePath ?? "").replace(/^[/\\\\]+/, "");
+  const candidates = [
+    path.join(repoRoot, "packages", "cli", normalizedPath),
+    path.join(repoRoot, "node_modules", "@brawnen", "agent-harness-cli", normalizedPath)
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return import(pathToFileURL(candidate).href);
+    }
+  }
+
+  try {
+    const resolved = require.resolve(\`@brawnen/agent-harness-cli/\${toPosixPath(normalizedPath)}\`, {
+      paths: [repoRoot]
+    });
+    return import(pathToFileURL(resolved).href);
+  } catch {
+    throw new Error(
+      \`无法解析 agent-harness runtime 模块：\${normalizedPath}。请确认目标仓库已安装 @brawnen/agent-harness-cli，或当前在 agent-harness monorepo 内执行。\`
+    );
+  }
+}
+
+function resolveRepoRoot(cwd) {
+  let current = path.resolve(cwd);
+
+  while (true) {
+    if (
+      fs.existsSync(path.join(current, "harness.yaml")) ||
+      fs.existsSync(path.join(current, ".harness")) ||
+      fs.existsSync(path.join(current, ".git"))
+    ) {
+      return current;
+    }
+
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return path.resolve(cwd);
+    }
+    current = parent;
+  }
+}
+
+function toPosixPath(value) {
+  return value.split(path.sep).join(path.posix.sep);
 }
 `;
 
@@ -396,9 +556,293 @@ const DEFAULT_CODEX_USER_PROMPT = `import { invokeAgentHarnessCodexHook, readHoo
 
 try {
   const payload = readHookPayload();
-  process.stdout.write(\`\${JSON.stringify(invokeAgentHarnessCodexHook("user-prompt-submit", payload), null, 2)}\\n\`);
+  process.stdout.write(\`\${JSON.stringify(await invokeAgentHarnessCodexHook("user-prompt-submit", payload), null, 2)}\\n\`);
 } catch (error) {
-  writeContinue("UserPromptSubmit", \`Codex UserPromptSubmit hook 执行失败：\${error.message}\`);
+  await writeContinue("UserPromptSubmit", \`Codex UserPromptSubmit hook 执行失败：\${error.message}\`);
+}
+`;
+
+const DEFAULT_CLAUDE_SESSION_START = `import { readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+const FALLBACK_COMMANDS = [
+  "npx @brawnen/agent-harness-cli state active",
+  "npx @brawnen/agent-harness-cli task intake \\"任务描述\\""
+];
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleSessionStart, buildClaudeHookOutput } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildClaudeHookOutput("SessionStart", handleSessionStart({
+    cwd,
+    fallbackCommands: FALLBACK_COMMANDS,
+    hostDisplayName: "Claude Code",
+    source: payload?.source ?? ""
+  })));
+} catch (error) {
+  const { buildClaudeHookOutput } = await importRuntimeModule("runtime-host");
+  writeHookOutput(buildClaudeHookOutput("SessionStart", {
+    additionalContext: \`Claude Code SessionStart hook 执行失败：\${error.message}\`,
+    status: "continue"
+  }));
+}
+`;
+
+const DEFAULT_CLAUDE_USER_PROMPT = `import { readHookPayload, resolvePayloadCwd, resolvePayloadPrompt, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+const FALLBACK_COMMANDS = [
+  "npx @brawnen/agent-harness-cli state active",
+  "npx @brawnen/agent-harness-cli task intake \\"任务描述\\"",
+  "npx @brawnen/agent-harness-cli task suspend-active --reason \\"切换任务\\""
+];
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handlePromptSubmit, buildClaudeHookOutput } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildClaudeHookOutput("UserPromptSubmit", handlePromptSubmit({
+    cwd,
+    fallbackCommands: FALLBACK_COMMANDS,
+    hostDisplayName: "Claude Code",
+    prompt: resolvePayloadPrompt(payload)
+  })));
+} catch (error) {
+  const { buildClaudeHookOutput } = await importRuntimeModule("runtime-host");
+  writeHookOutput(buildClaudeHookOutput("UserPromptSubmit", {
+    additionalContext: \`Claude Code UserPromptSubmit hook 执行失败：\${error.message}\`,
+    status: "continue"
+  }));
+}
+`;
+
+const DEFAULT_CLAUDE_PRE_TOOL = `import { firstString, readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleBeforeTool, buildClaudeHookOutput } = await importRuntimeModule("runtime-host", cwd);
+  const result = handleBeforeTool({
+    command: firstString([
+      payload?.tool_input?.command,
+      payload?.toolInput?.command,
+      payload?.input?.command,
+      payload?.arguments?.command,
+      payload?.tool_use?.input?.command,
+      payload?.toolUse?.input?.command,
+      payload?.command
+    ]) ?? "",
+    cwd,
+    filePath: firstString([
+      payload?.tool_input?.file_path,
+      payload?.tool_input?.path,
+      payload?.toolInput?.file_path,
+      payload?.toolInput?.path,
+      payload?.input?.file_path,
+      payload?.input?.path,
+      payload?.arguments?.file_path,
+      payload?.arguments?.path,
+      payload?.tool_use?.input?.file_path,
+      payload?.tool_use?.input?.path,
+      payload?.toolUse?.input?.file_path,
+      payload?.toolUse?.input?.path
+    ]),
+    taskId: firstString([
+      payload?.task_id,
+      payload?.taskId,
+      payload?.context?.task_id,
+      payload?.context?.taskId
+    ]),
+    toolName: firstString([
+      payload?.tool_name,
+      payload?.toolName,
+      payload?.tool?.name,
+      payload?.toolUse?.name,
+      payload?.name
+    ])
+  });
+  writeHookOutput(buildClaudeHookOutput("PreToolUse", result));
+} catch {
+  writeHookOutput({});
+}
+`;
+
+const DEFAULT_CLAUDE_POST_TOOL = `import { firstDefined, firstString, readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { appendMinimalToolEvidence } = await importRuntimeModule("runtime-host", cwd);
+  appendMinimalToolEvidence({
+    cwd,
+    exitCode: resolveExitCode(payload) ?? 0,
+    toolName: firstString([
+      payload?.tool_name,
+      payload?.toolName,
+      payload?.tool?.name,
+      payload?.toolUse?.name,
+      payload?.name
+    ])
+  });
+
+  writeHookOutput({});
+} catch {
+  writeHookOutput({});
+}
+
+function resolveExitCode(payload) {
+  const value = firstDefined([
+    payload?.exit_code,
+    payload?.exitCode,
+    payload?.result?.exit_code,
+    payload?.result?.exitCode,
+    payload?.tool_output?.exit_code,
+    payload?.toolOutput?.exitCode,
+    payload?.status
+  ]);
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+`;
+
+const DEFAULT_CLAUDE_STOP = `import { readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleCompletionGate, buildClaudeHookOutput, resolveClaudeCompletionMessage } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildClaudeHookOutput("Stop", handleCompletionGate({
+    cwd,
+    lastAssistantMessage: resolveClaudeCompletionMessage(payload)
+  })));
+} catch {
+  writeHookOutput({});
+}
+`;
+
+const DEFAULT_GEMINI_SESSION_START = `import { readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+const FALLBACK_COMMANDS = [
+  "node packages/cli/bin/agent-harness.js state active",
+  "node packages/cli/bin/agent-harness.js task intake \\"任务描述\\""
+];
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleSessionStart, buildGeminiHookOutput } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildGeminiHookOutput(handleSessionStart({
+    cwd,
+    fallbackCommands: FALLBACK_COMMANDS,
+    hostDisplayName: "Gemini CLI",
+    source: payload?.source ?? ""
+  })));
+} catch {
+  writeHookOutput({});
+}
+`;
+
+const DEFAULT_GEMINI_BEFORE_AGENT = `import { readHookPayload, resolvePayloadCwd, resolvePayloadPrompt, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+const FALLBACK_COMMANDS = [
+  "node packages/cli/bin/agent-harness.js state active",
+  "node packages/cli/bin/agent-harness.js task intake \\"任务描述\\"",
+  "node packages/cli/bin/agent-harness.js task suspend-active --reason \\"切换任务\\""
+];
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handlePromptSubmit, buildGeminiHookOutput } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildGeminiHookOutput(handlePromptSubmit({
+    cwd,
+    fallbackCommands: FALLBACK_COMMANDS,
+    hostDisplayName: "Gemini CLI",
+    prompt: resolvePayloadPrompt(payload)
+  })));
+} catch {
+  writeHookOutput({});
+}
+`;
+
+const DEFAULT_GEMINI_BEFORE_TOOL = `import { readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const {
+    handleBeforeTool,
+    buildGeminiHookOutput,
+    resolveGeminiToolCommand,
+    resolveGeminiToolName,
+    resolveGeminiToolPath
+  } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildGeminiHookOutput(handleBeforeTool({
+    command: resolveGeminiToolCommand(payload),
+    cwd,
+    filePath: resolveGeminiToolPath(payload),
+    toolName: resolveGeminiToolName(payload)
+  })));
+} catch {
+  writeHookOutput({});
+}
+`;
+
+const DEFAULT_GEMINI_AFTER_TOOL = `import { readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const {
+    handleAfterTool,
+    buildGeminiHookOutput,
+    resolveGeminiToolCommand,
+    resolveGeminiToolExitCode,
+    resolveGeminiToolName,
+    resolveGeminiToolOutput
+  } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildGeminiHookOutput(handleAfterTool({
+    command: resolveGeminiToolCommand(payload),
+    cwd,
+    exitCode: resolveGeminiToolExitCode(payload),
+    output: resolveGeminiToolOutput(payload),
+    toolName: resolveGeminiToolName(payload)
+  })));
+} catch {
+  writeHookOutput({});
+}
+`;
+
+const DEFAULT_GEMINI_AFTER_AGENT = `import { readHookPayload, resolvePayloadCwd, writeHookOutput } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
+
+try {
+  const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleCompletionGate, buildGeminiHookOutput, resolveGeminiCompletionMessage } = await importRuntimeModule("runtime-host", cwd);
+  writeHookOutput(buildGeminiHookOutput(handleCompletionGate({
+    cwd,
+    lastAssistantMessage: resolveGeminiCompletionMessage(payload)
+  })));
+} catch {
+  writeHookOutput({});
 }
 `;
 
@@ -406,21 +850,22 @@ const DEFAULT_CODEX_SESSION_START = `import { invokeAgentHarnessCodexHook, readH
 
 try {
   const payload = readHookPayload();
-  process.stdout.write(\`\${JSON.stringify(invokeAgentHarnessCodexHook("session-start", payload), null, 2)}\\n\`);
+  process.stdout.write(\`\${JSON.stringify(await invokeAgentHarnessCodexHook("session-start", payload), null, 2)}\\n\`);
 } catch (error) {
-  writeContinue("SessionStart", \`Codex SessionStart hook 执行失败：\${error.message}\`);
+  await writeContinue("SessionStart", \`Codex SessionStart hook 执行失败：\${error.message}\`);
 }
 `;
 
-const DEFAULT_CODEX_PRE_TOOL = `import { handleBeforeTool } from "../../../../packages/cli/src/lib/hook-core.js";
-import { buildCodexHookOutput } from "../../../../packages/cli/src/lib/hook-io/codex.js";
-import { readHookPayload, resolvePayloadCwd } from "../../../../packages/cli/src/lib/hook-io/shared.js";
+const DEFAULT_CODEX_PRE_TOOL = `import { firstString, readHookPayload, resolvePayloadCwd } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
 
 try {
   const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleBeforeTool, buildCodexHookOutput } = await importRuntimeModule("runtime-host", cwd);
   const result = handleBeforeTool({
     command: resolveCommand(payload),
-    cwd: resolvePayloadCwd(payload),
+    cwd,
     filePath: resolveFilePath(payload),
     taskId: resolveTaskId(payload),
     toolName: resolveToolName(payload)
@@ -478,26 +923,18 @@ function resolveCommand(payload) {
   ]);
 }
 
-function firstString(values) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
-  }
-
-  return null;
-}
 `;
 
-const DEFAULT_CODEX_POST_TOOL = `import { handleAfterTool } from "../../../../packages/cli/src/lib/hook-core.js";
-import { buildCodexHookOutput } from "../../../../packages/cli/src/lib/hook-io/codex.js";
-import { readHookPayload, resolvePayloadCwd } from "../../../../packages/cli/src/lib/hook-io/shared.js";
+const DEFAULT_CODEX_POST_TOOL = `import { firstDefined, firstString, readHookPayload, resolvePayloadCwd } from "../../shared/payload-io.js";
+import { importRuntimeModule } from "../../shared/runtime-loader.js";
 
 try {
   const payload = readHookPayload();
+  const cwd = resolvePayloadCwd(payload);
+  const { handleAfterTool, buildCodexHookOutput } = await importRuntimeModule("runtime-host", cwd);
   const result = handleAfterTool({
     command: resolveCommand(payload),
-    cwd: resolvePayloadCwd(payload),
+    cwd,
     exitCode: resolveExitCode(payload),
     output: resolveOutput(payload),
     toolName: "Bash"
@@ -556,33 +993,10 @@ function resolveOutput(payload) {
   ]) ?? "";
 }
 
-function firstString(values) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value.trim();
-    }
-  }
-
-  return null;
-}
-
-function firstDefined(values) {
-  for (const value of values) {
-    if (value !== undefined && value !== null) {
-      return value;
-    }
-  }
-
-  return null;
-}
 `;
 
 const DEFAULT_CODEX_SHARED_IO = `import fs from "node:fs";
-import path from "node:path";
-import { spawnSync } from "node:child_process";
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
+import { importRuntimeModule } from "../../../shared/runtime-loader.js";
 
 export function readHookPayload() {
   const raw = fs.readFileSync(0, "utf8").trim();
@@ -626,13 +1040,14 @@ export function buildManualFallbackContext(reason, { commands = [], hostDisplayN
     : [];
 
   if (fallbackCommands.length === 0) {
-    return \`\${safeReason} 已降级继续。\`;
+    return \`\${safeReason}，已降级继续。\`;
   }
 
-  return \`\${safeReason} 已降级到手动模式。可用 fallback：\${fallbackCommands.join("；")}\`;
+  return \`\${safeReason}，已降级。手动命令：\${fallbackCommands.join("；")}\`;
 }
 
-export function writeContinue(hookEventName, additionalContext = "") {
+export async function writeContinue(hookEventName, additionalContext = "") {
+  const { buildCodexHookOutput } = await importRuntimeModule("runtime-host");
   const text = typeof additionalContext === "string" ? additionalContext.trim() : "";
   process.stdout.write(\`\${JSON.stringify(
     buildCodexHookOutput(hookEventName, {
@@ -644,7 +1059,8 @@ export function writeContinue(hookEventName, additionalContext = "") {
   )}\\n\`);
 }
 
-export function writeBlock(reason) {
+export async function writeBlock(reason) {
+  const { buildCodexHookOutput } = await importRuntimeModule("runtime-host");
   process.stdout.write(\`\${JSON.stringify(
     buildCodexHookOutput("Block", { reason, status: "block" }),
     null,
@@ -652,97 +1068,41 @@ export function writeBlock(reason) {
   )}\\n\`);
 }
 
-export function invokeAgentHarnessCodexHook(event, payload) {
+export async function invokeAgentHarnessCodexHook(event, payload) {
   const cwd = resolvePayloadCwd(payload);
-  const repoRoot = resolveRepoRoot(cwd);
-  const cliBin = resolveAgentHarnessCliBin(repoRoot);
-  const result = spawnSync(
-    process.execPath,
-    [cliBin, "hook", "codex", event],
-    {
-      cwd: repoRoot,
-      encoding: "utf8",
-      input: \`\${JSON.stringify(payload ?? {})}\\n\`
-    }
-  );
-
-  if (result.error) {
-    throw result.error;
-  }
-
-  if (result.status !== 0) {
-    const detail = String(result.stderr ?? result.stdout ?? "").trim();
-    throw new Error(detail || \`agent-harness hook 命令失败（exit=\${result.status}）\`);
-  }
-
-  const stdout = String(result.stdout ?? "").trim();
-  if (!stdout) {
-    return {};
-  }
-
   try {
-    return JSON.parse(stdout);
-  } catch {
-    throw new Error("agent-harness hook 输出不是合法 JSON");
-  }
-}
+    const { handlePromptSubmit, handleSessionStart, buildCodexHookOutput } = await importRuntimeModule("runtime-host", cwd);
 
-function buildCodexHookOutput(eventName, decision) {
-  if (decision.status === "block") {
-    return {
-      decision: "block",
-      reason: decision.reason
-    };
-  }
-
-  if (!decision.additionalContext) {
-    return {};
-  }
-
-  return {
-    hookSpecificOutput: {
-      additionalContext: decision.additionalContext,
-      hookEventName: eventName
+    if (event === "session-start") {
+      return buildCodexHookOutput("SessionStart", handleSessionStart({
+        cwd,
+        fallbackCommands: SESSION_START_FALLBACK_COMMANDS,
+        hostDisplayName: "Codex",
+        source: payload?.source ?? ""
+      }));
     }
-  };
-}
 
-function resolveRepoRoot(cwd) {
-  const resolvedCwd = path.resolve(cwd);
-  const result = spawnSync("git", ["-C", resolvedCwd, "rev-parse", "--show-toplevel"], {
-    encoding: "utf8"
-  });
-
-  if (!result.error && result.status === 0) {
-    const root = String(result.stdout ?? "").trim();
-    if (root) {
-      return root;
+    if (event === "user-prompt-submit") {
+      return buildCodexHookOutput("UserPromptSubmit", handlePromptSubmit({
+        cwd,
+        fallbackCommands: MANUAL_FALLBACK_COMMANDS,
+        hostDisplayName: "Codex",
+        prompt: resolvePayloadPrompt(payload)
+      }));
     }
-  }
 
-  return resolvedCwd;
-}
-
-function resolveAgentHarnessCliBin(repoRoot) {
-  const candidates = [
-    path.join(repoRoot, "packages", "cli", "bin", "agent-harness.js"),
-    path.join(repoRoot, "node_modules", "@brawnen", "agent-harness-cli", "bin", "agent-harness.js")
-  ];
-
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-  }
-
-  try {
-    return require.resolve("@brawnen/agent-harness-cli/bin/agent-harness.js", {
-      paths: [repoRoot]
+    throw new Error(\`未知 Codex hook 事件: \${event}\`);
+  } catch (error) {
+    const hookEventName = event === "session-start" ? "SessionStart" : "UserPromptSubmit";
+    const fallbackCommands = event === "session-start" ? SESSION_START_FALLBACK_COMMANDS : MANUAL_FALLBACK_COMMANDS;
+    const { buildCodexHookOutput } = await importRuntimeModule("runtime-host", cwd);
+    return buildCodexHookOutput(hookEventName, {
+      additionalContext: buildManualFallbackContext(
+        \`Codex \${hookEventName} hook 执行失败：\${error.message}\`,
+        { commands: fallbackCommands, hostDisplayName: "Codex" }
+      ),
+      status: "continue"
     });
-  } catch {
-    throw new Error(
-      "无法定位 agent-harness CLI。请确认仓库内存在 packages/cli/bin/agent-harness.js，或已安装 @brawnen/agent-harness-cli。"
-    );
   }
 }
 `;
@@ -752,6 +1112,8 @@ const DEFAULT_SOURCE_FILES = {
   "type": "module"
 }
 `,
+  [path.posix.join(HOSTS_ROOT, "shared", "payload-io.js")]: DEFAULT_SHARED_PAYLOAD_IO,
+  [path.posix.join(HOSTS_ROOT, "shared", "runtime-loader.js")]: DEFAULT_SHARED_RUNTIME_LOADER,
   [path.posix.join(HOSTS_ROOT, "codex", "config.toml")]: DEFAULT_CODEX_CONFIG,
   [path.posix.join(HOSTS_ROOT, "codex", "hooks.json")]: DEFAULT_CODEX_HOOKS_JSON,
   [path.posix.join(HOSTS_ROOT, "codex", "hooks", "user_prompt_submit_intake.js")]: DEFAULT_CODEX_USER_PROMPT,
@@ -760,7 +1122,17 @@ const DEFAULT_SOURCE_FILES = {
   [path.posix.join(HOSTS_ROOT, "codex", "hooks", "post_tool_use_record_evidence.js")]: DEFAULT_CODEX_POST_TOOL,
   [path.posix.join(HOSTS_ROOT, "codex", "hooks", "shared", "codex-hook-io.js")]: DEFAULT_CODEX_SHARED_IO,
   [path.posix.join(HOSTS_ROOT, "claude", "settings.json")]: DEFAULT_CLAUDE_SETTINGS,
+  [path.posix.join(HOSTS_ROOT, "claude", "hooks", "session_start.js")]: DEFAULT_CLAUDE_SESSION_START,
+  [path.posix.join(HOSTS_ROOT, "claude", "hooks", "user_prompt_submit.js")]: DEFAULT_CLAUDE_USER_PROMPT,
+  [path.posix.join(HOSTS_ROOT, "claude", "hooks", "pre_tool_use.js")]: DEFAULT_CLAUDE_PRE_TOOL,
+  [path.posix.join(HOSTS_ROOT, "claude", "hooks", "post_tool_use.js")]: DEFAULT_CLAUDE_POST_TOOL,
+  [path.posix.join(HOSTS_ROOT, "claude", "hooks", "stop.js")]: DEFAULT_CLAUDE_STOP,
   [path.posix.join(HOSTS_ROOT, "gemini", "settings.json")]: DEFAULT_GEMINI_SETTINGS,
+  [path.posix.join(HOSTS_ROOT, "gemini", "hooks", "session_start.js")]: DEFAULT_GEMINI_SESSION_START,
+  [path.posix.join(HOSTS_ROOT, "gemini", "hooks", "before_agent.js")]: DEFAULT_GEMINI_BEFORE_AGENT,
+  [path.posix.join(HOSTS_ROOT, "gemini", "hooks", "before_tool.js")]: DEFAULT_GEMINI_BEFORE_TOOL,
+  [path.posix.join(HOSTS_ROOT, "gemini", "hooks", "after_tool.js")]: DEFAULT_GEMINI_AFTER_TOOL,
+  [path.posix.join(HOSTS_ROOT, "gemini", "hooks", "after_agent.js")]: DEFAULT_GEMINI_AFTER_AGENT,
   [path.posix.join(RULES_ROOT, "shared.md")]: DEFAULT_SHARED_RULES,
   [path.posix.join(RULES_ROOT, "codex.md")]: DEFAULT_RULE_DELTAS.codex,
   [path.posix.join(RULES_ROOT, "claude.md")]: DEFAULT_RULE_DELTAS["claude-code"],
@@ -862,7 +1234,9 @@ function requiredSourcePaths(hosts, options = {}) {
   const includeConfigs = options.includeConfigs !== false;
   const includeRules = options.includeRules !== false;
   const paths = new Set([
-    path.posix.join(SOURCE_ROOT, "package.json")
+    path.posix.join(SOURCE_ROOT, "package.json"),
+    path.posix.join(HOSTS_ROOT, "shared", "payload-io.js"),
+    path.posix.join(HOSTS_ROOT, "shared", "runtime-loader.js")
   ]);
 
   if (includeRules) {
@@ -882,6 +1256,22 @@ function requiredSourcePaths(hosts, options = {}) {
       paths.add(path.posix.join(HOSTS_ROOT, "codex", "hooks", "pre_tool_use_gate.js"));
       paths.add(path.posix.join(HOSTS_ROOT, "codex", "hooks", "post_tool_use_record_evidence.js"));
       paths.add(path.posix.join(HOSTS_ROOT, "codex", "hooks", "shared", "codex-hook-io.js"));
+    }
+
+    if (host === "claude-code" && includeConfigs) {
+      paths.add(path.posix.join(HOSTS_ROOT, "claude", "hooks", "session_start.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "claude", "hooks", "user_prompt_submit.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "claude", "hooks", "pre_tool_use.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "claude", "hooks", "post_tool_use.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "claude", "hooks", "stop.js"));
+    }
+
+    if (host === "gemini-cli" && includeConfigs) {
+      paths.add(path.posix.join(HOSTS_ROOT, "gemini", "hooks", "session_start.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "gemini", "hooks", "before_agent.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "gemini", "hooks", "before_tool.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "gemini", "hooks", "after_tool.js"));
+      paths.add(path.posix.join(HOSTS_ROOT, "gemini", "hooks", "after_agent.js"));
     }
 
     if (includeRules) {
