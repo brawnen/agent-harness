@@ -31,6 +31,39 @@ const AFFIRMATIVE_SHORT_REPLIES = [
   "先这样", "就这样", "开始吧", "搞起", "go"
 ];
 
+const TASK_REFERENCE_KEYWORDS = [
+  "刚才那个",
+  "刚才这个",
+  "刚才的任务",
+  "这个任务",
+  "这个问题",
+  "这个方案",
+  "当前任务",
+  "前面那个"
+];
+
+const TASK_REPLY_PREFIXES = [
+  "先做",
+  "先看",
+  "先把",
+  "先",
+  "再",
+  "然后",
+  "接着",
+  "列一下",
+  "看一下",
+  "看看",
+  "全部",
+  "只",
+  "统一",
+  "收敛成",
+  "按这个",
+  "就按这个",
+  "好，",
+  "好,",
+  "那就"
+];
+
 const NEW_TASK_KEYWORDS = [
   "新任务",
   "另一个问题",
@@ -59,7 +92,6 @@ const MANUAL_CONFIRMATION_KEYWORDS = [
   "允许继续",
   "就按这个做",
   "按这个做",
-  "继续",
   "go ahead",
   "proceed"
 ];
@@ -100,8 +132,13 @@ export function buildTaskDraftFromInput(sourceInput, options = {}) {
   const riskLevel = inferRiskLevel(input, riskSignals);
   const intent = options.intent ?? inferIntent(input);
   const mode = options.mode ?? (intent === "explore" ? "explore" : "delivery");
-  const nextAction = openQuestions.length > 0 ? "clarify" : "plan";
-  const derivedState = openQuestions.length > 0 ? "needs_clarification" : "planned";
+  const hasOpenQuestions = openQuestions.length > 0;
+  const nextAction = hasOpenQuestions
+    ? (riskLevel === "high" ? "clarify" : "observe")
+    : "plan";
+  const derivedState = hasOpenQuestions
+    ? (riskLevel === "high" ? "needs_clarification" : "draft")
+    : "planned";
 
   return {
     schema_version: "0.3",
@@ -247,7 +284,7 @@ export function autoIntakePrompt(cwd, prompt) {
   }
 
   const decision = classifyPromptAgainstTask(input, activeTask);
-  if (decision.type === "continue") {
+  if (decision.type === "continue" || decision.type === "provisional_continue") {
     return {
       action: "continue",
       task: activeTask,
@@ -287,13 +324,11 @@ export function buildCurrentTaskContext(taskState) {
   }
 
   const goal = taskState?.confirmed_contract?.goal ?? taskState?.task_draft?.goal ?? "未定义目标";
-  const nextAction = deriveNextAction(taskState);
-  const currentState = taskState?.current_state ?? "unknown";
   const blockingQuestion = Array.isArray(taskState?.open_questions) && taskState.open_questions.length > 0
-    ? ` 当前阻断问题：${taskState.open_questions[0]}`
+    ? ` 阻断：${taskState.open_questions[0]}`
     : "";
 
-  return `当前 active task: ${taskState.task_id}。目标：${goal}。当前状态：${currentState}。下一步动作：${nextAction}。${blockingQuestion}`.trim();
+  return `当前任务 ${taskState.task_id}：${goal}。${blockingQuestion}`.trim();
 }
 
 export function buildNewTaskContext(taskState) {
@@ -302,7 +337,7 @@ export function buildNewTaskContext(taskState) {
   }
 
   const draft = taskState.task_draft ?? {};
-  return `已自动创建新任务 ${taskState.task_id}。intent=${draft.intent}，goal=${draft.goal}，next_action=${draft.next_action}。请先按该任务继续。`;
+  return `已切换到新任务 ${taskState.task_id}：${draft.goal}。`;
 }
 
 export function classifyUserOverridePrompt(prompt) {
@@ -404,20 +439,44 @@ function classifyPromptAgainstTask(prompt, activeTask) {
     });
   }
 
+  const matchedTaskReference = TASK_REFERENCE_KEYWORDS.find((keyword) => normalizedPrompt.includes(keyword));
+  if (matchedTaskReference) {
+    return buildDecision("continue", {
+      reasonCode: "matched_task_reference",
+      reason: `输入命中当前任务指代：${matchedTaskReference}。`,
+      matchedSignals: [`task_reference:${matchedTaskReference}`],
+      confidence: "medium"
+    });
+  }
+
+  if (isLikelyTaskReply(normalizedPrompt)) {
+    return buildDecision("provisional_continue", {
+      reasonCode: "likely_task_reply",
+      reason: "输入更像是当前任务内的步骤选择或简短回复，先续接当前任务观察。",
+      matchedSignals: ["likely_task_reply"],
+      confidence: "low"
+    });
+  }
+
   const ambiguous = isAmbiguousPrompt(prompt);
   if (ambiguous) {
     const matchedHighRiskKeyword = findMatchedKeyword(normalizedPrompt, HIGH_RISK_KEYWORDS);
     const highRisk = Boolean(matchedHighRiskKeyword);
-    return buildDecision("clarify", {
-      block: highRisk,
-      reasonCode: highRisk ? "ambiguous_high_risk_prompt" : "ambiguous_prompt",
-      reason: highRisk
-        ? "输入任务归属不明且含高风险信号，请先澄清。"
-        : "输入归属不明，请先澄清是延续当前任务还是新任务。",
-      matchedSignals: highRisk
-        ? [`high_risk_keyword:${matchedHighRiskKeyword}`, "ambiguous_prompt"]
-        : ["ambiguous_prompt"],
-      confidence: highRisk ? "high" : "low"
+    if (highRisk) {
+      return buildDecision("clarify", {
+        block: true,
+        reasonCode: "ambiguous_high_risk_prompt",
+        reason: "输入任务归属不明且含高风险信号，请先澄清。",
+        matchedSignals: [`high_risk_keyword:${matchedHighRiskKeyword}`, "ambiguous_prompt"],
+        confidence: "high"
+      });
+    }
+
+    return buildDecision("provisional_continue", {
+      reasonCode: "ambiguous_low_risk_continue",
+      reason: "输入较短且无高风险信号，先按当前任务续接并观察。",
+      matchedSignals: ["ambiguous_prompt", "low_risk"],
+      confidence: "low"
     });
   }
 
@@ -446,6 +505,11 @@ function isAmbiguousPrompt(prompt) {
 function isAffirmativeShortReply(normalizedPrompt) {
   const trimmed = normalizedPrompt.trim();
   return AFFIRMATIVE_SHORT_REPLIES.some((reply) => trimmed === reply);
+}
+
+function isLikelyTaskReply(normalizedPrompt) {
+  const trimmed = normalizedPrompt.trim();
+  return TASK_REPLY_PREFIXES.some((prefix) => trimmed.startsWith(prefix));
 }
 
 function inferIntent(input) {

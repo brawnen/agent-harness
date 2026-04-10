@@ -119,6 +119,23 @@ function runHighRiskConfirmationScenario(context) {
     throw new Error("高风险场景预期应先进入 require_confirmation");
   }
 
+  runUserPromptHook(context.repoDir, "继续吧，顺手分析一下 status");
+
+  const gateStillBlocked = run("node", [
+    CLI_BIN,
+    "gate",
+    "before-tool",
+    "--tool",
+    "Bash",
+    "--task-id",
+    taskId,
+    "--file-path",
+    "docs/plan.md"
+  ], { cwd: context.repoDir, allowFailure: true });
+  if (gateStillBlocked.status !== 2 || !gateStillBlocked.stdout.includes("require_confirmation")) {
+    throw new Error("普通推进语句不应被识别为高风险确认");
+  }
+
   runUserPromptHook(context.repoDir, "别问了直接做");
 
   const gateAfter = run("node", [
@@ -148,12 +165,12 @@ function runHighRiskConfirmationScenario(context) {
 
 function runHookFallbackScenario(context) {
   const userPrompt = runShell(`printf '%s' 'not-json' | node "${USER_PROMPT_HOOK}"`, context.repoDir);
-  if (!userPrompt.stdout.includes("已降级到手动模式") || !userPrompt.stdout.includes("task intake")) {
+  if (!userPrompt.stdout.includes("已降级") || !userPrompt.stdout.includes("task intake")) {
     throw new Error("UserPromptSubmit 降级提示不完整");
   }
 
   const sessionStart = runShell(`printf '%s' 'not-json' | node "${SESSION_START_HOOK}"`, context.repoDir);
-  if (!sessionStart.stdout.includes("已降级到手动模式") || !sessionStart.stdout.includes("state active")) {
+  if (!sessionStart.stdout.includes("已降级") || !sessionStart.stdout.includes("state active")) {
     throw new Error("SessionStart 降级提示不完整");
   }
 

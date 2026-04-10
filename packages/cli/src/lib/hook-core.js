@@ -76,10 +76,10 @@ export function buildManualFallbackContext(reason, { commands = [], hostDisplayN
   const fallbackCommands = Array.isArray(commands) ? commands.filter(Boolean) : [];
 
   if (fallbackCommands.length === 0) {
-    return `${message} 已降级继续。`;
+    return `${message}，已降级继续。`;
   }
 
-  return `${message} 已降级到手动模式。可用 fallback：${fallbackCommands.join("；")}`;
+  return `${message}，已降级。手动命令：${fallbackCommands.join("；")}`;
 }
 
 export function handleSessionStart({
@@ -276,7 +276,7 @@ function handleUserOverridePrompt({ cwd, hostDisplayName, prompt }) {
   const additionalNotes = [];
 
   if (overrideDecision.type === "manual_confirmation") {
-    if (!(riskLevel === "high" && pendingConfirmation)) {
+    if (!(riskLevel === "high" && pendingConfirmation && isStandaloneConfirmationReply(prompt))) {
       return null;
     }
 
@@ -320,6 +320,29 @@ function handleUserOverridePrompt({ cwd, hostDisplayName, prompt }) {
   return {
     additionalContext: additionalNotes.join(" ")
   };
+}
+
+function isStandaloneConfirmationReply(prompt) {
+  const normalized = String(prompt ?? "").trim().toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+
+  if (normalized.length > 24) {
+    return false;
+  }
+
+  const separators = /[，。！？；,.!?;:：]/;
+  if (separators.test(normalized)) {
+    return false;
+  }
+
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  if (tokens.length > 4) {
+    return false;
+  }
+
+  return true;
 }
 
 function appendOverrideEntry(cwd, taskId, entry) {

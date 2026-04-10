@@ -98,6 +98,82 @@
       }
     },
     {
+      "name": "ambiguous-low-risk-continue",
+      "active_task": {
+        "input": "继续完善 packages/cli 的 intake 判定",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "输出结构化 decision"
+        ]
+      },
+      "prompt": "处理下",
+      "expected": {
+        "action": "continue",
+        "decision_type": "provisional_continue",
+        "reason_code": "ambiguous_low_risk_continue",
+        "block": false
+      }
+    },
+    {
+      "name": "likely-task-reply-all-in-one",
+      "active_task": {
+        "input": "刚才那个 git 提交任务",
+        "scope": [
+          "git"
+        ],
+        "acceptance": [
+          "完成一次本地提交"
+        ]
+      },
+      "prompt": "全部一起提交",
+      "expected": {
+        "action": "continue",
+        "decision_type": "provisional_continue",
+        "reason_code": "likely_task_reply",
+        "block": false
+      }
+    },
+    {
+      "name": "likely-task-reply-plan-first",
+      "active_task": {
+        "input": "重构 UserPromptSubmit 的任务判定策略",
+        "scope": [
+          "packages/cli/src/lib/task-core.js"
+        ],
+        "acceptance": [
+          "减少不必要澄清"
+        ]
+      },
+      "prompt": "先做问题定义和策略重构方案吧",
+      "expected": {
+        "action": "continue",
+        "decision_type": "provisional_continue",
+        "reason_code": "likely_task_reply",
+        "block": false
+      }
+    },
+    {
+      "name": "matched-task-reference",
+      "active_task": {
+        "input": "统一输出简化和任务判定重构方案",
+        "scope": [
+          "packages/cli"
+        ],
+        "acceptance": [
+          "方案可实施"
+        ]
+      },
+      "prompt": "继续刚才这个输出简化任务",
+      "expected": {
+        "action": "continue",
+        "decision_type": "continue",
+        "reason_code": "matched_continue_keyword",
+        "block": false
+      }
+    },
+    {
       "name": "fallback-new-task",
       "active_task": {
         "input": "继续完善 packages/cli 的 intake 判定",

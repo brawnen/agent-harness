@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\" hook claude session-start"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/session_start.js\""
           }
         ]
       }
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\" hook claude user-prompt-submit"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/user_prompt_submit.js\""
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\" gate before-tool --tool \"$TOOL_NAME\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/pre_tool_use.js\""
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\" state update --tool \"$TOOL_NAME\" --exit-code \"$EXIT_CODE\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/post_tool_use.js\""
           }
         ]
       }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/packages/cli/bin/agent-harness.js\" hook claude stop"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.harness/hosts/claude/hooks/stop.js\""
           }
         ]
       }

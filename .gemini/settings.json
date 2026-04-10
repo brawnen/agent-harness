@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\" hook gemini session-start"
+            "command": "node \"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/session_start.js\""
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\" hook gemini before-agent"
+            "command": "node \"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/before_agent.js\""
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\" hook gemini before-tool"
+            "command": "node \"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/before_tool.js\""
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\" hook gemini after-tool"
+            "command": "node \"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/after_tool.js\""
           }
         ]
       }
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/packages/cli/bin/agent-harness.js\" hook gemini after-agent"
+            "command": "node \"$(git rev-parse --show-toplevel)/.harness/hosts/gemini/hooks/after_agent.js\""
           }
         ]
       }

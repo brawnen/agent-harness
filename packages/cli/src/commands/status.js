@@ -386,36 +386,41 @@ function inspectClaudeHooks(cwd, runtimeMode, hasClaudeHost) {
     .map((hook) => hook.command)
     .filter(Boolean);
 
-  const hasPreTool = commands.some((command) =>
-    command.includes("agent-harness gate before-tool") ||
-    command.includes("@brawnen/agent-harness-cli gate before-tool") ||
-    command.includes("packages/cli/bin/agent-harness.js\" gate before-tool") ||
-    command.includes("packages/cli/bin/agent-harness.js gate before-tool")
-  );
-  const hasPostTool = commands.some((command) =>
-    command.includes("agent-harness state update") ||
-    command.includes("@brawnen/agent-harness-cli state update") ||
-    command.includes("packages/cli/bin/agent-harness.js\" state update") ||
-    command.includes("packages/cli/bin/agent-harness.js state update")
-  );
-  const hasSessionStart = commands.some((command) =>
-    command.includes("agent-harness hook claude session-start") ||
-    command.includes("@brawnen/agent-harness-cli hook claude session-start") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook claude session-start") ||
-    command.includes("packages/cli/bin/agent-harness.js hook claude session-start")
-  );
-  const hasUserPromptSubmit = commands.some((command) =>
-    command.includes("agent-harness hook claude user-prompt-submit") ||
-    command.includes("@brawnen/agent-harness-cli hook claude user-prompt-submit") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook claude user-prompt-submit") ||
-    command.includes("packages/cli/bin/agent-harness.js hook claude user-prompt-submit")
-  );
-  const hasStop = commands.some((command) =>
-    command.includes("agent-harness hook claude stop") ||
-    command.includes("@brawnen/agent-harness-cli hook claude stop") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook claude stop") ||
-    command.includes("packages/cli/bin/agent-harness.js hook claude stop")
-  );
+  const hasPreTool = hasCommandFragment(commands, [
+    "agent-harness gate before-tool",
+    "@brawnen/agent-harness-cli gate before-tool",
+    "packages/cli/bin/agent-harness.js\" gate before-tool",
+    "packages/cli/bin/agent-harness.js gate before-tool",
+    ".harness/hosts/claude/hooks/pre_tool_use.js"
+  ]);
+  const hasPostTool = hasCommandFragment(commands, [
+    "agent-harness state update",
+    "@brawnen/agent-harness-cli state update",
+    "packages/cli/bin/agent-harness.js\" state update",
+    "packages/cli/bin/agent-harness.js state update",
+    ".harness/hosts/claude/hooks/post_tool_use.js"
+  ]);
+  const hasSessionStart = hasCommandFragment(commands, [
+    "agent-harness hook claude session-start",
+    "@brawnen/agent-harness-cli hook claude session-start",
+    "packages/cli/bin/agent-harness.js\" hook claude session-start",
+    "packages/cli/bin/agent-harness.js hook claude session-start",
+    ".harness/hosts/claude/hooks/session_start.js"
+  ]);
+  const hasUserPromptSubmit = hasCommandFragment(commands, [
+    "agent-harness hook claude user-prompt-submit",
+    "@brawnen/agent-harness-cli hook claude user-prompt-submit",
+    "packages/cli/bin/agent-harness.js\" hook claude user-prompt-submit",
+    "packages/cli/bin/agent-harness.js hook claude user-prompt-submit",
+    ".harness/hosts/claude/hooks/user_prompt_submit.js"
+  ]);
+  const hasStop = hasCommandFragment(commands, [
+    "agent-harness hook claude stop",
+    "@brawnen/agent-harness-cli hook claude stop",
+    "packages/cli/bin/agent-harness.js\" hook claude stop",
+    "packages/cli/bin/agent-harness.js hook claude stop",
+    ".harness/hosts/claude/hooks/stop.js"
+  ]);
 
   if (hasSessionStart && hasUserPromptSubmit && hasPreTool && hasPostTool && hasStop) {
     return ok(".claude/settings.json", "Claude Code hooks 已配置（SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop）");
@@ -460,40 +465,45 @@ function inspectGeminiAdapter(cwd, runtimeMode, hasGeminiHost) {
     .map((hook) => hook.command)
     .filter(Boolean);
 
-  const hasSessionStart = commands.some((command) =>
-    command.includes("agent-harness hook gemini session-start") ||
-    command.includes("@brawnen/agent-harness-cli hook gemini session-start") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook gemini session-start") ||
-    command.includes("packages/cli/bin/agent-harness.js hook gemini session-start")
-  );
-  const hasBeforeAgent = commands.some((command) =>
-    command.includes("agent-harness hook gemini before-agent") ||
-    command.includes("@brawnen/agent-harness-cli hook gemini before-agent") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook gemini before-agent") ||
-    command.includes("packages/cli/bin/agent-harness.js hook gemini before-agent")
-  );
-  const hasBeforeTool = commands.some((command) =>
-    command.includes("agent-harness hook gemini before-tool") ||
-    command.includes("@brawnen/agent-harness-cli hook gemini before-tool") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook gemini before-tool") ||
-    command.includes("packages/cli/bin/agent-harness.js hook gemini before-tool")
-  );
-  const hasAfterTool = commands.some((command) =>
-    command.includes("agent-harness hook gemini after-tool") ||
-    command.includes("@brawnen/agent-harness-cli hook gemini after-tool") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook gemini after-tool") ||
-    command.includes("packages/cli/bin/agent-harness.js hook gemini after-tool")
-  );
-  const hasAfterAgent = commands.some((command) =>
-    command.includes("agent-harness hook gemini after-agent") ||
-    command.includes("@brawnen/agent-harness-cli hook gemini after-agent") ||
-    command.includes("packages/cli/bin/agent-harness.js\" hook gemini after-agent") ||
-    command.includes("packages/cli/bin/agent-harness.js hook gemini after-agent")
-  );
+  const hasSessionStart = hasCommandFragment(commands, [
+    "agent-harness hook gemini session-start",
+    "@brawnen/agent-harness-cli hook gemini session-start",
+    "packages/cli/bin/agent-harness.js\" hook gemini session-start",
+    "packages/cli/bin/agent-harness.js hook gemini session-start",
+    ".harness/hosts/gemini/hooks/session_start.js"
+  ]);
+  const hasBeforeAgent = hasCommandFragment(commands, [
+    "agent-harness hook gemini before-agent",
+    "@brawnen/agent-harness-cli hook gemini before-agent",
+    "packages/cli/bin/agent-harness.js\" hook gemini before-agent",
+    "packages/cli/bin/agent-harness.js hook gemini before-agent",
+    ".harness/hosts/gemini/hooks/before_agent.js"
+  ]);
+  const hasBeforeTool = hasCommandFragment(commands, [
+    "agent-harness hook gemini before-tool",
+    "@brawnen/agent-harness-cli hook gemini before-tool",
+    "packages/cli/bin/agent-harness.js\" hook gemini before-tool",
+    "packages/cli/bin/agent-harness.js hook gemini before-tool",
+    ".harness/hosts/gemini/hooks/before_tool.js"
+  ]);
+  const hasAfterTool = hasCommandFragment(commands, [
+    "agent-harness hook gemini after-tool",
+    "@brawnen/agent-harness-cli hook gemini after-tool",
+    "packages/cli/bin/agent-harness.js\" hook gemini after-tool",
+    "packages/cli/bin/agent-harness.js hook gemini after-tool",
+    ".harness/hosts/gemini/hooks/after_tool.js"
+  ]);
+  const hasAfterAgent = hasCommandFragment(commands, [
+    "agent-harness hook gemini after-agent",
+    "@brawnen/agent-harness-cli hook gemini after-agent",
+    "packages/cli/bin/agent-harness.js\" hook gemini after-agent",
+    "packages/cli/bin/agent-harness.js hook gemini after-agent",
+    ".harness/hosts/gemini/hooks/after_agent.js"
+  ]);
 
   const modeSummary = runtimeMode === "protocol-only"
     ? "当前为 protocol-only，但 hooks 已可用"
-    : "已检测到 .harness 运行时目录，可配合 hooks 与 CLI 做 state / verify / report";
+    : "已检测到 .harness 运行时目录，可配合 hooks 与兼容 CLI 做 state / verify / report";
 
   if (hasSessionStart && hasBeforeAgent && hasBeforeTool && hasAfterTool && hasAfterAgent) {
     return ok("Gemini adapter", `Gemini CLI hooks 已配置（SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent）；${modeSummary}`);
@@ -511,6 +521,10 @@ function hasCodexHookCommand(parsedHooks, eventName, commandFragment) {
   return eventEntries
     .flatMap((entry) => entry?.hooks ?? [])
     .some((hook) => typeof hook?.command === "string" && hook.command.includes(commandFragment));
+}
+
+function hasCommandFragment(commands, fragments) {
+  return commands.some((command) => fragments.some((fragment) => command.includes(fragment)));
 }
 
 function inspectRuntimeDirectories(cwd, runtimeMode) {

@@ -67,9 +67,9 @@ node packages/cli/bin/agent-harness.js delivery commit
    - [packages/protocol/schemas](packages/protocol/schemas)
    - [packages/protocol/adapters](packages/protocol/adapters)
 
-### 2.2 通过 npm 接入 CLI
+### 2.2 通过 npm 接入 Runtime
 
-这是现在最推荐的方式。
+这是现在最推荐的方式。这里的 `CLI` 应理解为 Runtime 的 compatibility layer，用于初始化、状态检查、手动验证与交付收口。
 
 在目标项目目录下执行：
 
@@ -122,16 +122,20 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 
 ## 3. 推荐接入顺序
 
+如果这是你们团队第一次试这套 Runtime，建议同时参考：
+
+- [Agent Harness Runtime 小团队试用清单](docs/2026-04-10-runtime-team-trial-checklist-v0.1.md)
+
 如果你要在本机的其他项目里推广，建议按这个顺序：
 
-1. 先选一个你常用的 `Codex` 项目做完整 CLI 接入
+1. 先选一个你常用的 `Codex` 项目做完整 Runtime 接入
 2. 再选一个 `Claude Code` 或 `Gemini CLI` 项目验证非 Codex 宿主的接入边界
 3. 团队里其他项目先从 `protocol-only` 开始
 4. 优先统一切到 `npx @brawnen/agent-harness-cli init`
 
-## 4. 什么时候用完整 CLI
+## 4. 什么时候用完整 Runtime
 
-建议使用完整 CLI 的情况：
+建议使用完整 Runtime 的情况：
 
 - 你希望任务状态持久化
 - 你希望有 `verify / report / delivery commit`
@@ -150,18 +154,19 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 
 - `Codex` 是支持最完整的宿主
 - `Claude Code` 已支持 `CLAUDE.md + .claude/settings.json` 的最小闭环接入
-- `Gemini CLI` 已支持 `GEMINI.md + .harness + CLI` 的最小 L2 接入闭环
+- `Gemini CLI` 已支持 `GEMINI.md + .gemini/settings.json + repo-local hooks` 的最小闭环接入
 - `Antigravity` 还在后续计划中
 - `commit` 已支持显式本地交付
 - `push` 仍然保持人工动作
 - 当前已提供 npm 包，跨项目接入优先推荐 npm CLI
+- 当前主产品应理解为 `Agent Harness Runtime`，不是继续扩张的 CLI 产品
 
 `Claude Code` 当前支持边界：
 
 - `SessionStart`：恢复 active task 摘要
 - `UserPromptSubmit`：自动 intake / continue / clarify / override
 - `PreToolUse`：前置 `gate before-tool`
-- `PostToolUse`：工具后 `state update`
+- `PostToolUse`：工具后写入最小 evidence
 - `Stop`：当模型明显宣称任务完成时，要求先补齐 verify / report
 - `CLAUDE.md` 继续承担 task contract 与执行策略的 L2 规则约束
 - 相比 `Codex`，当前 `Claude Code` 的 Stop 门禁仍是最小完成门禁，不是全面语义审查
@@ -169,6 +174,7 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 `Gemini CLI` 当前支持边界：
 
 - `GEMINI.md` 承担 intake / clarify / completion gate 的 L2 规则约束
-- `init --host gemini-cli` 会生成 `GEMINI.md` 与 `.harness` 运行时目录
-- `status` 会明确提示 Gemini CLI 当前属于无原生 hooks 的 L2 接入
-- 暂不具备 `Codex` 或 `Claude Code` 那样的自动工具级拦截或工具后记录能力
+- `init --host gemini-cli` 会生成 `GEMINI.md`、`.gemini/settings.json` 与 `.harness` 运行时目录
+- `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent` 已接入 repo-local hooks
+- `status` 会明确识别 Gemini CLI 当前接入状态
+- 当前仍属于最小闭环，不追求宿主专属体验深挖

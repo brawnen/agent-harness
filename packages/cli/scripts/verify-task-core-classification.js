@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { autoIntakePrompt, createTaskFromInput } from "../src/lib/task-core.js";
+import { autoIntakePrompt, classifyUserOverridePrompt, createTaskFromInput } from "../src/lib/task-core.js";
 import { updateTaskState } from "../src/lib/state-store.js";
 
 const fixturesPath = path.resolve(process.cwd(), "fixtures", "task-core-classification.json");
@@ -59,6 +59,32 @@ for (const fixture of fixtures.cases ?? []) {
 
   passed += 1;
   console.log(`PASS ${fixture.name} -> ${actual.decision_type}/${actual.reason_code}`);
+}
+
+const overrideCases = [
+  {
+    expectedType: null,
+    prompt: "继续"
+  },
+  {
+    expectedType: "manual_confirmation",
+    prompt: "继续执行"
+  }
+];
+
+for (const overrideCase of overrideCases) {
+  const decision = classifyUserOverridePrompt(overrideCase.prompt);
+  const actualType = decision?.type ?? null;
+
+  if (actualType !== overrideCase.expectedType) {
+    failures += 1;
+    console.error(`FAIL override ${JSON.stringify(overrideCase.prompt)}`);
+    console.error(`  expected=${JSON.stringify(overrideCase.expectedType)} actual=${JSON.stringify(actualType)}`);
+    continue;
+  }
+
+  passed += 1;
+  console.log(`PASS override ${JSON.stringify(overrideCase.prompt)} -> ${actualType ?? "null"}`);
 }
 
 if (failures > 0) {

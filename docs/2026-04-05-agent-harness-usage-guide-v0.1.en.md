@@ -69,9 +69,9 @@ How:
    - [packages/protocol/schemas](packages/protocol/schemas)
    - [packages/protocol/adapters](packages/protocol/adapters)
 
-### 2.2 Install The CLI From npm
+### 2.2 Install The Runtime From npm
 
-This is the recommended path now.
+This is the recommended path now. The CLI should be understood as the compatibility layer for bootstrap, status, verification, and explicit delivery actions.
 
 From the target repository:
 
@@ -124,15 +124,19 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js delivery ready
 
 ## 3. Recommended Rollout Order
 
+If this is your team’s first runtime trial, also read:
+
+- [Agent Harness Runtime Team Trial Checklist](docs/2026-04-10-runtime-team-trial-checklist-v0.1.md)
+
 If you want to roll this out across your local projects, the suggested order is:
 
-1. Start with one frequently used `Codex` repo and adopt the full CLI
+1. Start with one frequently used `Codex` repo and adopt the full Runtime
 2. Let other team repos start with `protocol-only`
 3. Standardize on `npx @brawnen/agent-harness-cli init`
 
-## 4. When To Use The Full CLI
+## 4. When To Use The Full Runtime
 
-Use the full CLI if you want:
+Use the full Runtime if you want:
 
 - persistent task state
 - `verify / report / delivery commit`
@@ -151,8 +155,9 @@ This guide reflects the current implementation today:
 
 - `Codex` is the most complete host
 - `Claude Code` already supports a hook-integrated loop via `CLAUDE.md + .claude/settings.json`
-- `Gemini CLI` already supports a minimum hook-integrated loop via `.gemini/settings.json + GEMINI.md + .harness + CLI`
+- `Gemini CLI` already supports a minimum hook-integrated loop via `.gemini/settings.json + GEMINI.md + repo-local hooks`
 - `Antigravity` is still future work
 - `commit` is supported as an explicit local delivery step
 - `push` remains manual
 - npm packages are now available, so cross-repo adoption should prefer the npm CLI path
+- the current product should be understood as `Agent Harness Runtime`, not an expanding CLI product

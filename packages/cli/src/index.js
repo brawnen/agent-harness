@@ -11,7 +11,7 @@ import { runStatus } from "./commands/status.js";
 import { runTask } from "./commands/task.js";
 import { runVerify } from "./commands/verify.js";
 
-const HELP_TEXT = `agent-harness CLI
+const HELP_TEXT = `agent-harness compatibility CLI
 
 Usage:
   agent-harness --help
@@ -43,7 +43,7 @@ Options:
   --force
 
 Status:
-  task/init/sync/status/state/verify/report/gate/audit/delivery/docs MVP are implemented.
+  CLI 主要承担 init/status/manual fallback，宿主运行时正向 repo-local hooks 收敛。
 `;
 
 export function run(argv) {
@@ -55,7 +55,7 @@ export function run(argv) {
   }
 
   if (command === "--version" || command === "-v") {
-    console.log("0.1.0");
+    console.log("0.1.1");
     return 0;
   }
 

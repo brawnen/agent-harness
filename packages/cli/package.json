@@ -1,10 +1,13 @@
 {
   "name": "@brawnen/agent-harness-cli",
   "version": "0.1.1",
-  "description": "CLI for task convergence, verification, reporting, and delivery in agent-harness projects.",
+  "description": "Compatibility CLI for bootstrap, status, and manual fallback in agent-harness projects.",
   "license": "MIT",
   "bin": {
     "agent-harness": "./bin/agent-harness.js"
+  },
+  "exports": {
+    "./runtime-host": "./src/runtime-host/index.js"
   },
   "type": "module",
   "files": [
@@ -38,7 +41,12 @@
     "@brawnen/agent-harness-protocol": "^0.1.1"
   },
   "scripts": {
-    "start": "node ./bin/agent-harness.js --help"
+    "start": "node ./bin/agent-harness.js --help",
+    "verify:codex-e2e": "node ./scripts/verify-codex-e2e.js",
+    "verify:host-hooks": "node ./scripts/verify-host-hooks-smoke.js",
+    "verify:init-status": "node ./scripts/verify-host-init-status.js",
+    "verify:status-compat": "node ./scripts/verify-sync-status-compat.js",
+    "verify:task-core": "node ./scripts/verify-task-core-classification.js"
   },
   "engines": {
     "node": ">=18"
