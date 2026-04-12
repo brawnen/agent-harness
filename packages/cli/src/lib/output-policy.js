@@ -199,22 +199,22 @@ function matchesArtifactCondition(condition, taskContext) {
       return inferCrossModuleChange(taskContext.scope);
     }
     if (normalized === "public_contract_changed") {
-      return hasKeyword(taskContext.goal, ["api", "schema", "接口", "契约", "协议", "contract"]);
+      return hasKeyword(taskContext.goal, ["public contract", "api schema", "schema change", "breaking change", "接口契约", "公开契约", "兼容性变更"]);
     }
     if (normalized === "reusable_decision") {
-      return hasKeyword(taskContext.goal, ["复用", "通用", "shared", "reusable"]);
+      return hasKeyword(taskContext.goal, ["复用决策", "通用方案", "shared decision", "reusable decision", "通用能力"]);
     }
     if (normalized === "architectural_decision") {
-      return hasKeyword(taskContext.goal, ["架构", "architecture", "协议", "adapter", "hook"]);
+      return hasKeyword(taskContext.goal, ["架构决策", "architecture decision", "架构边界", "runtime boundary"]);
     }
     if (normalized === "policy_change") {
-      return hasKeyword(taskContext.goal, ["策略", "policy", "规则"]);
+      return hasKeyword(taskContext.goal, ["治理策略", "policy as code", "policy change", "策略变更"]);
     }
     if (normalized === "protocol_change") {
-      return hasKeyword(taskContext.goal, ["协议", "protocol"]);
+      return hasKeyword(taskContext.goal, ["协议变更", "protocol change", "schema migration"]);
     }
     if (normalized === "host_adapter_contract_change") {
-      return hasKeyword(taskContext.goal, ["adapter", "适配", "hook", "codex", "claude", "gemini"]);
+      return hasKeyword(taskContext.goal, ["adapter contract", "host contract", "适配器契约", "宿主契约"]);
     }
     return false;
   }

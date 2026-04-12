@@ -20,6 +20,8 @@ Its focus is no longer to be the long-term product center. It is the compatibili
 
 The repo-local host runtime is becoming the primary execution surface. The CLI remains for initialization, diagnostics, and explicit manual operations.
 
+This package is now in maintenance mode. It remains publishable and usable, but it is no longer intended to grow into the long-term product center.
+
 ## Current Coverage
 
 The CLI currently includes these commands:
@@ -47,7 +49,7 @@ The current implementation also covers:
 
 ## Current Boundaries
 
-The CLI is already usable, but it is still an evolving implementation.
+The CLI is already usable, but it should now be treated as a bounded compatibility layer rather than an expanding surface.
 
 It currently does not try to provide:
 
@@ -55,6 +57,12 @@ It currently does not try to provide:
 - a full shell parser for `Bash`
 - automatic `git push`
 - a deep upgrader / migration system
+
+Maintenance-mode interpretation:
+
+- keep it usable for bootstrap, diagnostics, and manual fallback
+- accept bug fixes, compatibility fixes, and documentation clarification
+- do not keep expanding host-specific wrapper behavior
 
 ## What The CLI Does Today
 

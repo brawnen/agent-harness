@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { collectHostLayoutWrites } from "../lib/host-layout.js";
 import { DEFAULT_RUNTIME_DIR, defaultRuntimeRelativePath } from "../lib/runtime-paths.js";
 
-const CLI_VERSION = "0.1.1";
+const CLI_VERSION = "0.1.2";
 const RULE_MODES = new Set(["base", "full"]);
 const HOSTS = new Set(["auto", "claude-code", "codex", "gemini-cli"]);
 const MODES = new Set(["delivery", "explore", "poc"]);

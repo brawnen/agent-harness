@@ -134,8 +134,9 @@ output_policy:
     mode: conditional
     directory: docs/
     required_if:
-      - cross_module_change
+      - reusable_decision
       - public_contract_changed
+      - host_adapter_contract_change
       - risk_level: high
   adr:
     mode: conditional

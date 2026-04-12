@@ -256,15 +256,15 @@ function buildMissingArtifactsMessage(taskId, error, outputPolicy) {
 
     if (artifact === "design_note") {
       const suggestedPath = path.posix.join(outputPolicy.design_note.directory, `${taskId}-design-note.md`);
-      lines.push(`- design_note: 可先执行 \`node packages/cli/bin/agent-harness.js docs scaffold --type design-note --task-id ${taskId} --path ${suggestedPath}\``);
-      lines.push(`  然后在 report 中补上 \`--design-note ${suggestedPath}\``);
+      lines.push(`- design_note: 当前任务命中 design note 条件。若尚未沉淀设计决策，可执行 \`node packages/cli/bin/agent-harness.js docs scaffold --type design-note --task-id ${taskId} --path ${suggestedPath}\``);
+      lines.push(`  完成后在 report 中补上 \`--design-note ${suggestedPath}\``);
       continue;
     }
 
     if (artifact === "adr") {
       const suggestedPath = path.posix.join(outputPolicy.adr.directory, `${taskId}-adr.md`);
-      lines.push(`- adr: 可先执行 \`node packages/cli/bin/agent-harness.js docs scaffold --type adr --task-id ${taskId} --path ${suggestedPath}\``);
-      lines.push(`  然后在 report 中补上 \`--adr ${suggestedPath}\``);
+      lines.push(`- adr: 当前任务命中 ADR 条件。若尚未记录正式决策，可执行 \`node packages/cli/bin/agent-harness.js docs scaffold --type adr --task-id ${taskId} --path ${suggestedPath}\``);
+      lines.push(`  完成后在 report 中补上 \`--adr ${suggestedPath}\``);
     }
   }
 

@@ -4,6 +4,7 @@
 
 `agent-harness` is a protocol and toolchain for AI coding agent hosts such as `Codex`, `Claude Code`, and `Gemini CLI`.
 The current product direction is explicit: move the runtime center into agent/host hooks, and reduce the CLI to a bootstrap, diagnostics, and manual-fallback compatibility layer.
+This repository is now in maintenance mode: it remains usable and publishable, but it is no longer where the next-generation harness direction will be developed.
 
 It is not about making an agent “better at coding”. It is about making an agent behave predictably in a real project:
 
@@ -154,6 +155,44 @@ For the full cross-repo setup guide, see:
 - [Agent Harness Runtime Team Trial Checklist](docs/2026-04-10-runtime-team-trial-checklist-v0.1.md)
 - [Agent Harness Runtime Stability Surface And Frozen Scope](docs/2026-04-10-runtime-stability-surface-and-frozen-scope-v0.1.md)
 
+## In This Repository
+
+This repository self-hosts `agent-harness` and is maintained as the reference `Agent Harness Runtime` implementation.
+
+The key point is not "how to run the CLI", but how the repository is actually wired today:
+
+- `harness.yaml` is the policy entry
+- `.harness/hosts/*` and `.harness/rules/*` are the source of truth for host scripts and rules
+- `.codex/.claude/.gemini` are thin host-discovery shells
+- `packages/cli` is now the compatibility CLI for `init / sync / status / verify / report / delivery`
+- repo-local hooks now consume the stable runtime entry `@brawnen/agent-harness-cli/runtime-host`
+
+The most common commands in this repository are:
+
+```bash
+codex
+node packages/cli/bin/agent-harness.js status
+node packages/cli/bin/agent-harness.js sync --check
+npm run runtime:p0:check
+npm run runtime:p1:check
+node packages/cli/bin/agent-harness.js delivery ready
+```
+
+What they are for:
+
+- `codex`: enter the default host with repo-local Codex hooks enabled
+- `status`: inspect host integration, runtime directories, and delivery gates
+- `sync --check`: confirm the repository still matches the reference host layout with no source/generated drift
+- `runtime:p0:check`: run the minimum `task-core + host-hooks + init/status` regression suite
+- `runtime:p1:check`: add compatibility regression for `sync/status`
+- `delivery ready` / `delivery commit`: check and execute local commit flow after `verify/report` are complete
+
+Current host status in this repository:
+
+- `Codex`: `SessionStart / UserPromptSubmit` enabled by default; tool-level hooks stay off to avoid foreground noise
+- `Claude Code`: `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` wired
+- `Gemini CLI`: `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent` wired
+
 ### Codex
 
 This repository already includes:
@@ -199,29 +238,58 @@ Reason:
 
 ## Current Status
 
-`Codex` is still the most complete reference host. `Claude Code` now has a hook-integrated loop through `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`, and `Gemini CLI` now has a minimum hook-integrated loop through `.gemini/settings.json + GEMINI.md + repo-local hooks`, while the CLI is being intentionally narrowed to compatibility duties.
+`Runtime closeout` for `P0 / P1` is now complete.
 
-This repository is also maintained as the reference `Agent Harness Runtime` implementation, so `sync --check` should stay green here.
+This means the project is no longer trying to grow the CLI as the product center. It is now a closed-out, maintenance-mode `Agent Harness Runtime`:
 
-The following minimum loop is already working:
+- the formal product shape is now `Agent Harness Runtime`
+- the CLI is explicitly narrowed to a compatibility layer
+- this repository is maintained as the reference Runtime implementation
+- repo-local hooks are now the primary host integration path
+- repo-local hooks consume the stable runtime entry `@brawnen/agent-harness-cli/runtime-host`
+- the repository now accepts only necessary bug fixes, compatibility fixes, documentation clarification, and release maintenance
+- the next-generation harness direction will not continue inside this repository
+
+Current host status:
+
+- `Codex`: `SessionStart / UserPromptSubmit` enabled by default; `PreToolUse / PostToolUse` remain off by default because of foreground hook noise
+- `Claude Code`: `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` wired
+- `Gemini CLI`: `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent` wired
+
+Current stable surface:
+
+- core commands: `init / sync / status / verify / report / delivery`
+- runtime source directories: `.harness/hosts/*`, `.harness/rules/*`
+- this repository should keep `sync --check` converged
+- after key changes, the baseline checks are:
+  - `npm run runtime:p0:check`
+  - `npm run runtime:p1:check`
+
+The current minimum usable loop includes:
 
 - `task intake / confirm / suspend-active`
 - `state`
 - `verify`
 - `report`
-- `gate`
-- `audit`
 - `delivery ready / request / commit`
 - `docs scaffold`
-- `Codex` hooks for `SessionStart / UserPromptSubmit`
-- `Gemini CLI` hooks for `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent`
+- the minimum hook loop for all three hosts
+- `status` recognition for both repo-local and legacy host entrypoints
+- `sync` convergence checks for the reference layout
 
 Current boundaries:
 
-- `commit`: supported as an explicit action, recommended via skill
-- `push`: manual only, not automated
-- `Bash` pre-tool path inference only covers high-confidence common write commands
-- more complex shell syntax still degrades conservatively
+- the CLI is no longer expanding into a larger product center
+- `push` remains manual, not automated
+- legacy CLI hook commands are still recognized for compatibility, but new setup should default to repo-local hooks
+- `runtime-host` still lives inside the CLI package, not a separate runtime package yet
+- org-level policy, approval, insights, and console capabilities belong to the later `Control Plane`
+
+In practice, this repository should now be understood as:
+
+- a usable repo-local agent runtime
+- a reference implementation for small-team adoption
+- a first-generation product in maintenance mode, not an actively expanding product center
 
 ## Repository Layout
 

@@ -55,7 +55,7 @@ export function run(argv) {
   }
 
   if (command === "--version" || command === "-v") {
-    console.log("0.1.1");
+    console.log("0.1.2");
     return 0;
   }
 

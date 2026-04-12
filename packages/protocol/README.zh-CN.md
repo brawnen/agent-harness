@@ -20,3 +20,6 @@
 - `schemas/` 与 `templates/` 已进入 `packages/protocol`
 - `rules/` 已拆出 `base.md` 与 `full.md`
 - `adapters/` 先提供宿主接入说明和示例配置
+
+这个包当前适合作为 `Agent Harness Runtime` 的可复用协议层持续发布。
+后续应保持小而稳定，不承担更高层的 runtime 执行逻辑。

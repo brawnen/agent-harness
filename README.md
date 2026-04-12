@@ -6,6 +6,7 @@
 
 `agent-harness` 面向 `Codex`、`Claude Code`、`Gemini CLI` 等宿主，提供一层统一的任务控制与交付约束。
 当前产品方向已经明确：能力中心逐步前移到 agent / host runtime，`CLI` 收敛为初始化、诊断和人工 fallback 的兼容层。
+当前仓库已经进入维护态：保持可用、可试用、可维护，不再继续扩张为下一代 harness 主产品。
 
 它解决的核心问题是：
 
@@ -157,30 +158,52 @@ node /abs/path/to/agent-harness/packages/cli/bin/agent-harness.js status
 
 ## 在本仓库里怎么用
 
-当前仓库已经把 `agent-harness` 用在自己身上。
+当前仓库已经把 `agent-harness` 用在自己身上，并作为 `Agent Harness Runtime` 的参考实现维护。
 
-你现在就可以直接在本仓库里这样使用：
+这里最重要的不是“怎么跑 CLI”，而是理解当前仓库的真实运行形态：
+
+- `harness.yaml` 是项目策略入口
+- `.harness/hosts/*` 与 `.harness/rules/*` 是宿主脚本和规则的 source of truth
+- `.codex/.claude/.gemini` 只是宿主发现所需的薄壳入口
+- `packages/cli` 现在是 compatibility CLI，主要负责 `init / sync / status / verify / report / delivery`
+- repo-local hooks 现在通过稳定入口 `@brawnen/agent-harness-cli/runtime-host` 接入 runtime
+
+如果你是在当前仓库里日常使用，最常用的是这几类命令：
 
 ```bash
 codex
 node packages/cli/bin/agent-harness.js status
+node packages/cli/bin/agent-harness.js sync --check
+npm run runtime:p0:check
+npm run runtime:p1:check
 node packages/cli/bin/agent-harness.js delivery ready
 ```
 
-当前仓库的自举形态包括：
+各命令的含义：
 
-- `harness.yaml` 作为项目策略入口
-- `.harness/state`、`.harness/audit`、`.harness/reports` 作为运行时目录
-- `.harness/hosts/*` 与 `.harness/rules/*` 作为宿主与规则的真实源目录
-- `.codex/.claude/.gemini` 作为宿主发现用的薄壳入口
-- `packages/cli` 作为兼容 CLI 与人工 fallback 入口
-- `delivery commit` 作为本地提交标准入口
+- `codex`：进入当前仓库默认宿主，依赖 repo-local Codex hooks 恢复和续接任务
+- `status`：看当前仓库的宿主接入、运行时目录、交付门禁是否处于正确状态
+- `sync --check`：确认当前仓库仍然收敛到参考实现布局，没有 source/generate 漂移
+- `runtime:p0:check`：跑 `task-core + host-hooks + init/status` 最小回归
+- `runtime:p1:check`：补跑 `sync/status` 的兼容边界回归
+- `delivery ready` / `delivery commit`：在任务已 verify/report 收口后检查并执行本地提交
 
-当前仓库也作为 `Agent Harness Runtime` 的参考实现维护，要求 `sync --check` 能持续收敛到无 drift。
+当前仓库的宿主状态是：
+
+- `Codex`：默认启用 `SessionStart / UserPromptSubmit`，工具级 hooks 仍默认关闭以避免前台噪音
+- `Claude Code`：已接入 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`
+- `Gemini CLI`：已接入 `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent`
+
+当前维护要求也很明确：
+
+- 当前仓库应保持 `node packages/cli/bin/agent-harness.js sync --check` 通过
+- 关键调整后优先跑 `npm run runtime:p0:check`，涉及兼容边界时再跑 `npm run runtime:p1:check`
+- 新增宿主逻辑或规则时，优先改 `.harness/hosts/*` 和 `.harness/rules/*`，不要反过来把根目录薄壳当 source of truth
 
 如果你想看更完整的自举与跨项目接入方式，见：
 
 - [How To Use Agent Harness In This Repository And Other Projects](docs/2026-04-05-agent-harness-usage-guide-v0.1.md)
+- [Agent Harness Runtime 稳定面与冻结面](docs/2026-04-10-runtime-stability-surface-and-frozen-scope-v0.1.md)
 
 ### Codex
 
@@ -272,27 +295,58 @@ codex exec "继续推进当前任务"
 
 ## Current Status
 
-当前最完整的参考链路仍是 `Codex`。其中 `Codex` 当前默认启用 `SessionStart / UserPromptSubmit`，`PreToolUse / PostToolUse` 因视觉噪音问题暂时关闭；`Claude Code` 已支持 `CLAUDE.md + SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop` 的 hook 集成闭环，`Gemini CLI` 已支持 `.gemini/settings.json + GEMINI.md + repo-local hooks` 的最小 hook 闭环。
+当前 `Runtime closeout` 的 `P0 / P1` 已完成。
 
-已经形成完整最小闭环的能力包括：
+这意味着当前状态已经不是“继续扩 CLI”，而是一个已经收尾、进入维护态的 `Agent Harness Runtime`：
+
+- 当前正式产品定位是 `Agent Harness Runtime`
+- `CLI` 已明确降级为 compatibility layer
+- 当前仓库作为 Runtime 参考实现维护
+- repo-local hooks 已成为宿主接入主路径
+- repo-local hooks 通过稳定入口 `@brawnen/agent-harness-cli/runtime-host` 接入 runtime
+- 当前仓库只接受必要的 bug fix、兼容修复、文档澄清和发布维护
+- 下一代 harness 不再在本仓库继续演化
+
+当前三宿主状态：
+
+- `Codex`：默认启用 `SessionStart / UserPromptSubmit`；`PreToolUse / PostToolUse` 仍默认关闭，原因是工具级 hook 的前台噪音
+- `Claude Code`：已接入 `SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop`
+- `Gemini CLI`：已接入 `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent`
+
+当前稳定面：
+
+- 核心命令：`init / sync / status / verify / report / delivery`
+- 运行时源目录：`.harness/hosts/*`、`.harness/rules/*`
+- 当前仓库应保持 `sync --check` 收敛
+- 关键调整后至少可跑：
+  - `npm run runtime:p0:check`
+  - `npm run runtime:p1:check`
+
+当前已形成的最小可试用闭环包括：
 
 - `task intake / confirm / suspend-active`
 - `state`
 - `verify`
 - `report`
-- `gate`
-- `audit`
 - `delivery ready / request / commit`
 - `docs scaffold`
-- `Codex` 的 `SessionStart / UserPromptSubmit`
-- `Gemini CLI` 的 `SessionStart / BeforeAgent / BeforeTool / AfterTool / AfterAgent`
+- 三宿主最小 hook 链路
+- `status` 对新旧宿主接入方式的识别
+- `sync` 对参考实现布局的收敛检查
 
 当前边界：
 
-- `commit`：支持显式请求触发，并推荐由 skill 承载
-- `push`：保留为人工动作，不自动化
-- `Bash` 的前置路径识别只覆盖高置信常见写命令
-- 复杂 shell 语法仍会保守降级
+- `CLI` 不再继续扩张成更大的产品中心
+- `push` 仍保留为人工动作，不自动化
+- 旧版 `CLI` hook 命令仍兼容识别，但新接入默认生成 repo-local hooks
+- `runtime-host` 目前仍位于 CLI 包内，还没有拆成独立 runtime 包
+- 组织级策略中心、审批、洞察和控制台能力属于后续 `Control Plane`
+
+如果你现在评估这个项目，应把它理解为：
+
+- 一个已经可用的 repo-local agent runtime
+- 一个可供小团队试用和参考接入的实现
+- 一个进入维护态的第一代产品，而不是持续扩张中的主线平台
 
 ## Repository Layout
 

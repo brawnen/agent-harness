@@ -1,6 +1,6 @@
 {
   "name": "@brawnen/agent-harness-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Compatibility CLI for bootstrap, status, and manual fallback in agent-harness projects.",
   "license": "MIT",
   "bin": {
@@ -38,7 +38,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@brawnen/agent-harness-protocol": "^0.1.1"
+    "@brawnen/agent-harness-protocol": "^0.1.2"
   },
   "scripts": {
     "start": "node ./bin/agent-harness.js --help",

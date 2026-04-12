@@ -4,6 +4,11 @@ All notable changes to `agent-harness` will be documented in this file.
 
 ## Unreleased
 
+- Prepare the repository for closeout release `0.1.2`: mark the Runtime as maintenance-mode, tighten README/package positioning, and publish a final usable patch release surface.
+- Slimmed the live shared Runtime rules into kernel-only guidance, shifted task intake language to current work-unit convergence, tightened document artifact triggers, and made design-note / ADR scaffolds more information-dense.
+- Added a Runtime de-overengineering adjustment checklist that separates what to remove, what to push down into runtime mechanics, and what kernel capabilities must stay.
+- Added a concrete `shared.md` slimming draft that splits always-on kernel rules from documentation-only guidance and proposes a shorter replacement rule block.
+- Added a runtime lightweight optimization proposal covering rule slimming, token-cost control, and tighter document triggers for future Runtime maintenance.
 - Runtime P1: expose a stable `runtime-host` entry for repo-local hooks, add sync/status compatibility regression, and formalize the Runtime stability/frozen scope.
 - Closed out Runtime P0 by aligning `init/sync` host templates with repo-local hook entrypoints, adding host hook smoke plus init/status regression scripts, tightening usage docs around `Agent Harness Runtime`, and adding a small-team trial checklist for external adoption.
 - Began the CLI closeout transition by making the repository’s Codex hook restore/intake path call hook-core directly, moving the local Claude Code and Gemini CLI host settings onto repo-local hook scripts, teaching `status` to recognize both compatibility-CLI and repo-local hook entrypoints, and repositioning the CLI/docs as a compatibility layer rather than the product center.

@@ -32,6 +32,9 @@ The current repository already places the protocol resources here:
 - `rules/full.md`
 - `adapters/` for host-specific notes and example configuration
 
+This package is stable enough to keep publishing as the reusable protocol layer of `Agent Harness Runtime`.
+It should remain small, reusable, and maintenance-oriented rather than absorbing higher-level runtime behavior.
+
 ## Typical Use
 
 If you only want the behavior contract, without installing the full CLI:

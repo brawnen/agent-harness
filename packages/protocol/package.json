@@ -1,6 +1,6 @@
 {
   "name": "@brawnen/agent-harness-protocol",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Protocol assets for agent-harness: rules, schemas, templates, and adapter examples.",
   "license": "MIT",
   "files": [
